@@ -96,6 +96,29 @@
   </div>
 </section>
 
+<!-- ============ LOADING (plays once, between the hub and the results) ============
+     Filled and driven by startResultsLoading() in script2.js. -->
+<section id="view-loading" class="view" aria-label="Preparing your results">
+  <div class="load-card">
+    <div class="load-compass" aria-hidden="true">
+      <svg viewBox="0 0 120 120" width="132" height="132">
+        <circle class="lc-orbit" cx="60" cy="60" r="57" fill="none" stroke="#D98E2B" stroke-width="2.5" stroke-dasharray="3 8" stroke-linecap="round"/>
+        <circle cx="60" cy="60" r="48" fill="#FFFFFF" stroke="#22262B" stroke-width="3.5"/>
+        <circle cx="60" cy="60" r="39" fill="#FFE9A8" stroke="#D98E2B" stroke-width="1.5"/>
+        <g stroke="#22262B" stroke-width="2.5" stroke-linecap="round"><line x1="60" y1="16" x2="60" y2="24"/><line x1="60" y1="96" x2="60" y2="104"/><line x1="16" y1="60" x2="24" y2="60"/><line x1="96" y1="60" x2="104" y2="60"/></g>
+        <g class="lc-needle" id="load-needle">
+          <polygon points="60,20 68,60 52,60" fill="#B5711A"/>
+          <polygon points="60,100 68,60 52,60" fill="#1D2B45"/>
+        </g>
+        <circle cx="60" cy="60" r="5.5" fill="#FFFFFF" stroke="#22262B" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <p class="load-phrase" id="load-phrase" role="status" aria-live="polite">Tallying answers…</p>
+    <div class="load-track" aria-hidden="true"><div class="load-fill" id="load-fill"></div></div>
+    <p class="load-pct" id="load-pct" aria-hidden="true">0%</p>
+  </div>
+</section>
+
 <!-- ============ RESULTS ============ -->
 <section id="view-results" class="view">
   <div class="results-hero">
