@@ -16,7 +16,10 @@
       │  (score saved, module locked, NO answers shown) ─────┘
       │
    view-hub, once all 6 modules are done:
-      │  "See Overall Results" unlocks -> showResults()
+      │  "See Overall Results" unlocks -> startResultsLoading()
+      ▼
+   view-loading   (about 4.5 s of compass + progress bar, plays once per session)
+      │  finishes -> showResults()
       ▼
    view-results
 
@@ -30,7 +33,7 @@ const STRANDS = {
   STEM: {
     name: "STEM",
     full: "Science, Technology, Engineering & Mathematics",
-    color: "#3457D5",
+    color: "#1E8578",
     overview: "STEM is built for students who like asking why something works and proving it. Expect heavy math, laboratory science, and a lot of problem sets.",
     focus: "Deep, theory-first study of the natural and physical sciences, paired with advanced mathematics.",
     highlight: "theory-first",
@@ -59,7 +62,7 @@ const STRANDS = {
   BM: {
     name: "BM",
     full: "Business and Management",
-    color: "#1E8578",
+    color: "#3457D5",
     formerly: "ABM",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
     overview: "BM suits students curious about how businesses run, how money moves, and how to lead or manage an organization.",
     focus: "The fundamentals of business operations, finance, and management practices.",
@@ -313,6 +316,11 @@ function restoreSession() {
     }
     if (s.view === "view-hub") { openHub(); return true; }
     if (s.view === "view-results" && allDone()) { showResults(); return true; }
+    if (s.view === "view-loading") {   // refreshed mid-animation: skip it, never leave the student stuck
+      if (allDone()) { showResults(); return true; }
+      openHub("replace");
+      return true;
+    }
   } catch (e) { /* fall through to home */ }
   return false;
 }
@@ -373,6 +381,7 @@ function recordHistory(id, mode) {
 
 /* ---------- View switching ---------- */
 function showView(id, mode = "push") {
+  if (id !== "view-loading" && loader.active) stopLoader();   // leaving the loading screen early (Back, logo) cancels its timer
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   currentViewId = id;
@@ -505,7 +514,7 @@ function initStrandMotion(root) {
   if (!window.matchMedia || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!("IntersectionObserver" in window)) return;
   const targets = root.querySelectorAll(
-    ".sd-focus-text, .sd-cols .sd-h, .sd-subjects li, .sd-chip, .sd-path .sd-h, .sd-path-sub, " +
+    ".sd-focus-text, .sd-stage .sd-h, .sd-stage .sd-video, .sd-cols .sd-h, .sd-subjects li, .sd-chip, .sd-path .sd-h, .sd-path-sub, " +
     ".sd-path-grid, .sd-close h2, .sd-close p, .sd-close-actions, .sd-others"
   );
   const io = new IntersectionObserver(entries => {
@@ -520,6 +529,156 @@ function initStrandMotion(root) {
   targets.forEach(el => { el.classList.add("reveal"); io.observe(el); });
 }
 
+/* ---------- Strand scenes: the one decorative layer each strand page can have ----------
+   Purely visual (hidden from screen readers). The look and motion live in style2.css under
+   .sd[data-strand="CODE"]. To add a scene for another strand, add an entry here and style it there.
+   ASSH: ideas the strand actually studies, drifting up behind the hero like speech bubbles. */
+const STRAND_SCENES = {
+  /* ASSH bubbles now live inside the hero frame (STRAND_FRAMES.ASSH). Add an entry here for a background scene. */
+};
+
+/* ---------- Strand frames: the animated illustration beside each strand's intro ----------
+   Inline SVG (ICT is HTML), hidden from screen readers. Colors come from the strand's --sc.
+   The drawing lives here; the motion lives in style2.css (search ".fr-"). All motion is off
+   for "reduce motion", which leaves the finished drawing. */
+const FR_OPEN = '<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" focusable="false">';
+const STRAND_FRAMES = {
+  STEM: FR_OPEN + `
+    <path class="k" d="M36 14V186M18 104H306"/>
+    <path class="fr-wave k4 sc-s" pathLength="1" d="M36 104C66 44 96 44 126 104S186 164 216 104S276 44 306 104"/>
+    <g transform="rotate(-35 262 40)"><ellipse class="k" fill="none" cx="262" cy="40" rx="27" ry="11"/>
+      <g class="fr-ey"><circle class="fr-ex k sc" cx="262" cy="40" r="4.5"/></g></g>
+    <ellipse class="k" fill="none" cx="262" cy="40" rx="27" ry="11" transform="rotate(35 262 40)"/>
+    <circle class="k sc" cx="262" cy="40" r="6"/>
+    <g class="fr-sprout">
+      <path class="k" style="stroke-width:3" d="M72 184V152"/>
+      <path class="k sc-l" d="M72 164C58 164 49 155 49 144C62 144 72 152 72 164Z"/>
+      <path class="k sc" d="M72 154C72 139 84 129 99 129C99 144 88 154 72 154Z"/>
+    </g>
+    <path class="k" d="M50 186Q72 175 94 186"/>
+    <g class="fr-cell">
+      <path class="k sc-l" d="M236 150C236 128 256 120 274 122C294 124 304 140 302 156C300 174 282 180 264 178C246 176 236 168 236 150Z"/>
+      <circle class="k sc fr-nuc" cx="265" cy="148" r="11"/>
+      <circle cx="262" cy="145" r="3.2" fill="#fff"/>
+      <g class="fr-mito"><ellipse class="k yl" style="stroke-width:1.8" cx="287" cy="163" rx="9" ry="5" transform="rotate(-20 287 163)"/>
+        <path class="k" style="stroke-width:1.2" d="M281 164q2-4 3 0t3 0 3 0"/></g>
+      <path class="k" style="stroke-width:1.7" d="M243 162q4-6 8 0t8 0"/>
+      <circle cx="283" cy="137" r="1.9" style="fill:var(--ink)"/><circle cx="245" cy="143" r="1.9" style="fill:var(--ink)"/><circle cx="276" cy="171" r="1.9" style="fill:var(--ink)"/>
+    </g>
+  </svg>`,
+
+  ASSH: FR_OPEN + `
+    <circle class="k wh" cx="262" cy="42" r="24"/>
+    <ellipse class="fr-globe sc-s" cx="262" cy="42" rx="24" ry="24" fill="none" stroke-width="1.8"/>
+    <ellipse class="sc-s" cx="262" cy="42" rx="24" ry="9" fill="none" stroke-width="1.8"/>
+    <path class="sc-s" d="M262 18V66" stroke-width="1.8"/>
+    <g class="fr-pop" style="--d:0s"><rect class="k yl" x="14" y="12" width="90" height="40" rx="14"/><path class="k yl" d="M30 52l-6 11 18-11z"/><text x="59" y="31" text-anchor="middle">Kultura</text><text class="fr-sub" x="59" y="45" text-anchor="middle">culture</text></g>
+    <g class="fr-pop" style="--d:.9s"><rect class="k wh" x="122" y="26" width="80" height="40" rx="14"/><path class="k wh" d="M148 66l-2 11 14-11z"/><text x="162" y="45" text-anchor="middle">Sining</text><text class="fr-sub" x="162" y="59" text-anchor="middle">arts</text></g>
+    <g class="fr-pop" style="--d:1.8s"><rect class="k wh" x="14" y="74" width="112" height="40" rx="14"/><path class="k wh" d="M96 114l6 11 4-11z"/><text x="70" y="93" text-anchor="middle">Panitikan</text><text class="fr-sub" x="70" y="107" text-anchor="middle">literature</text></g>
+    <g class="fr-pop" style="--d:2.7s"><rect class="k wh" x="222" y="86" width="64" height="30" rx="14"/><circle class="fr-dot sc" cx="242" cy="101" r="3.5"/><circle class="fr-dot sc" style="--d:.18s" cx="254" cy="101" r="3.5"/><circle class="fr-dot sc" style="--d:.36s" cx="266" cy="101" r="3.5"/></g>
+    <g class="fr-pop" style="--d:3.6s"><rect class="k yl" x="14" y="130" width="136" height="40" rx="14"/><path class="k yl" d="M40 170l-6 11 18-11z"/><text x="82" y="149" text-anchor="middle">Pagpapahayag</text><text class="fr-sub" x="82" y="163" text-anchor="middle">expression</text></g>
+    <path class="k wh" d="M204 176V146Q228 138 248 146V176Q228 168 204 176Z"/>
+    <path class="fr-page k wh" d="M248 146Q268 138 290 146V176Q268 168 248 176Z"/>
+    <path class="sc-s" d="M212 154Q228 150 240 154M212 162Q228 158 240 162" fill="none" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>`,
+
+  BM: FR_OPEN + `
+    <rect class="fr-bar k sc-l" style="--d:0s"   x="22"  y="116" width="34" height="48"/>
+    <rect class="fr-bar k sc-l" style="--d:.15s" x="70"  y="98"  width="34" height="66"/>
+    <rect class="fr-bar k sc-l" style="--d:.3s"  x="118" y="124" width="34" height="40"/>
+    <rect class="fr-bar k sc-l" style="--d:.45s" x="166" y="130" width="34" height="34"/>
+    <rect class="fr-bar k sc"   style="--d:.6s"  x="214" y="148" width="34" height="16"/>
+    <path class="fr-line" pathLength="1" d="M30 100L88 70L136 82L192 44L252 20"/>
+    <g class="fr-coin"><circle class="k yl" cx="284" cy="66" r="22"/><text x="284" y="74" text-anchor="middle" class="fr-peso">&#8369;</text></g>
+    <rect class="sc" x="0" y="176" width="320" height="24"/>
+    <g class="fr-tick">
+      <text class="fr-tk" x="0" y="193" textLength="170" lengthAdjust="spacing">+8%  &#8369;  +12%  &#8369;  -3%  &#8369;</text>
+      <text class="fr-tk" x="190" y="193" textLength="170" lengthAdjust="spacing">+8%  &#8369;  +12%  &#8369;  -3%  &#8369;</text>
+      <text class="fr-tk" x="380" y="193" textLength="170" lengthAdjust="spacing">+8%  &#8369;  +12%  &#8369;  -3%  &#8369;</text>
+    </g>
+  </svg>`,
+
+  HT: FR_OPEN + `
+    <g class="fr-steamg">
+      <path class="fr-steam" d="M222 90c-7-9 7-16 0-26"/>
+      <path class="fr-steam" style="--d:.7s" d="M236 90c-7-9 7-16 0-26"/>
+      <path class="fr-steam" style="--d:1.4s" d="M250 90c-7-9 7-16 0-26"/>
+    </g>
+    <circle class="fr-rip sc-s" cx="110" cy="92" r="10"/>
+    <circle class="fr-rip sc-s" style="--d:.25s" cx="110" cy="92" r="10"/>
+    <g class="fr-bellg">
+      <g class="fr-plunger"><rect class="k wh" x="106" y="94" width="8" height="10"/><circle class="k sc" cx="110" cy="90" r="7"/></g>
+      <path class="k yl" d="M62 150a48 48 0 0 1 96 0Z"/>
+      <rect class="k wh" x="54" y="150" width="112" height="10" rx="4"/>
+    </g>
+    <text class="fr-ding" x="140" y="64">ding!</text>
+    <g class="fr-dish">
+      <path class="k" style="fill:#7CC36A" d="M202 150C198 138 208 130 218 133C222 122 238 120 244 130C256 126 266 138 262 150Z"/>
+      <circle class="k" style="fill:#E4572E;stroke-width:1.8" cx="222" cy="141" r="6"/>
+      <circle class="k" style="fill:#FFD66B;stroke-width:1.8" cx="246" cy="140" r="5"/>
+      <path class="k" style="stroke:#8E4BB5;stroke-width:2.4" d="M229 135q6-6 12 0"/>
+      <path class="k" style="fill:#5FAE4E;stroke-width:1.8" d="M232 128q-3-11 9-13q3 11-9 13z"/>
+    </g>
+    <g class="fr-sparkg">
+      <g transform="translate(194 130)"><path class="fr-sp" style="--d:0s" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2Z"/></g>
+      <g transform="translate(272 128)"><path class="fr-sp" style="--d:.5s" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2Z"/></g>
+      <g transform="translate(263 108)"><path class="fr-sp" style="--d:1s" d="M0-5L1.4-1.4 5 0 1.4 1.4 0 5-1.4 1.4-5 0-1.4-1.4Z"/></g>
+    </g>
+    <g class="fr-cloche">
+      <path class="k wh" d="M188 150a44 44 0 0 1 88 0Z"/>
+      <circle class="k sc" cx="232" cy="102" r="5"/>
+    </g>
+    <rect class="k wh" x="180" y="150" width="104" height="9" rx="4"/>
+    <rect class="sc" x="0" y="160" width="320" height="40"/>
+    <path class="k" d="M0 160H320"/>
+  </svg>`,
+
+  ICT: `<div class="fr-term">
+    <p style="--n:9;--d:0s">&gt; run ICT</p>
+    <p style="--n:19;--d:.9s">loading subjects...</p>
+    <p style="--n:14;--d:1.8s">programming ok</p>
+    <p style="--n:14;--d:2.7s">web/app dev ok</p>
+    <p style="--n:12;--d:3.6s">animation ok</p>
+    <p class="fr-ready" style="--n:7;--d:4.5s">&gt; ready<span class="fr-caret"></span></p>
+  </div>`,
+
+  IA: FR_OPEN + `
+    <g class="fr-gridl" stroke-width="1"><path d="M0 40H320M0 80H320M0 120H320M0 160H320M53 0V200M107 0V200M160 0V200M213 0V200M267 0V200"/></g>
+
+    <rect class="k fr-panel" x="22" y="22" width="76" height="58" rx="7"/>
+    <rect class="k fr-slot" x="32" y="32" width="14" height="38" rx="3"/><rect class="k fr-slot" x="55" y="32" width="14" height="38" rx="3"/><rect class="k fr-slot" x="78" y="32" width="14" height="38" rx="3"/>
+    <rect class="k wh fr-tog" style="--d:0s" x="32" y="34" width="14" height="16" rx="3"/>
+    <rect class="k wh fr-tog" style="--d:-1.4s" x="55" y="34" width="14" height="16" rx="3"/>
+    <rect class="k wh fr-tog" style="--d:-2.8s" x="78" y="34" width="14" height="16" rx="3"/>
+
+    <circle class="fr-glow" cx="254" cy="68" r="46"/>
+    <g class="fr-rays" fill="none" stroke="#FFD66B" stroke-width="3" stroke-linecap="round"><path d="M254 28V16M222 38L214 30M286 38L294 30M212 68H200M296 68H308"/></g>
+
+    <rect class="k fr-socket" x="6" y="116" width="14" height="48" rx="4"/>
+    <path class="k" style="stroke-width:5" d="M26 132H14M26 148H14"/>
+    <rect class="k wh" x="26" y="122" width="36" height="34" rx="8"/>
+
+    <path class="k" style="stroke-width:4" d="M62 140H110M152 140H254V112"/>
+    <path class="fr-pulse" pathLength="1" d="M62 140H254V112"/>
+
+    <g class="fr-lever"><path class="k" style="stroke-width:5" d="M110 140H150"/><circle class="k yl" cx="134" cy="140" r="6"/></g>
+    <circle class="k wh" cx="110" cy="140" r="5"/><circle class="k wh" cx="152" cy="140" r="5"/>
+    <path class="fr-sparkb" fill="none" stroke="#FFD66B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M150 130l4-9 3 6 5-9M158 142l9-2-4 6 8-1"/>
+
+    <circle class="k fr-bulb" cx="254" cy="68" r="26"/>
+    <path class="fr-fil" fill="none" d="M247 96V86L251 78L255 86L259 78L263 86V96"/>
+    <rect class="k fr-base" x="243" y="94" width="22" height="18" rx="3"/>
+    <path class="k" style="stroke-width:1.8" d="M243 100H265M243 106H265"/>
+  </svg>`
+};
+
+function strandSceneHTML(code) {
+  const scene = STRAND_SCENES[code];
+  if (!scene || !scene.bubbles) return "";
+  const bubbles = scene.bubbles.map((w, i) => `<span class="sd-bub sd-bub-${i + 1}"><span>${w}</span></span>`).join("");
+  return `<div class="sd-scene sd-scene-bubbles" aria-hidden="true">${bubbles}</div>`;
+}
+
 /* ---------- Strand detail page (from Explore Strands) ---------- */
 /* The strand page markup. Used by the Explore Strands page (withClosing = true) and by the
    results page (withClosing = false: no "Take the Assessment / Keep browsing" panel). */
@@ -530,10 +689,11 @@ function strandPageHTML(code, withClosing = true) {
   const nameTag = withClosing ? "h1" : "h2";   // the results page already has its own h1
 
   return `
-    <div class="sd" style="--sc:${info.color}">
+    <div class="sd" data-strand="${code}" style="--sc:${info.color}">
 
       <div class="sd-hero">
         <span class="sd-ring" aria-hidden="true"><span class="sd-ring-rings"></span><span class="sd-ring-spin"></span><span class="sd-ring-star">&#10022;</span></span>
+        ${strandSceneHTML(code)}
         <span class="sd-watermark" aria-hidden="true">${STRAND_ICONS[code]}</span>
         <div class="wrap-wide sd-hero-inner">
           <div>
@@ -546,17 +706,24 @@ function strandPageHTML(code, withClosing = true) {
               <span aria-hidden="true">${info.name} can take you to becoming </span><span class="sd-type-word" aria-hidden="true"></span><span class="sd-type-caret" aria-hidden="true"></span>
             </p>
           </div>
-          ${renderStrandVideo(info)}
+          <div class="sd-frame" aria-hidden="true">${STRAND_FRAMES[code]}</div>
         </div>
       </div>
 
-      <div class="wrap sd-focus">
-        <p class="sd-focus-text">${info.highlight ? info.focus.replace(info.highlight, `<span class="sd-focus-hl">${info.highlight}</span>`) : info.focus}</p>
+      <div class="sd-stage">
+        <div class="wrap sd-stage-inner">
+          <h2 class="sd-h sd-stage-h">Watch the recap</h2>
+          <div class="sd-stage-grid">
+            ${renderStrandVideo(info)}
+            <p class="sd-focus-text">${info.highlight ? info.focus.replace(info.highlight, `<span class="sd-focus-hl">${info.highlight}</span>`) : info.focus}</p>
+          </div>
+        </div>
       </div>
 
       <div class="wrap sd-cols">
         <div>
-          <h2 class="sd-h">Subjects you'll take</h2>
+          <h2 class="sd-h">Possible subjects you may take</h2>
+          <p class="sd-note">These are typical for the strand. The subjects PCSHS actually offers can vary by school year.</p>
           <ul class="sd-subjects">${li(info.subjects)}</ul>
         </div>
         <div>
@@ -796,7 +963,7 @@ function renderHub() {
   // "See Overall Results" stays locked until every module is finished
   const resultsBtn = document.getElementById("hub-results-btn");
   resultsBtn.disabled = !allDone();
-  resultsBtn.addEventListener("click", showResults);
+  resultsBtn.addEventListener("click", startResultsLoading);
 }
 
 /* Lock or unlock the hub's test cards to match the honesty pledge */
@@ -1347,6 +1514,102 @@ function showResults() {
   computeResults();
   renderResults();
   showView("view-results");
+}
+
+/* =========================================================
+   RESULTS LOADING SCREEN  (view-loading)
+   Purely visual: a swinging compass, rotating phrases and a progress bar that
+   speeds up, stalls near 80%, then finishes. Plays once per browser session;
+   after that the hub button goes straight to the results.
+   Not saved in browser history, so Back never lands on it.
+   Tweak the feel here: LOADER_BAR_MS, LOADER_HOLD_MS, LOADER_PHRASES, LOADER_STOPS.
+   ========================================================= */
+const LOADER_KEY = "strandwise.loader.v1";
+const LOADER_BAR_MS = 3800;    // how long the bar takes to reach 100%
+const LOADER_HOLD_MS = 700;    // pause on "Got it!" before the results open
+const LOADER_PHRASES = ["Tallying answers…", "Calculating results…", "Comparing skills and interests…", "Picking your best strand…"];
+const LOADER_DONE_PHRASE = "Got it! Opening your results…";
+const LOADER_STOPS = [[0, 0], [0.25, 30], [0.55, 62], [0.75, 80], [0.88, 82], [1, 100]];   // [time share, percent]
+const loader = { active: false, raf: 0, timer: 0, swap: 0 };
+
+function loaderSeen() { try { return sessionStorage.getItem(LOADER_KEY) === "1"; } catch (e) { return false; } }
+function markLoaderSeen() { try { sessionStorage.setItem(LOADER_KEY, "1"); } catch (e) { /* fine */ } }
+
+function loaderPct(p) {
+  for (let i = 1; i < LOADER_STOPS.length; i++) {
+    const a = LOADER_STOPS[i - 1], b = LOADER_STOPS[i];
+    if (p <= b[0]) return a[1] + (b[1] - a[1]) * ((p - a[0]) / (b[0] - a[0]));
+  }
+  return 100;
+}
+
+function stopLoader() {
+  cancelAnimationFrame(loader.raf);
+  clearTimeout(loader.timer);
+  clearTimeout(loader.swap);
+  loader.active = false;
+}
+
+function startResultsLoading() {
+  if (loader.active || !allDone()) return;            // blocks double-taps
+  if (loaderSeen()) { showResults(); return; }        // already watched it this session
+
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const barMs = reduce ? 1200 : LOADER_BAR_MS;
+  const holdMs = reduce ? 400 : LOADER_HOLD_MS;
+
+  const card = document.querySelector("#view-loading .load-card");
+  const needle = document.getElementById("load-needle");
+  const phrase = document.getElementById("load-phrase");
+  const fill = document.getElementById("load-fill");
+  const pct = document.getElementById("load-pct");
+  const btn = document.getElementById("hub-results-btn");
+
+  function setPhrase(text) {
+    clearTimeout(loader.swap);
+    phrase.classList.add("is-swapping");
+    loader.swap = setTimeout(() => { phrase.textContent = text; phrase.classList.remove("is-swapping"); }, 200);
+  }
+
+  function finish() {
+    needle.classList.remove("is-searching");
+    needle.classList.add("is-done");
+    card.classList.remove("is-searching");
+    setPhrase(LOADER_DONE_PHRASE);
+    loader.timer = setTimeout(() => {
+      stopLoader();
+      markLoaderSeen();
+      showResults();
+    }, holdMs);
+  }
+
+  // reset to the starting look
+  fill.style.width = "0%";
+  pct.textContent = "0%";
+  phrase.textContent = LOADER_PHRASES[0];
+  phrase.classList.remove("is-swapping");
+  needle.classList.remove("is-done");
+  needle.classList.add("is-searching");
+  card.classList.add("is-searching");
+  if (btn) btn.disabled = true;
+
+  loader.active = true;
+  showView("view-loading", "none");
+
+  const t0 = performance.now();
+  let lastIdx = 0;
+  const tick = now => {
+    if (!loader.active) return;
+    const p = Math.min((now - t0) / barMs, 1);
+    const v = loaderPct(p);
+    fill.style.width = v + "%";
+    pct.textContent = Math.round(v) + "%";
+    const idx = Math.min(Math.floor(p * LOADER_PHRASES.length), LOADER_PHRASES.length - 1);
+    if (idx !== lastIdx) { lastIdx = idx; setPhrase(LOADER_PHRASES[idx]); }
+    if (p < 1) loader.raf = requestAnimationFrame(tick);
+    else finish();
+  };
+  loader.raf = requestAnimationFrame(tick);
 }
 
 /* Which strands to recommend. Everything tied at the top qualifies, but only 2 are ever shown.
