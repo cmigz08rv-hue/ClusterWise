@@ -1106,6 +1106,7 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
   gap: 56px;
   padding-bottom: 72px;
 }
+.sd .sd-cols { padding-top: 64px; }          /* space below the stage band's bottom border */
 .sd-h { font-size: 1.5rem; margin: 0 0 18px; }
 .sd-subjects { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--sc); }
 .sd-subjects li {
@@ -1262,6 +1263,7 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 @media (max-width: 800px) {
   .sd-hero-inner { grid-template-columns: 1fr; gap: 32px; padding-top: 44px; }
   .sd-cols { grid-template-columns: 1fr; gap: 44px; }
+  .sd .sd-cols { padding-top: 44px; }
   .sd-path-grid { grid-template-columns: 1fr; }
   .sd-path-start { margin-bottom: 8px; }
   .sd-path-col { padding: 0 0 24px 32px; margin-left: 41px; border-left: 2px solid var(--sc); }
@@ -1817,9 +1819,6 @@ footer.site-footer {
 .sd .sd-h {
   font-weight: 800;
   font-variation-settings: "SOFT" 100, "WONK" 1;
-  text-decoration: underline wavy var(--sc);
-  text-decoration-thickness: 3px;
-  text-underline-offset: 8px;
   margin-bottom: 22px;
 }
 .sd .sd-subjects { border-top: 0; counter-reset: sdsub; }
@@ -3113,3 +3112,454 @@ footer.site-footer {
   }
   .save-toast { bottom: 84px; }
 }
+/* =========================================================
+   LOADING SCREEN (between the hub and the results)
+   Driven by startResultsLoading() in script2.js. Reuses the sticker look
+   of the results page: ink outline, hard offset shadow, sun + amber.
+   ========================================================= */
+#view-loading.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-h) - 60px);
+  padding: 32px 20px;
+}
+.load-card {
+  width: min(440px, 100%);
+  text-align: center;
+  background: var(--paper-raised);
+  border: 3px solid var(--ink);
+  border-radius: 22px;
+  box-shadow: 7px 7px 0 var(--ink);
+  padding: 36px 28px 30px;
+}
+.load-compass { display: flex; justify-content: center; margin-bottom: 18px; }
+.load-compass svg { display: block; max-width: 100%; height: auto; }
+
+.lc-needle { transform-origin: 60px 60px; }
+.lc-orbit { transform-origin: 60px 60px; }
+.lc-needle.is-searching { animation: lcSwing 2.2s ease-in-out infinite; }
+.lc-needle.is-done { transform: rotate(0deg); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.load-card.is-searching .lc-orbit { animation: resSpin 14s linear infinite; }
+
+@keyframes lcSwing {
+  0%   { transform: rotate(-40deg); }
+  25%  { transform: rotate(55deg); }
+  50%  { transform: rotate(-20deg); }
+  75%  { transform: rotate(30deg); }
+  100% { transform: rotate(-40deg); }
+}
+
+.load-phrase {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--navy);
+  min-height: 2.2em;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+.load-phrase.is-swapping { opacity: 0; }
+
+.load-track {
+  height: 14px;
+  background: var(--paper-alt);
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.load-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--amber);
+  border-radius: 999px;
+}
+.load-pct { margin: 10px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-needle.is-searching,
+  .load-card.is-searching .lc-orbit { animation: none; }
+  .lc-needle.is-done { transition: none; }
+}
+
+/* =========================================================
+   STRAND PAGE: shared note under "Subjects you might take"
+   ========================================================= */
+.sd .sd-note { margin: -2px 0 16px; font-size: 0.88rem; color: var(--ink-soft); max-width: 46ch; }
+
+/* =========================================================
+   STRAND THEME: ASSH  (writer's notebook + ideas in conversation)
+   Everything is scoped to .sd[data-strand="ASSH"], so no other strand is touched.
+   Layered on top of the shared strand styles: the title shine/float, typewriter,
+   ring, watermark and highlighter all keep working.
+   ========================================================= */
+
+/* ---- Hero: ruled notebook paper with a margin line ---- */
+.sd[data-strand="ASSH"] .sd-hero {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--sc) 38%, transparent), color-mix(in srgb, var(--sc) 38%, transparent)),
+    repeating-linear-gradient(to bottom, transparent 0 33px, color-mix(in srgb, var(--sc) 20%, transparent) 33px 34px);
+  background-size: 2px 100%, auto;
+  background-position: 72px 0, 0 0;
+  background-repeat: no-repeat, repeat;
+}
+
+/* ---- Hero: floating idea bubbles (behind the text) ---- */
+.sd-scene { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.sd-bub {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  opacity: 0.5;
+  --rise: 560px;
+}
+@supports (height: 1cqh) {
+  .sd-scene-bubbles { container-type: size; }
+  .sd-bub { --rise: 115cqh; }
+}
+.sd-bub > span {
+  position: relative;
+  display: block;
+  padding: 7px 16px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--sc);
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.sd-bub > span::after {   /* the little speech tail */
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: -7px;
+  width: 11px; height: 11px;
+  background: inherit;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(45deg) skew(8deg, 8deg);
+  border-radius: 0 0 3px 0;
+}
+.sd-bub-1 { --x: 1%;  --y: 62%; --dur: 19s; --del: -4s; }
+.sd-bub-2 { --x: 44%; --y: 18%; --dur: 23s; --del: -13s; }
+.sd-bub-3 { --x: 60%; --y: 70%; --dur: 21s; --del: -9s; }
+.sd-bub-4 { --x: 84%; --y: 38%; --dur: 18s; --del: -2s; }
+.sd-bub-5 { --x: 34%; --y: 84%; --dur: 25s; --del: -17s; }
+.sd-bub-6 { --x: 76%; --y: 8%;  --dur: 22s; --del: -7s; }
+.sd-bub-2 > span, .sd-bub-4 > span, .sd-bub-6 > span { background: color-mix(in srgb, var(--sc) 14%, #fff); }
+.sd-bub-3 > span { padding: 9px 22px; font-size: 1.08rem; }
+
+@keyframes sdBubRise {
+  0%   { transform: translateY(0) rotate(-2deg); opacity: 0; }
+  12%  { opacity: var(--bub-o, 0.55); }
+  50%  { transform: translateY(calc(var(--rise) * -0.5)) rotate(2deg); }
+  88%  { opacity: var(--bub-o, 0.55); }
+  100% { transform: translateY(calc(var(--rise) * -1)) rotate(-2deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sd-bub { top: 100%; opacity: 0; animation: sdBubRise var(--dur) linear var(--del) infinite; will-change: transform, opacity; }
+}
+
+/* ---- Subjects: a stack of books ---- */
+.sd[data-strand="ASSH"] .sd-subjects li {
+  padding-left: 30px;
+  border-radius: 6px 14px 14px 6px;
+  background-image: linear-gradient(90deg, var(--sc) 0 14px, var(--ink) 14px 16px, #fff 16px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.2s ease;
+}
+.sd[data-strand="ASSH"] .sd-subjects li:nth-child(2) { margin-left: 14px; }
+.sd[data-strand="ASSH"] .sd-subjects li:nth-child(3) { margin-left: 5px; }
+.sd[data-strand="ASSH"] .sd-subjects li:nth-child(4) { margin-left: 20px; }
+.sd[data-strand="ASSH"] .sd-subjects li:nth-child(5) { margin-left: 8px; }
+.sd[data-strand="ASSH"] .sd-subjects li:hover { transform: translateX(12px); box-shadow: 3px 3px 0 var(--sc); }
+
+/* ---- Careers: a big quotation mark behind the cards ---- */
+.sd[data-strand="ASSH"] .sd-path { position: relative; overflow: hidden; }
+.sd[data-strand="ASSH"] .sd-path .wrap { position: relative; z-index: 1; }
+.sd[data-strand="ASSH"] .sd-path::before {
+  content: "\201C";
+  position: absolute;
+  right: 5%;
+  top: -48px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 800;
+  font-size: 20rem;
+  line-height: 1;
+  color: var(--sc);
+  opacity: 0.09;
+  pointer-events: none;
+}
+
+/* ---- Closing band: ruled lines and a closing quotation mark ---- */
+.sd[data-strand="ASSH"] .sd-close {
+  overflow: hidden;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 33px, rgba(255, 255, 255, 0.1) 33px 34px);
+}
+.sd[data-strand="ASSH"] .sd-close .wrap { position: relative; z-index: 1; }
+.sd[data-strand="ASSH"] .sd-close::after {
+  content: "\201D";
+  position: absolute;
+  right: 6%;
+  bottom: -90px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 800;
+  font-size: 16rem;
+  line-height: 1;
+  color: #fff;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* ---- Phones: calmer scene ---- */
+@media (max-width: 800px) {
+  .sd[data-strand="ASSH"] .sd-hero { background-size: 0 0, auto; }          /* margin line would cut across the text */
+  .sd-bub-5, .sd-bub-6 { display: none; }                                    /* four bubbles are plenty on a small screen */
+  .sd-bub { --bub-o: 0.22; }                                                 /* text spans the full width here, so keep bubbles faint */
+  .sd-bub > span { font-size: 0.88rem; padding: 6px 13px; border-color: color-mix(in srgb, var(--ink) 45%, transparent); }
+  .sd-bub > span::after { border-color: color-mix(in srgb, var(--ink) 45%, transparent); }
+  .sd-bub-3 > span { font-size: 0.95rem; padding: 7px 16px; }
+  .sd-bub-1 { --x: 2%; } .sd-bub-2 { --x: 52%; } .sd-bub-3 { --x: 8%; } .sd-bub-4 { --x: 58%; }
+  .sd[data-strand="ASSH"] .sd-subjects li:nth-child(2) { margin-left: 8px; }
+  .sd[data-strand="ASSH"] .sd-subjects li:nth-child(3) { margin-left: 3px; }
+  .sd[data-strand="ASSH"] .sd-subjects li:nth-child(4) { margin-left: 10px; }
+  .sd[data-strand="ASSH"] .sd-subjects li:nth-child(5) { margin-left: 5px; }
+  .sd[data-strand="ASSH"] .sd-path::before { font-size: 13rem; top: -30px; }
+  .sd[data-strand="ASSH"] .sd-close::after { font-size: 11rem; bottom: -60px; }
+}
+
+/* =========================================================
+   STRAND FRAMES  (the animated illustration beside each strand's intro)
+   Drawings are in script2.js (STRAND_FRAMES); this block styles and animates them.
+   Every strand reads --sc (its color). All motion sits inside "no-preference" blocks, so
+   "reduce motion" shows the finished drawing. The video now has its own section below the hero.
+   ========================================================= */
+.sd .sd-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--sc) 8%, #fff);
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  box-shadow: 8px 8px 0 var(--sc);
+}
+.sd .sd-frame svg { display: block; width: 100%; height: 100%; }
+.sd .sd-frame svg text { font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 15px; fill: var(--ink); }
+.sd .sd-frame .k  { stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.sd .sd-frame path.k:not([class*="wh"]):not([class*="yl"]):not([class*="sc"]) { fill: none; }
+.sd .sd-frame .k4 { stroke-width: 5; }
+.sd .sd-frame .sc   { fill: var(--sc); }
+.sd .sd-frame .sc-l { fill: color-mix(in srgb, var(--sc) 45%, #fff); }
+.sd .sd-frame .sc-s { stroke: var(--sc); fill: none; stroke-linecap: round; }
+.sd .sd-frame .wh { fill: #fff; }
+.sd .sd-frame .yl { fill: #FFD66B; }
+.sd .sd-frame .fr-wave { stroke-dasharray: 1; }
+
+/* per-strand surfaces */
+.sd[data-strand="STEM"] .sd-frame {
+  background-color: color-mix(in srgb, var(--sc) 7%, #fff);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--sc) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--sc) 14%, transparent) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.sd[data-strand="IA"] .sd-frame { background: color-mix(in srgb, var(--sc) 78%, #1a0000); }
+.sd[data-strand="IA"] .fr-gridl { stroke: rgba(255, 255, 255, 0.16); }
+.sd[data-strand="IA"] .sd-frame .k { stroke: #fff; }
+.sd[data-strand="HT"] .sd-frame { background: #FFF2E2; }
+.sd[data-strand="HT"] .fr-steam { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; opacity: 0.35; }
+.sd[data-strand="HT"] .fr-rip { fill: none; stroke-width: 3; opacity: 0; vector-effect: non-scaling-stroke; }
+.sd[data-strand="HT"] .sd-frame svg .fr-ding { font-size: 18px; font-weight: 800; fill: var(--sc); opacity: 0; }
+.sd[data-strand="BM"] .fr-line { fill: none; stroke: #E4572E; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+.sd[data-strand="BM"] .sd-frame svg .fr-tk { fill: #fff; font-size: 12px; font-weight: 700; }
+.sd[data-strand="BM"] .sd-frame svg .fr-peso { font-size: 24px; font-weight: 800; }
+.sd[data-strand="ASSH"] .sd-frame {
+  background-color: #FCEEF4;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--sc) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--sc) 14%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.sd[data-strand="ICT"] .sd-frame { background: #1B1230; box-shadow: 8px 8px 0 var(--sc); }
+
+/* ASSH: small English gloss under each Filipino word */
+.sd .sd-frame svg text.fr-sub { font-size: 11px; font-weight: 500; opacity: 0.7; }
+
+/* STEM: sprout + cell */
+.sd[data-strand="STEM"] .fr-sprout { transform-origin: 72px 184px; }
+.sd[data-strand="STEM"] .fr-cell, .sd[data-strand="STEM"] .fr-nuc, .sd[data-strand="STEM"] .fr-mito { transform-box: fill-box; transform-origin: center; }
+
+/* HT: finished drawing = cover lifted, dish revealed, no steam */
+.sd[data-strand="HT"] .fr-cloche { transform-origin: 232px 128px; translate: 6px -50px; rotate: -16deg; }
+.sd[data-strand="HT"] .fr-steamg { opacity: 0; }
+.sd[data-strand="HT"] .fr-sp { fill: #FFD66B; stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; }
+
+/* IA: finished drawing = switch closed, bulb lit */
+.sd[data-strand="IA"] .fr-panel { fill: rgba(255, 255, 255, 0.12); }
+.sd[data-strand="IA"] .fr-slot  { fill: rgba(0, 0, 0, 0.35); stroke-width: 2; }
+.sd[data-strand="IA"] .fr-tog   { stroke-width: 1.8; }
+.sd[data-strand="IA"] .fr-socket { fill: rgba(255, 255, 255, 0.18); }
+.sd[data-strand="IA"] .fr-base   { fill: rgba(255, 255, 255, 0.18); }
+.sd[data-strand="IA"] .fr-bulb   { fill: #FFD66B; }
+.sd[data-strand="IA"] .fr-glow   { fill: #FFD66B; opacity: 0.3; }
+.sd[data-strand="IA"] .fr-rays   { opacity: 1; }
+.sd[data-strand="IA"] .fr-fil    { stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.sd[data-strand="IA"] .fr-pulse  { fill: none; stroke: #FFD66B; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 0.05 2; stroke-dashoffset: 0.05; opacity: 0; }
+.sd[data-strand="IA"] .fr-sparkb { opacity: 0; }
+.sd[data-strand="IA"] .fr-lever  { transform-origin: 110px 140px; }
+
+/* ICT terminal (HTML, not SVG) */
+.fr-term { height: 100%; padding: 22px 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(0.8rem, 1.7vw, 1rem); color: #CDBDF5; }
+.sd .fr-term p { color: #CDBDF5; margin: 0 0 8px; overflow: hidden; white-space: nowrap; width: calc(var(--n) * 1ch); }
+.sd .fr-term .fr-ready { color: #fff; overflow: visible; width: auto; }
+.fr-caret { display: inline-block; width: 0.6em; height: 1.05em; margin-left: 4px; vertical-align: -0.15em; background: var(--sc); }
+
+/* stage: the video and the fact card share one tinted band under the hero.
+   Side by side on desktop, stacked on phones. */
+.sd-stage {
+  background-color: color-mix(in srgb, var(--sc) 7%, var(--paper));
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--sc) 14%, transparent) 1.5px, transparent 2px);
+  background-size: 22px 22px;
+  border-bottom: 3px solid var(--ink);
+  padding: 52px 0 64px;
+}
+.sd-stage .sd-stage-h { margin-bottom: 26px; }
+.sd-stage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+.sd .sd-stage .sd-video { animation: none; max-width: none; }
+.sd .sd-stage .sd-focus-text { max-width: none; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
+@media (max-width: 860px) {
+  .sd-stage { padding: 40px 0 52px; }
+  .sd-stage-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .sd .sd-stage .sd-focus-text { font-size: clamp(1.5rem, 6vw, 2rem); }
+}
+
+/* subject cards: each strand gets its own card shape */
+.sd[data-strand="STEM"] .sd-subjects li {
+  border-color: var(--sc); border-radius: 6px; box-shadow: none;
+  background-color: #fff;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--sc) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--sc) 12%, transparent) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+.sd[data-strand="STEM"] .sd-subjects li::before { border-radius: 4px; }
+.sd[data-strand="IA"] .sd-subjects li { border: 2px dashed var(--sc); border-radius: 8px; box-shadow: none; }
+.sd[data-strand="IA"] .sd-subjects li::before { border-radius: 3px; border-style: dashed; }
+.sd[data-strand="ICT"] .sd-subjects li {
+  background: #1B1230; color: #E3D9FA; border: 2px solid var(--sc); border-radius: 2px; box-shadow: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 1rem;
+}
+.sd[data-strand="ICT"] .sd-subjects li::before { content: ">"; width: auto; height: auto; border: 0; background: none; color: #B58BFF; font-family: inherit; font-size: 1rem; }
+.sd[data-strand="HT"] .sd-subjects li { position: relative; border-color: var(--sc); border-radius: 2px; box-shadow: none; }
+.sd[data-strand="HT"] .sd-subjects li::after {
+  content: ""; position: absolute; top: -2px; right: -2px; width: 0; height: 0;
+  border-style: solid; border-width: 0 20px 20px 0; border-color: transparent var(--paper) var(--sc) transparent;
+}
+.sd[data-strand="BM"] .sd-subjects li { border-color: var(--sc); border-radius: 12px; box-shadow: 4px 4px 0 var(--sc); }
+.sd[data-strand="BM"] .sd-subjects li:hover { box-shadow: 6px 6px 0 var(--sc); }
+
+@media (max-width: 800px) {
+  .sd .sd-frame { box-shadow: 6px 6px 0 var(--sc); }
+}
+
+/* ---- motion (off for "reduce motion") ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .sd .sd-frame { animation: heroIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.30s both; }
+
+  /* STEM: the wave draws itself, the electron orbits */
+  .sd .fr-wave { animation: frDraw 7s ease-in-out infinite; }
+  .sd .fr-ex { animation: frX 1.5s ease-in-out infinite alternate; }
+  .sd .fr-ey { animation: frY 1.5s ease-in-out -0.75s infinite alternate; }
+
+  /* STEM: the sprout sways, the cell breathes, the nucleus beats, the mitochondrion drifts */
+  .sd .fr-sprout { animation: frSway 4s ease-in-out infinite alternate; }
+  .sd .fr-cell { animation: frBreathe 3.4s ease-in-out infinite alternate; }
+  .sd .fr-nuc { animation: frBeat 1.8s ease-in-out infinite; }
+  .sd .fr-mito { animation: frDrift 5s ease-in-out infinite alternate; }
+
+  /* ASSH: bubbles pop in like a conversation, the globe turns, a page flips */
+  .sd .fr-pop { transform-box: fill-box; transform-origin: 50% 100%; opacity: 0; animation: frPop 9s ease-in-out var(--d, 0s) infinite; }
+  .sd .fr-dot { transform-box: fill-box; animation: frBlink 1.1s ease-in-out var(--d, 0s) infinite; }
+  .sd .fr-globe { transform-box: fill-box; transform-origin: center; animation: frGlobe 6s ease-in-out infinite alternate; }
+  .sd .fr-page { transform-box: fill-box; transform-origin: 0% 50%; animation: frFlip 4.5s ease-in-out infinite; }
+
+  /* BM: bars grow, the line draws, the coin flips, the ticker scrolls */
+  .sd .fr-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: frGrow 6s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0s) infinite; }
+  .sd .fr-line { animation: frDraw 6s ease-in-out 0.6s infinite; }
+  .sd .fr-coin { transform-origin: 284px 66px; animation: frCoin 3.2s ease-in-out infinite; }
+  .sd .fr-tick { animation: frTick 9s linear infinite; }
+
+  /* HT: the bell is struck, rings spread out, steam rises from the dish */
+  .sd .fr-bellg { transform-origin: 110px 150px; animation: frShake 8s ease-in-out infinite; }
+  .sd .fr-plunger { animation: frPress 8s ease-in-out infinite; }
+  .sd .fr-rip { transform-origin: 110px 92px; animation: frRing 8s ease-out var(--d, 0s) infinite; }
+  .sd .fr-ding { animation: frDing 8s ease-out infinite; }
+  .sd .fr-steamg { animation: frSteamGate 8s ease-in-out infinite; }
+  .sd .fr-cloche { animation: frCloche 8s cubic-bezier(0.45, 0, 0.25, 1) infinite; }
+  .sd .fr-sparkg { animation: frReveal 8s ease-in-out infinite; }
+  .sd .fr-sp { animation: frSpark 1.6s ease-in-out var(--d, 0s) infinite; }
+  .sd .fr-steam { animation: frSteam 3s ease-in-out var(--d, 0s) infinite; }
+
+  /* ICT: the terminal types itself line by line */
+  .fr-term p { animation: frType 14s steps(var(--n)) var(--d) infinite; }
+  .fr-term .fr-ready { animation: none; }
+  .fr-caret { animation: sdCaret 1s steps(1) infinite; }
+
+  /* IA: switch closes, a pulse runs down the wire, the bulb lights, then it all opens again */
+  .sd .fr-lever { animation: frLever 7s ease-in-out infinite; }
+  .sd .fr-sparkb { animation: frSparkB 7s linear infinite; }
+  .sd .fr-pulse { animation: frPulse 7s linear infinite; }
+  .sd .fr-bulb { animation: frBulb 7s ease-in-out infinite; }
+  .sd .fr-glow { animation: frGlow 7s ease-in-out infinite; }
+  .sd .fr-rays { animation: frGlow 7s ease-in-out infinite; }
+  .sd .fr-fil { animation: frFil 7s ease-in-out infinite; }
+  .sd .fr-tog { animation: frTog 6s ease-in-out var(--d, 0s) infinite; }
+}
+@keyframes frDraw  { 0% { stroke-dashoffset: 1; } 55%, 88% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes frX     { from { translate: -27px 0; } to { translate: 27px 0; } }
+@keyframes frY     { from { translate: 0 -11px; } to { translate: 0 11px; } }
+@keyframes frPop   { 0% { opacity: 0; transform: scale(0.5); } 6% { opacity: 1; transform: scale(1.08); } 9% { transform: scale(1); } 82% { opacity: 1; transform: scale(1); } 92%, 100% { opacity: 0; transform: scale(0.9); } }
+@keyframes frBlink { 0%, 60%, 100% { translate: 0 0; opacity: 0.45; } 30% { translate: 0 -3px; opacity: 1; } }
+@keyframes frGlobe { from { transform: scaleX(0.25); } to { transform: scaleX(1); } }
+@keyframes frFlip  { 0%, 20% { transform: scaleX(1); } 50% { transform: scaleX(0.05); } 80%, 100% { transform: scaleX(1); } }
+@keyframes frGrow  { 0% { transform: scaleY(0); } 20%, 85% { transform: scaleY(1); } 100% { transform: scaleY(0); } }
+@keyframes frCoin  { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.08); } }
+@keyframes frTick  { to { translate: -190px 0; } }
+@keyframes frShake { 0%, 4%, 100% { rotate: 0deg; } 6% { rotate: -2.5deg; } 8% { rotate: 2deg; } 10% { rotate: -1deg; } 12% { rotate: 0deg; } }
+@keyframes frPress { 0%, 4%, 100% { translate: 0 0; } 5.5% { translate: 0 6px; } 8% { translate: 0 0; } }
+@keyframes frRing  { 0%, 5% { opacity: 0; transform: scale(1); } 6% { opacity: 0.9; } 22% { opacity: 0; transform: scale(5.5); } 100% { opacity: 0; transform: scale(5.5); } }
+@keyframes frDing  { 0%, 5% { opacity: 0; translate: 0 6px; } 7%, 15% { opacity: 1; translate: 0 0; } 22%, 100% { opacity: 0; translate: 0 -6px; } }
+@keyframes frSteam { 0% { opacity: 0; translate: 0 10px; } 35% { opacity: 0.5; } 100% { opacity: 0; translate: 0 -14px; } }
+@keyframes frType  { 0% { width: 0; } 10% { width: calc(var(--n) * 1ch); } 88% { width: calc(var(--n) * 1ch); } 100% { width: 0; } }
+
+/* STEM */
+@keyframes frSway    { from { rotate: -4deg; } to { rotate: 4deg; } }
+@keyframes frBreathe { from { scale: 1; } to { scale: 1.05; } }
+@keyframes frBeat    { 0%, 100% { scale: 1; } 15% { scale: 1.14; } 30% { scale: 1; } }
+@keyframes frDrift   { from { translate: -3px 1px; rotate: -6deg; } to { translate: 3px -2px; rotate: 6deg; } }
+
+/* HT: ding (5-12%) -> cover lifts (10-18%) -> dish shown -> cover lowers (70-78%) */
+@keyframes frCloche    { 0%, 9% { translate: 0 0; rotate: 0deg; } 15% { translate: 9px -56px; rotate: -19deg; } 19%, 70% { translate: 6px -50px; rotate: -16deg; } 78%, 100% { translate: 0 0; rotate: 0deg; } }
+@keyframes frSteamGate { 0%, 8% { opacity: 1; } 12%, 80% { opacity: 0; } 90%, 100% { opacity: 1; } }
+@keyframes frReveal    { 0%, 15% { opacity: 0; } 20%, 66% { opacity: 1; } 74%, 100% { opacity: 0; } }
+@keyframes frSpark     { 0%, 100% { scale: 0.55; } 50% { scale: 1.15; } }
+
+/* IA: lever closes (8-15%) -> pulse runs (18-46%) -> bulb on (46-84%) -> lever opens (86-92%) */
+@keyframes frLever  { 0%, 8% { rotate: -32deg; } 14% { rotate: 2deg; } 16%, 86% { rotate: 0deg; } 92%, 100% { rotate: -32deg; } }
+@keyframes frSparkB { 0%, 12% { opacity: 0; } 14% { opacity: 1; } 18% { opacity: 0; } 87% { opacity: 0; } 89% { opacity: 1; } 93%, 100% { opacity: 0; } }
+@keyframes frPulse  { 0%, 17% { opacity: 0; stroke-dashoffset: 0.05; } 18% { opacity: 1; stroke-dashoffset: 0.05; } 46% { opacity: 1; stroke-dashoffset: -1; } 47%, 100% { opacity: 0; stroke-dashoffset: -1; } }
+@keyframes frBulb   { 0%, 44% { fill: rgba(255, 255, 255, 0.14); } 45% { fill: #FFD66B; } 46% { fill: rgba(255, 255, 255, 0.14); } 48%, 84% { fill: #FFD66B; } 90%, 100% { fill: rgba(255, 255, 255, 0.14); } }
+@keyframes frGlow   { 0%, 44% { opacity: 0; } 45% { opacity: 0.3; } 46% { opacity: 0; } 48%, 84% { opacity: 0.3; } 90%, 100% { opacity: 0; } }
+@keyframes frFil    { 0%, 44% { stroke: #fff; } 48%, 84% { stroke: #22262B; } 90%, 100% { stroke: #fff; } }
+@keyframes frTog    { 0%, 30% { translate: 0 0; } 40%, 80% { translate: 0 18px; } 90%, 100% { translate: 0 0; } }
