@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClusterWise — Find your SHS strand</title>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="stylesheet" href="style2.css">
+</head>
+<body>
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="wrap header-inner">
+    <button class="mark mark-compact brand" id="nav-home" aria-label="ClusterWise home">
+      <img class="brand-seal" src="images/pcshslogo.png" alt="Pasay City South High School seal" width="44" height="44">
+      <span class="brand-divider" aria-hidden="true"></span>
+      <img class="brand-compass" src="images/favicon.svg" alt="" width="38" height="38">
+      <span class="mark-word">ClusterWise</span>
+    </button>
+    <nav class="nav-links">
+      <button class="nav-link" id="nav-explore"><span class="nav-opt">Explore </span>Strands</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HOME ============ -->
+<section id="view-home" class="view">
+  <div class="home-hero">
+    <div class="wrap">
+      <h1>Discover Your Ideal Senior High <span>Strand</span> here in PCSHS</h1>
+      <p class="lede">Take six short skill tests, one for each strand, plus a quick questionnaire about what you enjoy. ClusterWise shows your skills and your interests side by side, so you can see where they line up.</p>
+      <button class="btn btn-primary btn-compass" id="start-btn">
+        <span>Start Assessment</span>
+        <span class="btn-compass-icon" aria-hidden="true"></span>
+      </button>
+
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="manual">
+      <p class="manual-title">How it works</p>
+      <ol class="manual-list">
+        <li>Click <strong>Start Assessment</strong> to open the Assessment Hub.</li>
+        <li>The hub has six skill tests, one per strand, with 15 multiple-choice questions each (90 in total), plus an Interests questionnaire (30 questions, no right or wrong answers). Take them in any order.</li>
+        <li>Every skill question has one correct answer. Answers are not revealed and a finished part cannot be retaken, so take your time.</li>
+        <li>Once all seven parts are done, <strong>See Overall Results</strong> unlocks.</li>
+        <li>Your results show your skill score and interest ranking for every strand, one main takeaway from comparing them, and a breakdown of your strengths. Then explore that strand's subjects, skills, and career paths.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="explore-strands-section" id="explore-strands">
+      <h2 class="section-title">Strands offered at PCSHS</h2>
+      <p class="section-sub">Not ready for the assessment yet? Open a strand below to see what it actually covers.</p>
+      <div class="strand-grid" id="strand-grid"></div>
+    </section>
+  </div>
+</section>
+
+<!-- ============ ASSESSMENT HUB ============
+     Empty on purpose: renderHub() in script2.js fills it. -->
+<section id="view-hub" class="view"></section>
+
+<!-- ============ ASSESSMENT (one sub-test at a time) ============ -->
+<section id="view-assessment" class="view">
+  <div class="assess-header">
+    <div class="wrap">
+      <div class="stepper" id="stepper"></div>
+      <div class="q-progress-track"><div class="q-progress-fill" id="q-progress-fill"></div></div>
+      <span class="q-progress-label" id="q-progress-label">Question 1 of 15</span>
+    </div>
+  </div>
+
+  <div class="wrap assess-body">
+    <div class="question-card" id="question-card"></div>
+    <div class="assess-nav">
+      <button class="btn btn-ghost" id="btn-back">Back</button>
+      <button class="btn btn-primary" id="btn-next" disabled>Next</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section id="view-results" class="view">
+  <div class="results-hero">
+    <div class="wrap">
+      <h1 id="result-headline"></h1>
+      <p id="result-sub"></p>
+    </div>
+  </div>
+
+  <div class="wrap chart-section">
+    <div class="bar-chart" id="bar-chart"></div>
+  </div>
+
+  <div class="wrap interest-section" id="interest-section"></div>
+
+  <div class="wrap explain-section">
+    <div id="explain-why"></div>
+  </div>
+
+  <div class="results-strand">
+    <div class="strand-header">
+      <h2 class="section-title" id="strand-header-title"></h2>
+      <p class="section-sub" id="strand-header-sub"></p>
+      <div class="strand-tabs" id="strand-tabs" hidden></div>
+    </div>
+    <div id="strand-panel"></div>
+  </div>
+
+  <div class="wrap faq-section">
+    <h3>Questions about your result</h3>
+    <div id="faq-list"></div>
+  </div>
+
+  <div class="wrap results-footer">
+  </div>
+</section>
+
+<!-- ============ STRAND DETAIL (from Explore Strands) ============
+     Everything inside is built by renderStrandDetail() in script2.js,
+     including the closing panel with its buttons. -->
+<section id="view-strand-detail" class="view">
+  <div id="strand-detail-content"></div>
+</section>
+
+<footer class="site-footer">ClusterWise — a strand exploration tool for prospective Senior High School students.</footer>
+
+<!-- Floating "Save my results" button: only visible while the results page is open (savecard.js toggles it) -->
+<button class="save-fab" id="save-fab" type="button" data-save-results aria-label="Save my results as a picture">
+  <svg class="save-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+  <span class="save-label">Save my results</span>
+</button>
+
+<!-- Question bank first (data), then the controller (logic) -->
+<script src="questions.js"></script>
+<script src="script2.js"></script>
+<script src="savecard.js"></script>
+</body>
+</html>
