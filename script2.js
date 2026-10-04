@@ -62,7 +62,7 @@ const STRANDS = {
   BM: {
     name: "BM",
     full: "Business and Management",
-    color: "#3457D5",
+    color: "#E4572E",
     formerly: "ABM",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
     overview: "BM suits students curious about how businesses run, how money moves, and how to lead or manage an organization.",
     focus: "The fundamentals of business operations, finance, and management practices.",
@@ -77,7 +77,7 @@ const STRANDS = {
   HT: {
     name: "HT",
     full: "Hospitality and Tourism",
-    color: "#E4572E",
+    color: "#3457D5",
     formerly: "HE",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
     overview: "HT is a practical, service-oriented track — cooking, hotel and restaurant operations, and tourism skills you can apply right away.",
     focus: "Hands-on training in food, service, hospitality, and tourism-related work.",
@@ -607,17 +607,26 @@ const STRAND_FRAMES = {
     <circle class="fr-rip sc-s" cx="110" cy="92" r="10"/>
     <circle class="fr-rip sc-s" style="--d:.25s" cx="110" cy="92" r="10"/>
     <g class="fr-bellg">
-      <g class="fr-plunger"><rect class="k wh" x="106" y="94" width="8" height="10"/><circle class="k sc" cx="110" cy="90" r="7"/></g>
+      <g class="fr-plunger"><rect class="k wh" x="106" y="94" width="8" height="10"/><circle class="k yl" cx="110" cy="90" r="7"/></g>
       <path class="k yl" d="M62 150a48 48 0 0 1 96 0Z"/>
       <rect class="k wh" x="54" y="150" width="112" height="10" rx="4"/>
     </g>
     <text class="fr-ding" x="140" y="64">ding!</text>
-    <g class="fr-dish">
+    <g class="fr-dish fr-dish-a">
       <path class="k" style="fill:#7CC36A" d="M202 150C198 138 208 130 218 133C222 122 238 120 244 130C256 126 266 138 262 150Z"/>
       <circle class="k" style="fill:#E4572E;stroke-width:1.8" cx="222" cy="141" r="6"/>
       <circle class="k" style="fill:#FFD66B;stroke-width:1.8" cx="246" cy="140" r="5"/>
       <path class="k" style="stroke:#8E4BB5;stroke-width:2.4" d="M229 135q6-6 12 0"/>
       <path class="k" style="fill:#5FAE4E;stroke-width:1.8" d="M232 128q-3-11 9-13q3 11-9 13z"/>
+    </g>
+    <g class="fr-dish fr-dish-b">
+      <rect class="k" style="fill:#FFE3C2" x="206" y="135" width="52" height="15" rx="3"/>
+      <rect class="k" style="fill:#F7A8C8" x="214" y="121" width="36" height="14" rx="3"/>
+      <path class="k" style="fill:#fff;stroke-width:1.8" d="M212 127H252V129Q250 134 247 129Q244 135 241 129Q238 135 235 129Q232 135 229 129Q226 135 223 129Q220 134 217 129Q214 133 212 129Z"/>
+      <path class="k" style="stroke-width:1.6" d="M206 143Q214 139 222 143T238 143T254 143"/>
+      <rect class="k" style="fill:#7CC3E8;stroke-width:1.6" x="231" y="109" width="4" height="12" rx="1"/>
+      <path class="k" style="fill:#FFD66B;stroke-width:1.4" d="M233 100Q238 106 233 108Q228 106 233 100Z"/>
+      <circle cx="221" cy="126" r="1.6" style="fill:#E4572E"/><circle cx="243" cy="125" r="1.6" style="fill:#3457D5"/><circle cx="249" cy="143" r="1.6" style="fill:#E4572E"/><circle cx="214" cy="145" r="1.6" style="fill:#3457D5"/>
     </g>
     <g class="fr-sparkg">
       <g transform="translate(194 130)"><path class="fr-sp" style="--d:0s" d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2Z"/></g>
@@ -626,10 +635,12 @@ const STRAND_FRAMES = {
     </g>
     <g class="fr-cloche">
       <path class="k wh" d="M188 150a44 44 0 0 1 88 0Z"/>
-      <circle class="k sc" cx="232" cy="102" r="5"/>
+      <circle class="k yl" cx="232" cy="102" r="5"/>
     </g>
     <rect class="k wh" x="180" y="150" width="104" height="9" rx="4"/>
-    <rect class="sc" x="0" y="160" width="320" height="40"/>
+    <rect x="0" y="160" width="320" height="40" style="fill:#C98B52"/>
+    <path d="M0 176H320M0 190H320" style="stroke:#A66B3A;stroke-width:2;fill:none"/>
+    <path d="M70 160V176M210 176V190M120 190V200" style="stroke:#A66B3A;stroke-width:2;fill:none"/>
     <path class="k" d="M0 160H320"/>
   </svg>`,
 
