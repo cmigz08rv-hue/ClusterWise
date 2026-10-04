@@ -3372,11 +3372,11 @@ footer.site-footer {
 .sd[data-strand="IA"] .sd-frame { background: color-mix(in srgb, var(--sc) 78%, #1a0000); }
 .sd[data-strand="IA"] .fr-gridl { stroke: rgba(255, 255, 255, 0.16); }
 .sd[data-strand="IA"] .sd-frame .k { stroke: #fff; }
-.sd[data-strand="HT"] .sd-frame { background: #FFF2E2; }
+.sd[data-strand="HT"] .sd-frame { background: color-mix(in srgb, var(--sc) 9%, #fff); }
 .sd[data-strand="HT"] .fr-steam { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linecap: round; opacity: 0.35; }
 .sd[data-strand="HT"] .fr-rip { fill: none; stroke-width: 3; opacity: 0; vector-effect: non-scaling-stroke; }
 .sd[data-strand="HT"] .sd-frame svg .fr-ding { font-size: 18px; font-weight: 800; fill: var(--sc); opacity: 0; }
-.sd[data-strand="BM"] .fr-line { fill: none; stroke: #E4572E; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+.sd[data-strand="BM"] .fr-line { fill: none; stroke: #2E9E5B; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
 .sd[data-strand="BM"] .sd-frame svg .fr-tk { fill: #fff; font-size: 12px; font-weight: 700; }
 .sd[data-strand="BM"] .sd-frame svg .fr-peso { font-size: 24px; font-weight: 800; }
 .sd[data-strand="ASSH"] .sd-frame {
@@ -3398,6 +3398,7 @@ footer.site-footer {
 /* HT: finished drawing = cover lifted, dish revealed, no steam */
 .sd[data-strand="HT"] .fr-cloche { transform-origin: 232px 128px; translate: 6px -50px; rotate: -16deg; }
 .sd[data-strand="HT"] .fr-steamg { opacity: 0; }
+.sd[data-strand="HT"] .fr-dish-a { opacity: 0; }
 .sd[data-strand="HT"] .fr-sp { fill: #FFD66B; stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; transform-box: fill-box; transform-origin: center; }
 
 /* IA: finished drawing = switch closed, bulb lit */
@@ -3506,6 +3507,8 @@ footer.site-footer {
   .sd .fr-rip { transform-origin: 110px 92px; animation: frRing 8s ease-out var(--d, 0s) infinite; }
   .sd .fr-ding { animation: frDing 8s ease-out infinite; }
   .sd .fr-steamg { animation: frSteamGate 8s ease-in-out infinite; }
+  .sd .fr-dish-a { animation: frDishB 16s linear infinite; }
+  .sd .fr-dish-b { animation: frDishA 16s linear infinite; }
   .sd .fr-cloche { animation: frCloche 8s cubic-bezier(0.45, 0, 0.25, 1) infinite; }
   .sd .fr-sparkg { animation: frReveal 8s ease-in-out infinite; }
   .sd .fr-sp { animation: frSpark 1.6s ease-in-out var(--d, 0s) infinite; }
@@ -3563,3 +3566,48 @@ footer.site-footer {
 @keyframes frGlow   { 0%, 44% { opacity: 0; } 45% { opacity: 0.3; } 46% { opacity: 0; } 48%, 84% { opacity: 0.3; } 90%, 100% { opacity: 0; } }
 @keyframes frFil    { 0%, 44% { stroke: #fff; } 48%, 84% { stroke: #22262B; } 90%, 100% { stroke: #fff; } }
 @keyframes frTog    { 0%, 30% { translate: 0 0; } 40%, 80% { translate: 0 18px; } 90%, 100% { translate: 0 0; } }
+/* HT: cake on the first lift, salad on the second; the swap happens while the cover is down */
+@keyframes frDishA { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes frDishB { 0%, 49% { opacity: 0; } 50%, 100% { opacity: 1; } }
+
+/* =========================================================
+   HOME HERO PHOTO  (school building, recolored)
+   images/home-background.jpg is already a navy -> amber -> cream duotone.
+   It multiplies into the hero's yellow, so the whites disappear and only the
+   building and sky tones remain, then fades out toward the bottom edge.
+   To make it stronger or fainter: change "opacity". To fade sooner or later: change the 95% / 40% stops.
+   ========================================================= */
+.home-hero { isolation: isolate; }                 /* lets the photo sit between the yellow and the content */
+.home-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("images/home-background.jpg") center 18% / cover no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.22;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 96%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 38%, transparent 96%);
+}
+@media (max-width: 800px) {
+  .home-hero::after { background-position: 30% top; opacity: 0.18; }   /* keep the seal and building in view on phones */
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero::after { animation: heroPhotoIn 1.4s ease-out both; }
+}
+@keyframes heroPhotoIn { from { opacity: 0; } to { opacity: 0.22; } }
+@media (prefers-reduced-motion: no-preference) and (max-width: 800px) {
+  .home-hero::after { animation-name: heroPhotoInMobile; }
+}
+@keyframes heroPhotoInMobile { from { opacity: 0; } to { opacity: 0.18; } }
+
+/* soft cream glow behind the hero text so it stays easy to read over the photo */
+.home-hero > .wrap::after {
+  content: "";
+  position: absolute;
+  inset: 6% 12% 4%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 240, 196, 0.85), rgba(255, 240, 196, 0.55) 55%, rgba(255, 240, 196, 0));
+}
