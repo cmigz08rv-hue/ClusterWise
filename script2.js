@@ -423,6 +423,7 @@ function recordHistory(id, mode) {
 
 /* ---------- View switching ---------- */
 function showView(id, mode = "push") {
+  if (unlock.active) endUnlock();   // any screen change cuts the unlock cutscene short
   if (id !== "view-loading" && loader.active) stopLoader();   // leaving the loading screen early (Back, logo) cancels its timer
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -1442,6 +1443,7 @@ function finishModule() {
   state.draft = [];
   state.optionOrder = [];
   openHub("replace");   // replaces the locked test's history entry so Back never lands on it
+  playUnlockIfFirst();  // only does anything when this was the seventh and last part
 }
 
 /* =========================================================
@@ -1711,6 +1713,7 @@ function finishInterest() {
   } catch (e) { /* keep going in memory */ }
   ist.active = false; ist.phase = null;
   openHub("replace");
+  playUnlockIfFirst();  // only does anything when this was the seventh and last part
 }
 
 /* Interest per strand, 0-100: Part A and Part B each converted to 0-100, then averaged 50/50 (provisional weights).
@@ -1728,6 +1731,125 @@ function interestScores() {
   });
   STRAND_ORDER.forEach(c => { out[c].rank = 1 + STRAND_ORDER.filter(o => out[o].pct > out[c].pct).length; });
   return out;
+}
+
+/* =========================================================
+   UNLOCK CUTSCENE  (full-screen overlay on the hub)
+   Plays ONCE per browser session, right after the seventh and last part is finished
+   (called from finishModule() and finishInterest(), nowhere else, so a refresh,
+   Back/Forward or a later hub visit can never replay it).
+   One big padlock fades in, shakes, the shackle swings open, a short message appears,
+   then everything fades out by itself. Tapping anywhere (or Enter / Space / Esc) skips it.
+   People with "reduce motion" switched on never see it: the button is simply active.
+   Tweak the feel here: UNLOCK_TITLE, UNLOCK_TEXT, UNLOCK_HINT, UNLOCK_AT, UNLOCK_FADE_MS.
+   Look: the last block of style2.css (".unlock-overlay").
+   ========================================================= */
+const UNLOCK_KEY = "strandwise.unlock.v1";   // old "strandwise" prefix on purpose, same as the other saved keys
+const UNLOCK_TITLE = "You did it!";
+const UNLOCK_TEXT = "All seven parts are complete. Your skills and interests are ready to compare.";
+const UNLOCK_HINT = "Tap anywhere to continue";
+const UNLOCK_AT = { pop: 300, shake: 700, open: 1150, title: 1250, text: 1550, hint: 2000, end: 3400 };   // ms from start
+const UNLOCK_FADE_MS = 350;                  // fade-out length (keep in step with the CSS transition)
+const unlock = { active: false, timers: [], el: null };
+
+function unlockSeen() { try { return sessionStorage.getItem(UNLOCK_KEY) === "1"; } catch (e) { return false; } }
+function markUnlockSeen() { try { sessionStorage.setItem(UNLOCK_KEY, "1"); } catch (e) { /* fine */ } }
+
+/* The padlock icon inside the hub's results button: closed while the cutscene runs, open afterwards */
+function setResultsLockIcon(open) {
+  const path = document.querySelector("#hub-results-btn .results-lock path");
+  if (path) path.setAttribute("d", open ? "M8 11V7a4 4 0 0 1 7.5-2" : "M8 11V7a4 4 0 0 1 8 0v4");
+}
+
+function playUnlockIfFirst() {
+  if (unlock.active || !allDone() || unlockSeen()) return;
+  markUnlockSeen();                                   // marked first, so even a refresh mid-cutscene can't replay it
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const btn = document.getElementById("hub-results-btn");
+  if (reduce || !btn) return;
+
+  btn.classList.add("unlock-hold");                   // looks locked until the cutscene ends
+  setResultsLockIcon(false);
+
+  const el = document.createElement("div");
+  el.className = "unlock-overlay";
+  el.tabIndex = -1;
+  el.setAttribute("role", "dialog");
+  el.setAttribute("aria-label", UNLOCK_TITLE);
+  el.innerHTML = `
+    <div class="uc-lock" aria-hidden="true">
+      <svg viewBox="0 0 200 240" focusable="false">
+        <defs><clipPath id="uc-clip"><rect x="30" y="100" width="140" height="110" rx="16"/></clipPath></defs>
+        <circle class="uc-ring" cx="100" cy="155" r="40" fill="none" stroke="#FFE9A8" stroke-width="4"/>
+        <g class="uc-shackle">
+          <path d="M60 102 V72 a40 40 0 0 1 80 0 V102" fill="none" stroke="#22262B" stroke-width="22"/>
+          <path d="M60 102 V72 a40 40 0 0 1 80 0 V102" fill="none" stroke="#C9CDD4" stroke-width="12"/>
+        </g>
+        <rect x="30" y="100" width="140" height="110" rx="16" fill="#D98E2B" stroke="#22262B" stroke-width="5"/>
+        <g clip-path="url(#uc-clip)"><polygon class="uc-glint" points="14,90 40,90 20,220 -6,220" fill="#FFFFFF" fill-opacity=".6"/></g>
+        <circle cx="100" cy="155" r="26" fill="#FFE9A8" stroke="#22262B" stroke-width="3"/>
+        <polygon points="100,138 106,155 94,155" fill="#B5711A"/>
+        <polygon points="100,172 106,155 94,155" fill="#1D2B45"/>
+        <circle cx="100" cy="155" r="3.5" fill="#FFFFFF" stroke="#22262B" stroke-width="1.5"/>
+        <polygon class="uc-sp" points="34,56 40,64 34,72 28,64" fill="#FFE9A8" style="--dx:-30px;--dy:-30px"/>
+        <polygon class="uc-sp" points="169,50 175,58 169,66 163,58" fill="#FFE9A8" style="--dx:30px;--dy:-34px"/>
+        <polygon class="uc-sp" points="22,134 28,141 22,148 16,141" fill="#D98E2B" style="--dx:-34px;--dy:0px"/>
+        <polygon class="uc-sp" points="178,134 184,141 178,148 172,141" fill="#D98E2B" style="--dx:34px;--dy:4px"/>
+        <polygon class="uc-sp" points="100,14 106,21 100,28 94,21" fill="#FFFFFF" style="--dx:0px;--dy:-30px"/>
+      </svg>
+    </div>
+    <p class="uc-title uc-fade" aria-hidden="true">${UNLOCK_TITLE}</p>
+    <p class="uc-text uc-fade" aria-hidden="true">${UNLOCK_TEXT}</p>
+    <p class="uc-hint uc-fade" aria-hidden="true">${UNLOCK_HINT}</p>
+    <p class="uc-sr" role="status" aria-live="polite"></p>`;
+  document.body.appendChild(el);
+  document.body.classList.add("cw-modal-open");       // no page scrolling underneath
+  unlock.active = true;
+  unlock.el = el;
+
+  const lock = el.querySelector(".uc-lock");
+  const [title, text, hint] = ["uc-title", "uc-text", "uc-hint"].map(c => el.querySelector("." + c));
+  const at = (ms, fn) => unlock.timers.push(setTimeout(fn, ms));
+
+  void el.offsetWidth;                                // lets the fade-in transition run
+  el.classList.add("show");
+  el.focus({ preventScroll: true });
+
+  at(UNLOCK_AT.pop,   () => lock.classList.add("pop"));
+  at(UNLOCK_AT.shake, () => lock.classList.add("shake"));
+  at(UNLOCK_AT.open,  () => { lock.classList.add("open"); el.querySelector(".uc-sr").textContent = UNLOCK_TITLE + " " + UNLOCK_TEXT; });
+  at(UNLOCK_AT.title, () => title.classList.add("in"));
+  at(UNLOCK_AT.text,  () => text.classList.add("in"));
+  at(UNLOCK_AT.hint,  () => hint.classList.add("in"));
+  at(UNLOCK_AT.end,   endUnlock);
+
+  el.addEventListener("click", endUnlock);
+  el.addEventListener("keydown", e => {
+    if (e.key === "Escape" || e.key === "Enter" || e.key === " ") { e.preventDefault(); endUnlock(); }
+  });
+}
+
+function endUnlock() {
+  if (!unlock.active) return;
+  unlock.timers.forEach(clearTimeout);
+  unlock.timers = [];
+  const el = unlock.el;
+  unlock.active = false;
+  unlock.el = null;
+  el.classList.remove("show");                        // fade out
+  setTimeout(() => {
+    el.remove();
+    document.body.classList.remove("cw-modal-open");
+    const btn = document.getElementById("hub-results-btn");
+    if (!btn) return;
+    btn.classList.remove("unlock-hold");
+    setResultsLockIcon(true);
+    if (currentViewId === "view-hub") {               // draw the eye to the now-active button
+      btn.classList.add("unlock-pulse");
+      setTimeout(() => btn.classList.remove("unlock-pulse"), 2000);
+      btn.focus({ preventScroll: true });
+    }
+  }, UNLOCK_FADE_MS);
 }
 
 /* =========================================================
