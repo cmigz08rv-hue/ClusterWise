@@ -2948,7 +2948,7 @@ footer.site-footer {
 }
 
 /* ============================================================
-   SAVE MY RESULTS (button, toast, and the phone fallback preview)
+   SAVE MY RESULTS (button, toast, and the preview window)
    ============================================================ */
 .save-btn[disabled], [data-save-results][disabled] { opacity: 0.7; cursor: progress; }
 
@@ -2980,21 +2980,39 @@ footer.site-footer {
   justify-content: center;
   padding: 16px;
 }
+body.save-modal-open { overflow: hidden; }
 .save-modal-card {
   background: var(--paper);
-  border-radius: 12px;
-  padding: 16px;
-  max-width: 440px;
-  width: 100%;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 18px;
+  width: min(520px, 100%);
   max-height: 100%;
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.save-modal-tip { font-size: 0.92rem; color: var(--ink); margin: 0; }
-.save-modal-card img { width: 100%; height: auto; display: block; border-radius: 8px; -webkit-touch-callout: default; }
-.save-modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.save-modal-title { margin: 0; font-size: 1.25rem; color: var(--navy); }
+.save-modal-tip { font-size: 0.9rem; color: var(--ink-soft); margin: 0; line-height: 1.4; }
+.save-modal-view {
+  flex: 1 1 auto;
+  min-height: 0;                 /* lets the picture scroll inside the window so the buttons stay in view */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+.save-modal-view img { width: 100%; height: auto; display: block; -webkit-touch-callout: default; }
+.save-modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.save-modal-actions .btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 26px; text-decoration: none;
+}
+.save-modal-actions .btn:focus-visible { outline: 3px solid var(--amber-deep); outline-offset: 3px; }
+@media (max-width: 600px) { .save-modal-actions .btn { flex: 1; padding-left: 14px; padding-right: 14px; } }
 
 /* ---- Floating "Save my results" button (results page only) ---- */
 .save-fab {
@@ -3370,7 +3388,7 @@ footer.site-footer {
     linear-gradient(90deg, color-mix(in srgb, var(--sc) 14%, transparent) 1px, transparent 1px);
   background-size: 40px 40px;
 }
-.sd[data-strand="ICT"] .sd-frame { background: #1B1230; box-shadow: 8px 8px 0 var(--sc); }
+.sd[data-strand="ICT"] .sd-frame { background: #1B1230; box-shadow: 8px 8px 0 var(--sc); container-type: inline-size; }
 
 /* ASSH: small English gloss under each Filipino word */
 .sd .sd-frame svg text.fr-sub { font-size: 11px; font-weight: 500; opacity: 0.7; }
@@ -3399,11 +3417,90 @@ footer.site-footer {
 .sd[data-strand="IA"] .fr-sparkb { opacity: 0; }
 .sd[data-strand="IA"] .fr-lever  { transform-origin: 110px 140px; }
 
-/* ICT terminal (HTML, not SVG) */
-.fr-term { height: 100%; padding: 22px 24px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: clamp(0.8rem, 1.7vw, 1rem); color: #CDBDF5; }
-.sd .fr-term p { color: #CDBDF5; margin: 0 0 8px; overflow: hidden; white-space: nowrap; width: calc(var(--n) * 1ch); }
-.sd .fr-term .fr-ready { color: #fff; overflow: visible; width: auto; }
-.fr-caret { display: inline-block; width: 0.6em; height: 1.05em; margin-left: 4px; vertical-align: -0.15em; background: var(--sc); }
+/* =========================================================
+   ICT frame (HTML, not SVG): terminal + design canvas + layers + wireframe + progress bar
+   The markup is in script2.js (STRAND_FRAMES.ICT) and is the FINISHED picture, so this block's base rules show it
+   complete (that is what "reduce motion" sees). While the loop plays, script2.js adds .ict-live and the
+   ".ict-live" rules below put each part back to empty until it is its turn.
+   Everything is sized in em, and the em follows the frame's width, so it scales like the SVG frames.
+   Colors: --sq / --ci / --sp are the logo's square, circle and spark (script2.js recolors them while the ring hops).
+   ========================================================= */
+.fr-ict {
+  --sq: #7A56D1; --ci: #FFD36E; --sp: #C39BFF;
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.8em;
+  padding: 1.1em 1.2em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(6px, 1.5vw, 12px);              /* fallback for browsers without container units */
+  font-size: clamp(6px, 2.4cqw, 16px);
+  line-height: 1.3;
+  color: #CDBDF5;
+}
+.ict-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 0.7em; min-height: 0; transition: opacity 0.4s; }
+.ict-right { display: grid; grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr); gap: 0.7em; min-width: 0; min-height: 0; }
+.ict-row2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.7em; min-height: 0; }
+.ict-row3 { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr); gap: 0.7em; min-height: 0; }
+.ict-pnl { position: relative; overflow: hidden; min-width: 0; min-height: 0; background: #241B44; border: 1px solid #8A63E0; border-radius: 0.45em; }
+.ict-lb { position: absolute; top: 0.35em; left: 0.6em; font-size: 0.85em; color: #A894E0; }
+.ict-pnl > svg { position: absolute; inset: 0; }
+
+/* terminal */
+.ict-term { background: #130E24; display: flex; flex-direction: column; }
+.ict-bar { display: flex; align-items: center; gap: 0.5em; padding: 0.55em 0.8em; background: #241B44; border-bottom: 1px solid #3A2A63; font-size: 0.9em; }
+.ict-bar i { width: 0.7em; height: 0.7em; border-radius: 50%; }
+.ict-bar span { margin-left: 0.3em; }
+.ict-line { margin: 0.7em 0 0 0.9em; width: calc(var(--n) * 1ch); overflow: hidden; white-space: nowrap; color: #CDBDF5; }
+.ict-out { color: #fff; }
+.ict-ok { color: #7EE8A2; }
+
+/* design canvas */
+.ict-cv { fill: var(--sq); stroke: #C39BFF; transition: fill 0.35s; }
+.ict-dot { fill: var(--ci); transition: fill 0.35s; }
+.ict-spk { fill: var(--sp); transition: fill 0.35s; }
+.ict-hs { fill: #fff; stroke: #7A56D1; stroke-width: 1; opacity: 0; }
+.ict-cur { opacity: 0; }
+.sd .sd-frame .ict-cur text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 7.5px; font-weight: 500; fill: #1B1230; }
+
+/* layers list */
+.ict-lay { padding: 1.6em 0.5em 0.5em; display: flex; flex-direction: column; gap: 0.3em; }
+.ict-li { font-size: 0.85em; padding: 0.25em 0.45em; border: 1px solid transparent; border-radius: 0.3em; color: #A894E0; transition: background 0.25s, color 0.25s, border-color 0.25s; }
+.ict-li.act { background: #4A3A8A; border-color: #C39BFF; color: #fff; }
+
+/* wireframe + palette */
+.ict-wf { padding: 1.7em 0.7em 0.6em; display: grid; grid-template-columns: 1.2fr 1fr; grid-template-rows: auto repeat(3, minmax(0, 1fr)) auto; gap: 0.4em; }
+.ict-b { border-radius: 0.25em; transition: background 0.35s, transform 0.35s; }
+.ict-b.on { transform: scale(1.02); }
+.ict-hdr { grid-column: 1 / 3; height: 0.9em; background: var(--sp); }
+.ict-img { grid-column: 1; grid-row: 2 / 5; position: relative; background: var(--sq); }
+.ict-img i { position: absolute; top: 0.8em; right: 0.9em; width: 1.5em; height: 1.5em; border-radius: 50%; background: var(--ci); transition: opacity 0.4s, background 0.35s; }
+.ict-t { grid-column: 2; align-self: center; height: 0.8em; background: var(--sp); }
+.ict-t-short { width: 70%; }
+.ict-btn { grid-column: 1; grid-row: 5; width: 70%; height: 1.3em; background: var(--ci); }
+.ict-sw { grid-column: 2; grid-row: 5; display: flex; align-items: center; justify-content: flex-end; gap: 0.6em; padding-right: 0.2em; }
+.ict-sw i { width: 0.9em; height: 0.9em; border-radius: 50%; transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.ict-sw i.sel { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* progress bar */
+.ict-prog { display: grid; grid-template-columns: 17.5em minmax(0, 1fr); gap: 1.2em; align-items: center; font-size: 0.95em; transition: opacity 0.4s; }
+.ict-track { height: 0.8em; border: 1px solid #4A3A8A; border-radius: 0.5em; overflow: hidden; background: #241B44; }
+.ict-fill { height: 100%; width: 100%; background: #B794FF; transition: width 0.6s ease; }
+.ict-lab { white-space: nowrap; }
+.ict-lab-run { display: none; }
+
+/* while the loop plays: everything starts empty and fills in on cue */
+.ict-live .ict-line { width: 0; transition: width calc(var(--n) * 45ms) steps(var(--n)); }
+.ict-live .ict-line.on { width: calc(var(--n) * 1ch); }
+.ict-live .ict-cv:not(.done) { fill: none; stroke-dasharray: 3 3; }
+.ict-live .ict-b:not(.on) { background: #3D3166; }
+.ict-live .ict-img:not(.on) i { opacity: 0; }
+.ict-live .ict-b.ol { outline: 1px dashed #C39BFF; }
+.ict-live:not(.ict-sw-on) .ict-sw i { transform: scale(0); }
+.ict-live:not(.ict-done) .ict-lab-run { display: inline; }
+.ict-live:not(.ict-done) .ict-lab-done { display: none; }
+.ict-fade .ict-main, .ict-fade .ict-prog { opacity: 0; }
+.ict-snap, .ict-snap * { transition: none !important; }
 
 /* stage: the video and the fact card share one tinted band under the hero.
    Side by side on desktop, stacked on phones. */
@@ -3498,10 +3595,7 @@ footer.site-footer {
   .sd .fr-sp { animation: frSpark 1.6s ease-in-out var(--d, 0s) infinite; }
   .sd .fr-steam { animation: frSteam 3s ease-in-out var(--d, 0s) infinite; }
 
-  /* ICT: the terminal types itself line by line */
-  .fr-term p { animation: frType 14s steps(var(--n)) var(--d) infinite; }
-  .fr-term .fr-ready { animation: none; }
-  .fr-caret { animation: sdCaret 1s steps(1) infinite; }
+  /* ICT: its loop is driven by initIctFrame() in script2.js (see "ICT frame" above) */
 
   /* IA: switch closes, a pulse runs down the wire, the bulb lights, then it all opens again */
   .sd .fr-lever { animation: frLever 7s ease-in-out infinite; }
@@ -3528,7 +3622,6 @@ footer.site-footer {
 @keyframes frRing  { 0%, 5% { opacity: 0; transform: scale(1); } 6% { opacity: 0.9; } 22% { opacity: 0; transform: scale(5.5); } 100% { opacity: 0; transform: scale(5.5); } }
 @keyframes frDing  { 0%, 5% { opacity: 0; translate: 0 6px; } 7%, 15% { opacity: 1; translate: 0 0; } 22%, 100% { opacity: 0; translate: 0 -6px; } }
 @keyframes frSteam { 0% { opacity: 0; translate: 0 10px; } 35% { opacity: 0.5; } 100% { opacity: 0; translate: 0 -14px; } }
-@keyframes frType  { 0% { width: 0; } 10% { width: calc(var(--n) * 1ch); } 88% { width: calc(var(--n) * 1ch); } 100% { width: 0; } }
 
 /* STEM */
 @keyframes frSway    { from { rotate: -4deg; } to { rotate: 4deg; } }
@@ -3594,4 +3687,293 @@ footer.site-footer {
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(closest-side, rgba(255, 240, 196, 0.85), rgba(255, 240, 196, 0.55) 55%, rgba(255, 240, 196, 0));
+}
+/* =========================================================
+   HUB + TEST QUALITY-OF-LIFE (appended block, no motion)
+   Keep-tab-open note, results-button reason,
+   "Leave this test?" dialog, keyboard hint.
+   Delete this block to remove all of it from the look.
+   ========================================================= */
+
+/* "Keep this tab open" note, sits under the lock hint above the cards */
+.hub-tab-note {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 18px;
+  padding: 9px 14px;
+  background: #FFF4DB;
+  border: 2px solid var(--amber);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+/* Reason line under "See Overall Results" */
+.hub-results-note {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* "Leave this test?" dialog */
+body.cw-modal-open { overflow: hidden; }
+.cw-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(29, 43, 69, 0.55);
+}
+.cw-modal[hidden] { display: none; }
+.cw-modal-card {
+  width: min(440px, 100%);
+  padding: 24px 24px 20px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.cw-modal-card h3 { margin: 0 0 8px; font-size: 1.3rem; color: var(--navy); }
+.cw-modal-card p { margin: 0 0 20px; line-height: 1.5; color: var(--ink); }
+.cw-modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.cw-modal-card .btn { padding: 12px 24px; }
+.cw-modal-card .btn:focus-visible { outline: 3px solid var(--amber-deep); outline-offset: 3px; }
+
+/* Keyboard hint under Back / Next (hidden on touch screens) */
+.kbd-hint {
+  max-width: 620px;
+  margin: 14px auto 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+@media (hover: none) { .kbd-hint { display: none; } }
+
+/* Padlock on the "See Overall Results" button (closed while locked, open when ready) */
+#hub-results-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+#hub-results-btn .results-lock { flex-shrink: 0; }
+
+/* ============================================================
+   HOME PAGE POLISH (appended block; delete it to undo)
+   - "How it works" text: larger and roomier
+   - Strand cards: Academic / TechPro groups, 3 columns on desktop,
+     more space between cards, tinted backgrounds, darker full names,
+     "Formerly ..." tag on the name line
+   - Second "Start Assessment" button under the grid
+   ============================================================ */
+
+/* How it works */
+.manual { max-width: 720px; }
+.manual-list li {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  padding-bottom: 26px;
+}
+.manual-list li:last-child { padding-bottom: 0; }
+
+/* Grid: more breathing room, three across on desktop */
+#strand-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px 28px;
+}
+@media (min-width: 980px) {
+  #strand-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  #strand-grid { grid-template-columns: 1fr; gap: 26px; }
+}
+
+/* Group labels span the full row */
+.strand-group-label {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0 -4px;
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.strand-group-label::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  opacity: 0.18;
+}
+#strand-grid .strand-group-label:first-child { margin-top: 0; }
+
+/* Card tint (hover still fills with the full strand color) */
+#strand-grid .strand-card {
+  background-color: #fff;
+  background-color: color-mix(in srgb, var(--sc) 8%, #fff);
+}
+#strand-grid .strand-card:hover,
+#strand-grid .strand-card:focus-visible {
+  background-color: var(--sc);
+}
+
+/* Name + "Formerly" tag on one line */
+.strand-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-bottom: 2px;
+}
+.strand-card-head .strand-card-name { margin-bottom: 0; }
+.strand-card-head .strand-card-former {
+  align-self: center;
+  margin: 0 0 0 auto;
+}
+@media (max-width: 400px) {
+  .strand-card-head .strand-card-former { margin-left: 0; }
+}
+
+/* Full strand name: darker and bolder */
+#strand-grid .strand-card-full {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+}
+#strand-grid .strand-card:hover .strand-card-full,
+#strand-grid .strand-card:focus-visible .strand-card-full {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Cards in a row stretch evenly; the link line sits at the bottom */
+#strand-grid .strand-card { align-items: stretch; }
+#strand-grid .strand-card-badge { align-self: flex-start; }
+#strand-grid .strand-card-cta { margin-top: auto; padding-top: 4px; }
+
+/* Second call to action */
+.explore-cta {
+  text-align: center;
+  margin-top: 56px;
+}
+.explore-cta-text {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+
+
+/* ============================================================
+   LOADING SCREEN: strand tiles, checklist, finish pop (appended block)
+   Built by startResultsLoading() in script2.js. Delete this block to go back
+   to the plain loader (the HTML/JS parts are harmless without it).
+   ============================================================ */
+.load-card { padding: 30px 26px 24px; position: relative; }
+.load-compass { position: relative; }
+.load-phrase { margin-bottom: 18px; }
+
+/* six strand tiles */
+.load-tiles { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.load-tile { flex: 1 1 0; max-width: 52px; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+.load-tile-box {
+  width: 100%; aspect-ratio: 1; max-width: 46px;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px dashed #B9B2A3; border-radius: 11px;
+  background: var(--paper-alt); color: #9A9384;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.load-tile-box svg { width: 62%; height: 62%; display: block; }
+.load-tile-name { font-size: 0.68rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 0.02em; }
+.load-tile.on .load-tile-box {
+  border: 2px solid var(--ink); background: var(--sc); color: #fff;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.load-tile.on .load-tile-name { color: var(--ink); }
+
+/* checklist */
+.load-checks {
+  list-style: none; margin: 0 auto 20px; padding: 0;
+  display: flex; flex-direction: column; gap: 9px;
+  width: fit-content; text-align: left;
+}
+.load-checks li { display: flex; align-items: center; gap: 10px; font-size: 0.92rem; color: var(--ink-soft); transition: color 0.2s ease; }
+.load-checks li.on { color: var(--ink); font-weight: 600; }
+.load-check-dot {
+  position: relative; width: 20px; height: 20px; flex-shrink: 0;
+  border: 2px solid #B9B2A3; border-radius: 50%;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.load-checks li.on .load-check-dot { background: var(--sun, #FFD25E); border-color: var(--ink); }
+.load-checks li.on .load-check-dot::after {
+  content: ""; position: absolute; left: 5px; top: 1px; width: 5px; height: 9px;
+  border: solid var(--ink); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg);
+}
+
+/* bar, percentage, privacy note */
+.load-track { height: 16px; }
+.load-fill {
+  background-color: var(--amber);
+  background-image: repeating-linear-gradient(115deg, rgba(255,255,255,0.28) 0 7px, transparent 7px 14px);
+  background-size: 28px 100%;
+}
+.load-card.is-searching .load-fill { animation: loadStripe 0.7s linear infinite; }
+.load-fill.is-done { background-color: var(--sun, #FFD25E); background-image: none; transition: background-color 0.2s ease; }
+@keyframes loadStripe { to { background-position: 28px 0; } }
+.load-pct { margin: 8px 0 0; font-size: 1.4rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.load-privacy { margin: 10px 0 0; font-size: 0.82rem; color: var(--ink-soft); }
+.load-privacy svg { vertical-align: -2px; margin-right: 6px; }
+
+/* finish: compass pop + sparks */
+.load-compass.is-popping svg { animation: loadPop 0.45s ease-out; }
+@keyframes loadPop { 0% { transform: scale(1); } 45% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.load-spark {
+  position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; margin: -4px 0 0 -4px;
+  border-radius: 50%; background: var(--sun, #FFD25E); border: 1.5px solid var(--ink);
+  pointer-events: none; animation: loadSpark 0.65s ease-out forwards;
+}
+.load-spark.alt { background: var(--amber); }
+@keyframes loadSpark {
+  from { transform: translate(0, 0) scale(1); opacity: 1; }
+  to   { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; }
+}
+
+@media (max-width: 380px) {
+  .load-card { padding: 26px 16px 20px; }
+  .load-tiles { gap: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .load-card.is-searching .load-fill,
+  .load-compass.is-popping svg,
+  .load-spark { animation: none; }
+  .load-spark { display: none; }
+}
+
+
+/* ============================================================
+   SUBJECT DESCRIPTIONS on the strand page (appended block)
+   Text comes from `subjectNotes` in STRANDS (script2.js). Delete this block
+   and the cards simply show a name with a plain second line.
+   ============================================================ */
+.sd .sd-subj-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sd .sd-subj-name { line-height: 1.25; }
+.sd .sd-subj-desc {
+  font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.sd[data-strand="ICT"] .sd-subj-desc { color: #C9BCEB; font-size: 0.84rem; }
+@media (max-width: 480px) {
+  .sd .sd-subj-desc { font-size: 0.85rem; }
 }
