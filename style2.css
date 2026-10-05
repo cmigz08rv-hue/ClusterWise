@@ -3977,3 +3977,99 @@ body.cw-modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .sd .sd-subj-desc { font-size: 0.85rem; }
 }
+
+/* ============================================================
+   UNLOCK CUTSCENE (appended block)
+   Full-screen padlock that plays once when the last part is finished.
+   Built and timed by playUnlockIfFirst() in script2.js.
+   Delete this block and the hub still works, it just loses the animation.
+   ============================================================ */
+.unlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  background: rgba(29, 43, 69, 0.97);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.unlock-overlay.show { opacity: 1; }
+
+.uc-lock { opacity: 0; }
+.uc-lock svg { display: block; height: min(52vh, 380px); width: auto; overflow: visible; }
+.uc-lock.pop { animation: ucPop 0.35s cubic-bezier(0.3, 1.5, 0.5, 1) forwards; }
+.uc-lock.shake { animation: ucShake 0.4s ease-in-out; opacity: 1; }
+@keyframes ucPop {
+  0%   { opacity: 0; transform: scale(0.8); }
+  70%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ucShake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-4deg); }
+  40% { transform: rotate(4deg); }
+  60% { transform: rotate(-3deg); }
+  80% { transform: rotate(2deg); }
+}
+.uc-lock.open { opacity: 1; }
+
+.uc-shackle { transform-origin: 140px 100px; transition: transform 0.5s cubic-bezier(0.3, 1.7, 0.5, 1); }
+.uc-lock.open .uc-shackle { transform: translateY(-26px) rotate(-32deg); }
+
+.uc-glint { transform: translateX(-60px); }
+.uc-lock.open .uc-glint { transform: translateX(200px); transition: transform 0.5s ease-out; }
+
+.uc-ring { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.uc-lock.open .uc-ring { animation: ucRing 0.8s ease-out forwards; }
+@keyframes ucRing {
+  0%   { opacity: 0.9; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(3); }
+}
+
+.uc-sp { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.uc-lock.open .uc-sp { animation: ucSpark 0.8s ease-out forwards; }
+@keyframes ucSpark {
+  0%   { opacity: 1; transform: translate(0, 0) scale(0.4); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2); }
+}
+
+.unlock-overlay .uc-fade { opacity: 0; transform: translateY(8px); transition: opacity 0.35s ease, transform 0.35s ease; }
+.unlock-overlay .uc-fade.in { opacity: 1; transform: none; }
+.unlock-overlay .uc-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.7rem, 5vw, 2.3rem);
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin: 18px 0 0;
+}
+.unlock-overlay .uc-text {
+  font-size: clamp(0.98rem, 2.6vw, 1.1rem);
+  color: #FFE9A8;
+  max-width: 380px;
+  margin: 8px 0 0;
+}
+.unlock-overlay .uc-hint {
+  font-size: 0.8rem;
+  color: #C9CDD4;
+  margin: 26px 0 0;
+}
+.uc-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Results button: looks locked while the cutscene runs, then pulses once it ends */
+.btn.unlock-hold { opacity: 0.4; pointer-events: none; }
+.btn.unlock-pulse { animation: ucBtnPulse 0.95s ease-out 2; }
+@keyframes ucBtnPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(217, 142, 43, 0.7); }
+  100% { box-shadow: 0 0 0 16px rgba(217, 142, 43, 0); }
+}
