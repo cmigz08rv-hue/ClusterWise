@@ -65,11 +65,18 @@
     </div>
   </div>
 
-  <div class="wrap">
+  <div class="wrap wrap-wide">
     <section class="explore-strands-section" id="explore-strands">
       <h2 class="section-title">Strands offered at PCSHS</h2>
       <p class="section-sub">Not ready for the assessment yet? Open a strand below to see what it actually covers.</p>
       <div class="strand-grid" id="strand-grid"></div>
+      <div class="explore-cta">
+        <p class="explore-cta-text">Seen enough? Find out which one fits you.</p>
+        <button class="btn btn-primary btn-compass" id="start-btn-2">
+          <span>Start Assessment</span>
+          <span class="btn-compass-icon" aria-hidden="true"></span>
+        </button>
+      </div>
     </section>
   </div>
 </section>
@@ -114,9 +121,16 @@
         <circle cx="60" cy="60" r="5.5" fill="#FFFFFF" stroke="#22262B" stroke-width="2.5"/>
       </svg>
     </div>
-    <p class="load-phrase" id="load-phrase" role="status" aria-live="polite">Tallying answers…</p>
+    <p class="load-phrase" id="load-phrase" role="status" aria-live="polite">Working on your results…</p>
+    <div class="load-tiles" id="load-tiles" aria-hidden="true"></div>
+    <ul class="load-checks" id="load-checks" aria-hidden="true">
+      <li><span class="load-check-dot"></span>Skill tests scored</li>
+      <li><span class="load-check-dot"></span>Interests ranked</li>
+      <li><span class="load-check-dot"></span>Skills and interests compared</li>
+    </ul>
     <div class="load-track" aria-hidden="true"><div class="load-fill" id="load-fill"></div></div>
     <p class="load-pct" id="load-pct" aria-hidden="true">0%</p>
+    <p class="load-privacy"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Your answers stay on this device</p>
   </div>
 </section>
 
