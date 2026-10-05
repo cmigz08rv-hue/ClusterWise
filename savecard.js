@@ -327,29 +327,72 @@
       (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent));
   }
 
-  function download(blob, name) {
-    var url = URL.createObjectURL(blob), a = document.createElement("a");
-    a.href = url; a.download = name; a.style.display = "none";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-  }
+  /* The preview window. Nothing is saved until the student presses Download (or Share on a phone).
+     Cancel, Esc, or tapping outside the window closes it without saving anything. */
+  var openPreview = null;   // only one preview at a time
 
-  /* Fallback for phones that cannot open the share menu (some in-app browsers):
-     show the picture so it can be pressed and held to save. */
-  function showPreview(blob, name) {
+  function showPreview(blob, name, file, opener) {
+    if (openPreview) openPreview();
     var url = URL.createObjectURL(blob);
+    var canShare = isPhone() && file && navigator.canShare && navigator.canShare({ files: [file] });
     var box = document.createElement("div");
     box.className = "save-modal";
     box.innerHTML =
-      '<div class="save-modal-card" role="dialog" aria-modal="true" aria-label="Your results picture">' +
-      '<p class="save-modal-tip">Press and hold the picture, then choose Save image.</p>' +
-      '<img alt="Your ClusterWise results" src="' + url + '">' +
-      '<div class="save-modal-actions"><a class="btn btn-primary" download="' + name + '" href="' + url + '">Download</a>' +
-      '<button type="button" class="btn btn-ghost">Close</button></div></div>';
+      '<div class="save-modal-card" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">' +
+      '<h3 class="save-modal-title" id="save-modal-title">Preview of your results picture</h3>' +
+      '<p class="save-modal-tip">' + (canShare
+        ? 'This is the picture that will be saved. Tap Share or save to keep it or send it.'
+        : isPhone()
+          ? 'This is the picture that will be saved. Tap Download, or press and hold the picture and choose Save image.'
+          : 'This is the picture that will be saved. Scroll to see all of it.') + '</p>' +
+      '<div class="save-modal-view"><img alt="Preview of your ClusterWise results picture" src="' + url + '"></div>' +
+      '<div class="save-modal-actions">' +
+      '<button type="button" class="btn btn-ghost" data-act="cancel">Cancel</button>' +
+      (canShare
+        ? '<button type="button" class="btn btn-primary" data-act="share">Share or save</button>'
+        : '<a class="btn btn-primary" data-act="download" download="' + name + '" href="' + url + '">Download</a>') +
+      '</div></div>';
     document.body.appendChild(box);
-    var close = function () { box.remove(); URL.revokeObjectURL(url); };
-    box.querySelector(".btn-ghost").addEventListener("click", close);
+    document.body.classList.add("save-modal-open");
+
+    var card = box.querySelector(".save-modal-card");
+    var cancelBtn = box.querySelector('[data-act="cancel"]');
+    var main = box.querySelector('[data-act="share"], [data-act="download"]');
+
+    function close() {
+      openPreview = null;
+      document.removeEventListener("keydown", onKey, true);
+      document.body.classList.remove("save-modal-open");
+      box.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);   // give a just-started download time to read the blob
+      if (opener && document.contains(opener) && opener.focus) opener.focus();
+    }
+    function onKey(e) {
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); return; }
+      if (e.key !== "Tab") return;                                   // keep Tab inside the window
+      if (e.shiftKey && document.activeElement === cancelBtn) { e.preventDefault(); main.focus(); }
+      else if (!e.shiftKey && document.activeElement === main) { e.preventDefault(); cancelBtn.focus(); }
+    }
+    openPreview = close;
+    document.addEventListener("keydown", onKey, true);
+    cancelBtn.addEventListener("click", close);
     box.addEventListener("click", function (e) { if (e.target === box) close(); });
+
+    if (canShare) {
+      main.addEventListener("click", function () {
+        navigator.share({ files: [file], title: "My ClusterWise results" }).then(close).catch(function (err) {
+          if (err && err.name === "AbortError") return;              // closed the share sheet: stay in the preview
+          main.outerHTML = '<a class="btn btn-primary" data-act="download" download="' + name + '" href="' + url + '">Download</a>';
+          card.querySelector(".save-modal-tip").textContent =
+            "Sharing isn't available here. Tap Download, or press and hold the picture and choose Save image.";
+        });
+      });
+    } else {
+      main.addEventListener("click", function () {
+        setTimeout(function () { close(); say("Saved. Check your Downloads folder."); }, 250);
+      });
+    }
+    main.focus();
   }
 
   function save(btn) {
@@ -361,15 +404,7 @@
     build().then(toBlob).then(function (blob) {
       var file = null;
       try { file = new File([blob], name, { type: "image/png" }); } catch (e) { file = null; }
-      if (isPhone() && file && navigator.canShare && navigator.canShare({ files: [file] })) {
-        return navigator.share({ files: [file], title: "My ClusterWise results" }).catch(function (err) {
-          if (err && err.name === "AbortError") return;
-          showPreview(blob, name);
-        });
-      }
-      if (isPhone()) { showPreview(blob, name); return; }
-      download(blob, name);
-      say("Saved. Check your Downloads folder.");
+      showPreview(blob, name, file, btn);
     }).catch(function () {
       say("Sorry, the picture could not be made. Please try again.");
     }).then(function () {
