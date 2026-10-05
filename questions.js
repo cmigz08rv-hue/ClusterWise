@@ -147,9 +147,14 @@ const MODULES = {
         topic: "Percentages"
       },
       {
-        q: "Facts: A cell takes in food and oxygen through its surface and uses them throughout its whole volume. For a cube-shaped cell, surface area = 6 × side × side, and volume = side × side × side.\n\nA cube-shaped cell with sides of 2 µm grows until its sides are 4 µm. Which statement is correct?",
-        options: ["Its surface area becomes 8 times larger but its volume becomes 4 times larger, so it has more surface for each unit of volume", "Its surface area and its volume both become 4 times larger, so nothing important changes for the cell", "Its surface area becomes 4 times larger but its volume becomes 8 times larger, so it has less surface for each unit of volume", "Its surface area and its volume both become 2 times larger, because each side has doubled in length"],
-        correctAnswerIndex: 2,
+        q: "Facts: A cell takes in food and oxygen through its surface and uses them throughout its whole volume.\n\nA small cube-shaped cell grows bigger. After growing, its volume is 8 times larger, but its surface area is only 4 times larger. What does this mean for the cell?",
+        options: [
+          "It has more surface for each bit of volume, so it gets food and oxygen more easily",
+          "It has less surface for each bit of volume, so it gets food and oxygen less easily",
+          "Nothing changes, because the cell is still the same shape",
+          "It needs less food and oxygen now, because it is bigger"
+        ],
+        correctAnswerIndex: 1,
         topic: "Scaling"
       },
       {
@@ -164,14 +169,14 @@ const MODULES = {
         topic: "Percent change"
       },
       {
-        q: "Rule: in a right triangle, the longest side (the hypotenuse) squared equals the sum of the squares of the other two sides.\n\nA rectangular garden is 12 m long and 5 m wide. A straight path runs from one corner to the opposite corner. How long is the path?",
+        q: "Rule: in a right triangle, the longest side (the hypotenuse) squared equals the sum of the squares of the other two sides.\n\nA rectangular garden is 6 m long and 8 m wide. A straight path runs from one corner to the opposite corner. How long is the path?",
         options: [
-          "17 m",
-          "7 m",
-          "60 m",
-          "13 m"
+          "14 m",
+          "10 m",
+          "48 m",
+          "100 m"
         ],
-        correctAnswerIndex: 3,
+        correctAnswerIndex: 1,
         topic: "Geometry"
       },
       {
@@ -280,12 +285,12 @@ const MODULES = {
         topic: "Author's purpose"
       },
       {
-        q: "\"Critics called the link between the two studies tenuous: the authors used different methods, different samples, and different years, and the studies shared only one variable.\"\n\nAs used here, the word \"tenuous\" most nearly means:",
+        q: "\"After the typhoon, clean water became scarce: each family could collect only one small container a day.\"\n\nAs used here, the word \"scarce\" most nearly means:",
         options: [
-          "carefully documented",
-          "surprisingly strong",
-          "weak and thinly supported",
-          "widely accepted"
+          "easy to find and plentiful",
+          "dirty and unsafe",
+          "hard to find and in short supply",
+          "cheap and widely sold"
         ],
         correctAnswerIndex: 2,
         topic: "Vocabulary in context"
@@ -479,7 +484,7 @@ const MODULES = {
      --------------------------------------------------------- */
   ICT: {
     title: "Logic, Computers & Problem Solving",
-    blurb: "Step-by-step logic, basic hardware and software, and reading simple code.",
+    blurb: "Step-by-step logic, how computers work, and the basics of web pages.",
     questions: [
       {
         q: "Follow these steps in order:\n\n1. Start with 6\n2. Double it\n3. Subtract 5\n4. Add the original starting number\n\nWhat is the result?",
@@ -506,10 +511,15 @@ const MODULES = {
         topic: "Reading a flowchart"
       },
       {
-        q: "A program starts with a = 1 and b = 2. It then repeats these three steps, in order, 3 times:\n\n1. temp = a\n2. a = b\n3. b = temp + b\n\nWhat are the values of a and b at the end?",
-        options: ["a = 3, b = 5", "a = 8, b = 13", "a = 5, b = 8", "a = 5, b = 13"],
+        q: "Which pair correctly names one input device and one output device?",
+        options: [
+          "Monitor (input) and mouse (output)",
+          "Speakers (input) and microphone (output)",
+          "Keyboard (input) and printer (output)",
+          "Printer (input) and keyboard (output)"
+        ],
         correctAnswerIndex: 2,
-        topic: "Tracing variables"
+        topic: "Computer hardware"
       },
       {
         q: "A student's computer runs very slowly when many programs are open at the same time. Files open and save normally, and the hard drive has plenty of free space. Which upgrade would most likely help?",
@@ -523,16 +533,26 @@ const MODULES = {
         topic: "Hardware and performance"
       },
       {
-        q: "A program goes through the numbers 1 to 15. For each number n it follows these rules in order:\n\nRule 1: If n is divisible by both 3 and 5, print \"FizzBuzz\".\nRule 2: Otherwise, if n is divisible by 3, print \"Fizz\".\nRule 3: Otherwise, if n is divisible by 5, print \"Buzz\".\nRule 4: Otherwise, print n itself.\n\nHow many of the 15 printed lines are exactly the word \"Fizz\"?",
-        options: ["3", "4", "5", "6"],
-        correctAnswerIndex: 1,
-        topic: "Following rules in order"
+        q: "What is the main job of a computer's CPU?",
+        options: [
+          "It runs instructions and does the calculations",
+          "It stores the user's files permanently",
+          "It shows the picture on the screen",
+          "It supplies electricity to every part"
+        ],
+        correctAnswerIndex: 0,
+        topic: "Computer hardware"
       },
       {
-        q: "A game picks a secret whole number from 1 to 100. After each guess, it only says \"higher\" or \"lower\". The best strategy is to always guess the middle of the numbers that are still possible, which cuts the remaining possibilities roughly in half each time.\n\nAt most how many guesses does this strategy need to be certain of finding the number?",
-        options: ["5", "10", "50", "7"],
+        q: "A student saves a photo and then turns the computer off. Which part keeps the photo while the power is off?",
+        options: [
+          "RAM",
+          "The CPU",
+          "The graphics card",
+          "The hard drive or SSD"
+        ],
         correctAnswerIndex: 3,
-        topic: "Efficiency"
+        topic: "Computer hardware"
       },
       {
         q: "A robot on a grid starts facing north. Its commands are:\n\nF = move one square forward\nR = turn 90° to the right\nL = turn 90° to the left\n\nIt follows this program: F, F, R, F\n\nWhere does the robot end up?",
@@ -546,10 +566,15 @@ const MODULES = {
         topic: "Tracing a program"
       },
       {
-        q: "A program finds the biggest number in a list. It sets biggest to the first number, then goes through the rest of the list. If a number is bigger than biggest, it replaces biggest with that number.\n\nThe list is: 7, 3, 12, 9, 12, 5\n\nHow many times is biggest replaced, not counting the first time it was set?",
-        options: ["2", "3", "4", "1"],
-        correctAnswerIndex: 3,
-        topic: "Tracing an algorithm"
+        q: "What is the main job of the motherboard?",
+        options: [
+          "It stores the operating system and all the files",
+          "It connects the CPU, memory, and other parts so they can work together",
+          "It keeps the computer cool",
+          "It makes the screen show images"
+        ],
+        correctAnswerIndex: 1,
+        topic: "Computer hardware"
       },
       {
         q: "The alarm sounds if the door is open AND the system is armed, OR if the panic button is pressed.\n\nIn which situation does the alarm sound?",
@@ -563,48 +588,48 @@ const MODULES = {
         topic: "Logic rules"
       },
       {
-        q: "A program sets total = 0, then goes through the numbers 1 to 5 in order. If a number is odd, it adds that number to total. Otherwise, it subtracts 1 from total.\n\nWhat is the final total?",
+        q: "A web page has the site's logo and menu at the top, the main article in the middle, and the copyright notice at the bottom.\n\nWhich HTML elements fit these three parts, in that order?",
         options: [
-          "9",
-          "2",
-          "8",
-          "7"
+          "footer, main, header",
+          "main, header, footer",
+          "header, main, footer",
+          "header, footer, main"
         ],
-        correctAnswerIndex: 3,
-        topic: "Tracing a loop"
+        correctAnswerIndex: 2,
+        topic: "Web basics"
       },
       {
-        q: "In binary, the places from right to left are worth 1, 2, 4, 8, and so on. A digit of 1 means that place is counted, and a 0 means it is not.\n\nWhat is the binary number 1101 in ordinary (decimal) numbers?",
+        q: "Which of these jobs is done by CSS and not by HTML?",
         options: [
-          "11",
-          "13",
-          "15",
-          "9"
+          "Adding a paragraph of text to the page",
+          "Putting an image on the page",
+          "Making every heading blue with a bigger font size",
+          "Creating a link to another page"
         ],
-        correctAnswerIndex: 1,
-        topic: "Number systems"
+        correctAnswerIndex: 2,
+        topic: "Web basics"
       },
       {
-        q: "A sorting program goes through a list from left to right, comparing each pair of neighbors. If the left number is bigger than the right number, it swaps them. It makes one full pass this way.\n\nThe list is: 7, 3, 9, 1\n\nWhat does the list look like after the one pass?",
+        q: "Which of the following is software and not hardware?",
         options: [
-          "1, 3, 7, 9",
-          "3, 7, 1, 9",
-          "3, 7, 9, 1",
-          "1, 7, 3, 9"
-        ],
-        correctAnswerIndex: 1,
-        topic: "Following a procedure"
-      },
-      {
-        q: "A program is meant to add the numbers from 1 to 5. It sets total = 0, then repeats the following for each number n from 1 to 4: total = total + n. When run, it prints 10 instead of the expected 15.\n\nWhat is the most likely error?",
-        options: [
-          "The loop stops at 4 instead of including 5",
-          "The total should start at 1 instead of 0",
-          "The program adds each number twice",
-          "The program should multiply instead of add"
+          "A web browser",
+          "A keyboard",
+          "A hard drive",
+          "A motherboard"
         ],
         correctAnswerIndex: 0,
-        topic: "Finding a bug"
+        topic: "Hardware and software"
+      },
+      {
+        q: "A student's laptop will not connect to the school Wi-Fi, but a phone next to it connects fine. What is the most sensible first step?",
+        options: [
+          "Restart the router for the whole school",
+          "Check that the laptop's Wi-Fi is turned on and it is joined to the right network",
+          "Reinstall the laptop's operating system",
+          "Ask the phone's owner to share the phone's password"
+        ],
+        correctAnswerIndex: 1,
+        topic: "Troubleshooting"
       }
     ]
   },
@@ -613,7 +638,7 @@ const MODULES = {
      IA — Mechanical Logic, Tool Safety & Schematic Analysis
      --------------------------------------------------------- */
   IA: {
-    title: "Mechanical Logic, Tool Safety & Schematics",
+    title: "Electricity, Machines & Tool Safety",
     blurb: "How machines and circuits behave, and safe work habits.",
     questions: [
       {
@@ -628,32 +653,37 @@ const MODULES = {
         topic: "Gears"
       },
       {
-        q: "Rules: When two gears mesh, they turn in opposite directions, and the same number of teeth pass the contact point on each gear.\n\nThree gears are in a row. Gear A (20 teeth) meshes with gear B (40 teeth), and gear B meshes with gear C (10 teeth). Gear A turns clockwise.\n\nWhich way does gear C turn, and how many turns does it make for each full turn of gear A?",
-        options: ["Counterclockwise; 2 turns", "Clockwise; 0.5 turns", "Clockwise; 2 turns", "Counterclockwise; 0.5 turns"],
-        correctAnswerIndex: 2,
-        topic: "Gear trains"
-      },
-      {
-        q: "Rules: power (watts) = voltage (volts) × current (amps). Energy (watt-hours) = power (watts) × time (hours).\n\nA 12 V lamp draws 2 A and is left on for 5 hours. How much energy does it use?",
+        q: "What does an electric circuit need so that a lamp can light?",
         options: [
-          "24 Wh",
-          "60 Wh",
-          "70 Wh",
-          "120 Wh"
-        ],
-        correctAnswerIndex: 3,
-        topic: "Simple electricity"
-      },
-      {
-        q: "In the water-pipe picture of a circuit, the battery is a pump, the wires are pipes, the current is the flow of water, and a resistor is a narrow section of pipe.\n\nA pump pushes water around a loop that has one narrow section. A second, identical narrow section is added in line with the first, so all the water must pass through both. The pump is unchanged.\n\nWhat happens to the flow, and what does this suggest for a circuit where a second identical resistor is added in series?",
-        options: [
-          "The flow increases; the current in the circuit increases",
-          "The flow decreases; the current in the circuit decreases",
-          "The flow stays the same; the current stays the same",
-          "The flow stops; the current stops"
+          "Only a battery placed next to the lamp",
+          "A power source, a complete loop of wire, and the lamp",
+          "A wire connected to just one end of the battery",
+          "A switch that is left in the open position"
         ],
         correctAnswerIndex: 1,
-        topic: "Circuit analogies"
+        topic: "Electricity basics"
+      },
+      {
+        q: "Which statement best describes an electric current?",
+        options: [
+          "Heat that travels along a wire",
+          "Light that the battery gives off",
+          "The flow of electric charge through a material, such as a metal wire",
+          "A liquid that is stored inside a battery"
+        ],
+        correctAnswerIndex: 2,
+        topic: "Electricity basics"
+      },
+      {
+        q: "Why are electric wires usually covered in plastic?",
+        options: [
+          "The plastic makes the electricity flow faster",
+          "The plastic is an insulator, so it keeps electricity in the wire and protects people from shocks",
+          "The plastic stores extra electricity for later",
+          "The plastic stops the wire from getting warm when it is used"
+        ],
+        correctAnswerIndex: 1,
+        topic: "Electrical safety"
       },
       {
         q: "A flashlight has two batteries, a switch, and a bulb, connected in a loop. It does not light. You replace the batteries with new ones, and it still does not light. You then put the bulb into a different, working flashlight, and the bulb lights up.\n\nWhich part is most likely at fault?",
@@ -678,21 +708,26 @@ const MODULES = {
         topic: "Tracing a fault"
       },
       {
-        q: "A measuring cylinder is marked with numbers every 10 mL. Between the 40 mL and 50 mL marks there are 4 small lines that divide the space into 5 equal parts. The water surface is exactly at the 3rd small line above the 40 mL mark.\n\nWhat volume does the cylinder show?",
+        q: "What is the job of a fuse or circuit breaker?",
         options: [
-          "43 mL",
-          "46 mL",
-          "44 mL",
-          "48 mL"
+          "It makes appliances use less electricity",
+          "It boosts the voltage when an appliance needs more power",
+          "It cuts off the electricity when too much current flows, to prevent overheating",
+          "It stores electricity for use during a blackout"
         ],
-        correctAnswerIndex: 1,
-        topic: "Reading measurements"
+        correctAnswerIndex: 2,
+        topic: "Electrical safety"
       },
       {
-        q: "Rule: A seesaw balances when (weight × distance from the pivot) on one side equals (weight × distance from the pivot) on the other side.\n\nA 50 kg child sits 1.2 m from the pivot. Where must a 30 kg child sit on the other side to balance?",
-        options: ["0.72 m", "1.2 m", "2.0 m", "2.5 m"],
-        correctAnswerIndex: 2,
-        topic: "Balance and turning effect"
+        q: "Why is it unsafe to plug many heavy appliances into one extension cord?",
+        options: [
+          "Too much current can overheat the cord and cause a fire",
+          "The appliances would just run slower but stay safe",
+          "Extension cords can only carry electricity in one direction",
+          "The wall socket would slowly give out less electricity"
+        ],
+        correctAnswerIndex: 0,
+        topic: "Electrical safety"
       },
       {
         q: "On machines, lockout means switching the power off at the main switch and attaching your own padlock to it, so nobody else can switch it back on while you work.\n\nA worker must clear a jam inside a machine. Which is the best example of lockout?",
@@ -728,43 +763,48 @@ const MODULES = {
         topic: "Parallel circuits"
       },
       {
-        q: "Facts: In a simple pulley system, effort = load ÷ number of supporting rope segments (ignoring friction). The length of rope you pull = the lift distance × the number of supporting segments.\n\nA 200 N load is lifted 1 m using 4 supporting segments. What effort and how much rope?",
+        q: "A long crowbar helps a person lift a heavy rock. Why does it help?",
         options: [
-          "50 N; 1 m",
-          "50 N; 4 m",
-          "200 N; 4 m",
-          "800 N; 1 m"
-        ],
-        correctAnswerIndex: 1,
-        topic: "Pulleys"
-      },
-      {
-        q: "Facts: In a series circuit, a break anywhere stops all current. With no current, every working part shows 0 V across it, and the full battery voltage appears across the break.\n\nA 9 V battery, a switch, and a lamp are connected in series. The switch is closed, but the lamp is off. A technician measures the voltage across the lamp and finds 0 V. Across the switch, the reading is 9 V.\n\nWhat does this show?",
-        options: ["The lamp has burned out, because it shows 0 V", "The battery is dead, because the lamp is getting no voltage", "Nothing is wrong, because these are the normal readings for a working circuit", "The switch is not conducting even though it is closed, so it is the faulty part"],
-        correctAnswerIndex: 3,
-        topic: "Measuring a fault"
-      },
-      {
-        q: "Facts: In a hydraulic system, the pressure is the same throughout the liquid. Pressure = force ÷ area.\n\nA hydraulic jack has a small piston with an area of 2 cm² and a large piston with an area of 20 cm². You push down on the small piston with a force of 100 N.\n\nWhat force does the large piston produce?",
-        options: [
-          "10 N",
-          "2,000 N",
-          "1,000 N",
-          "100 N"
+          "It makes the rock weigh less while it is being lifted",
+          "It adds extra energy that the person does not have to supply",
+          "A small push at one end becomes a bigger lifting force at the other end, using a pivot",
+          "It turns the rock's weight into friction"
         ],
         correctAnswerIndex: 2,
-        topic: "Hydraulics"
+        topic: "Simple machines"
       },
       {
-        q: "A circuit schematic, described in words: a battery is connected in a loop with a closed switch A and a lamp, and the lamp is lit. A second switch, B, is wired directly across the two ends of the lamp, giving a plain wire path around it. Switch B is currently open.\n\nWhat happens when switch B is closed?",
+        q: "What is the main advantage of lifting a heavy load with a pulley system?",
         options: [
-          "The lamp stays equally bright, because it is still connected to the battery",
-          "The lamp goes out, and a large current flows through switch B instead",
-          "The lamp gets brighter, because current now has two paths to flow through",
-          "Nothing flows anywhere, because the loop is now broken"
+          "It reduces the weight of the load",
+          "It lets you do less total work than lifting by hand",
+          "It makes the lift faster without any extra effort",
+          "It changes the direction of the pull, and with more rope segments it takes less effort"
+        ],
+        correctAnswerIndex: 3,
+        topic: "Simple machines"
+      },
+      {
+        q: "A technician needs to cut a thin copper wire cleanly. Which tool is the best choice?",
+        options: [
+          "Wire cutters",
+          "Handsaw",
+          "Adjustable wrench",
+          "Claw hammer"
+        ],
+        correctAnswerIndex: 0,
+        topic: "Tools"
+      },
+      {
+        q: "A family member needs to repair a broken appliance. What is the safest first step?",
+        options: [
+          "Wear rubber slippers and work carefully while it is still plugged in",
+          "Unplug it or switch off the power before touching it",
+          "Dry your hands well and keep it plugged in so you can test it",
+          "Ask someone to hold the plug while you work"
         ],
         correctAnswerIndex: 1,
-        topic: "Reading schematics"
+        topic: "Electrical safety"
       }
     ]
   },
@@ -778,91 +818,166 @@ const MODULES = {
     questions: [
       {
         q: "A guest at a hotel restaurant tells you the steak is overcooked. They have already eaten half of it. What is the best response?",
-        options: ["Apologize, offer a free dessert, and clear the plate so the table can move on and enjoy the rest of the evening", "Apologize sincerely, ask whether they would like a remake or a different dish, and tell the kitchen exactly what went wrong", "Explain politely that steak keeps cooking on a hot plate, and suggest ordering it less done next time", "Take the plate away and bring a fresh steak without asking, so the guest does not have to wait through a discussion"],
+        options: [
+          "Explain that steak keeps cooking on a hot plate and suggest ordering it less done next time",
+          "Apologize, ask if they want a remake or another dish, and tell the kitchen",
+          "Apologize and take the plate away so they can enjoy the rest of the evening",
+          "Bring a fresh steak without asking, so the guest does not have to discuss it"
+        ],
         correctAnswerIndex: 1,
         topic: "Handling complaints"
       },
       {
         q: "A couple arrives late at the front desk. They confirmed a sea-view room for their anniversary, but the hotel is overbooked and only a garden-view room is left. What is the best way to handle this?",
-        options: ["Give them the garden-view room and mention the difference only if they ask, so the evening is not spoiled by bad news at check-in", "Book them into a sea-view room at a nearby hotel at your hotel's expense and arrange their transport so they get the view they paid for", "Offer the garden-view room at a discount, and explain that it is the only room left tonight because of the overbooking", "Be honest at check-in, apologize, offer the garden view tonight with a confirmed sea-view room tomorrow, and a small anniversary gesture"],
-        correctAnswerIndex: 3,
+        options: [
+          "Give them the garden-view room and mention the difference only if they ask",
+          "Offer the garden-view room at a discount and say it is the only room left",
+          "Apologize, explain, and offer the garden view tonight with a sea-view room tomorrow",
+          "Book a sea-view room at another hotel at your hotel's expense without asking your manager"
+        ],
+        correctAnswerIndex: 2,
         topic: "Service recovery"
       },
       {
         q: "You are guiding a day tour. Heavy rain blocks the road to the waterfall, which most of the group paid to see. The group includes elderly guests and children. What should you do?",
-        options: ["Explain the situation honestly, confirm safe alternatives with your operator, and offer the group two options with time and cost for each", "Keep the group at the roadblock until the rain eases, since the waterfall is the main reason they booked this tour", "Skip the waterfall, go straight to lunch, and refund that stop's cost at the end of the tour once the weather clears", "Choose the best alternative yourself and announce it clearly, so the group does not waste time debating in the rain"],
-        correctAnswerIndex: 0,
+        options: [
+          "Keep the group at the roadblock until the rain eases, since the waterfall is why they booked",
+          "Skip the waterfall, go straight to lunch, and refund that stop later",
+          "Choose the best alternative yourself and announce it, so nobody wastes time debating in the rain",
+          "Explain honestly, check safe options with your operator, and offer the group two choices"
+        ],
+        correctAnswerIndex: 3,
         topic: "Handling changes"
       },
       {
         q: "During a wedding banquet, the head cook falls ill and the kitchen falls 20 minutes behind. You are a server on the floor. What is the most useful thing you can do?",
-        options: ["Go into the kitchen and help plate dishes, since that is where the delay is and extra hands will speed things up", "Tell each table the kitchen is short-staffed and that you cannot say when food will arrive, so nobody is misled", "Ask your supervisor to stop taking new orders until the kitchen catches up, so the backlog does not grow further", "Stay on the floor, share your supervisor's time estimate, offer bread or drinks, and tell your supervisor which tables have waited longest"],
-        correctAnswerIndex: 3,
+        options: [
+          "Stay on the floor, share the supervisor's time estimate, offer bread or drinks, and report long waits",
+          "Go into the kitchen and help plate dishes, since that is where the delay is and extra hands will speed it up",
+          "Tell each table the kitchen is short-staffed and you cannot say when food will come",
+          "Ask your supervisor to stop taking new orders until the kitchen catches up with the ones it has"
+        ],
+        correctAnswerIndex: 0,
         topic: "Working under pressure"
       },
       {
         q: "A chicken delivery arrived an hour ago and sat in a warm receiving area. The supplier says it was packed cold. A large booking arrives at noon. What should you do?",
-        options: ["Use it, since it was packed cold by the supplier and thorough cooking will kill any bacteria that grew in transit", "Wash it thoroughly and cook it first, so it does not sit any longer before the noon booking arrives", "Probe-check its temperature, record it, and reject or quarantine it if above the safe limit, then tell the chef", "Use it only for well-done dishes and keep it away from ready-to-eat items, so any risk stays contained"],
+        options: [
+          "Use it, since it was packed cold and thorough cooking will kill any bacteria that grew",
+          "Wash it well and cook it first so it does not sit any longer",
+          "Probe-check its temperature, record it, and reject it if above the safe limit",
+          "Use it only for well-done dishes and keep it away from ready-to-eat food"
+        ],
         correctAnswerIndex: 2,
         topic: "Food safety"
       },
       {
         q: "You notice that a coworker you get along with overcharged a guest by ₱500 at checkout. The guest has already left without noticing. The coworker says, \"Please don't tell anyone, it was an honest mistake.\" What is the best response?",
-        options: ["Say nothing this time but warn them to double-check bills in future, since the guest left happy and it was an honest mistake", "Quietly put ₱500 into the cash drawer from your own money, so the books balance and your coworker avoids trouble", "Go straight to the supervisor without telling your coworker, so they cannot talk you out of reporting it", "Urge your coworker to report it and arrange the refund with the supervisor today, and report it yourself if they refuse"],
-        correctAnswerIndex: 3,
+        options: [
+          "Say nothing this time but warn them to double-check bills in future, since it was an honest mistake",
+          "Urge your coworker to report it and refund the guest, or report it yourself",
+          "Quietly put ₱500 in the cash drawer from your own money",
+          "Go straight to the supervisor without telling your coworker"
+        ],
+        correctAnswerIndex: 1,
         topic: "Honesty at work"
       },
       {
         q: "You are caring for an elderly resident who says she is too tired for her bath today. Facility policy encourages daily hygiene. What is the best approach?",
-        options: ["Explain that daily baths are facility policy and keep encouraging her until she agrees, so her routine stays consistent", "Skip it for today without telling anyone, since it is her decision and she is clearly tired", "Offer a quick face-and-hands wash-up now, suggest the full bath later today, and let the nurse know", "Ask a colleague she likes to persuade her, then bathe her as soon as she agrees to it"],
+        options: [
+          "Remind her that daily baths are facility policy and keep encouraging her until she agrees",
+          "Skip it for today without telling anyone, since it is her choice",
+          "Offer a quick face-and-hands wash now, suggest the full bath later, and tell the nurse",
+          "Ask a colleague she likes to persuade her, then bathe her once she agrees"
+        ],
         correctAnswerIndex: 2,
         topic: "Care and dignity"
       },
       {
         q: "You are the only server on the floor. At the same moment, one guest calls for the bill because she is running late, and a guest at another table signals that he wants to order drinks. What should you do?",
-        options: ["Take the drink order first, since a new order adds to sales and the other guest can pay when you pass by", "Acknowledge both at once, say you will be right with them, then bring the bill to the guest in a hurry first", "Serve whoever signaled first, to keep things fair, since guests tend to notice when others are served before them", "Ask both guests to wait while you look for a colleague who can take over one of the two requests"],
-        correctAnswerIndex: 1,
+        options: [
+          "Take the drink order first, since new orders add to sales",
+          "Serve whoever signaled first, to keep things fair, since guests notice when others are served before them",
+          "Ask both guests to wait while you find a colleague to take one of the requests",
+          "Acknowledge both guests, say you will be right there, and bring the bill to the hurried guest first"
+        ],
+        correctAnswerIndex: 3,
         topic: "Prioritizing guests"
       },
       {
         q: "A tourist offers extra pay if you take them to a village festival that the community has marked as closed to outsiders. What is the best response?",
-        options: ["Take them if your friend in the village agrees, and ask the tourist to stay at the back and avoid taking photos", "Accept, and charge extra to cover the risk of being questioned by the villagers if anyone objects to the visit", "Explain the community's rules and let the tourist decide whether to go alone, since that is their own choice", "Decline politely, explain that some events are reserved for the community, and offer public cultural activities or a local artisan visit instead"],
-        correctAnswerIndex: 3,
+        options: [
+          "Decline politely, explain some events are for the community only, and offer public activities",
+          "Take them if your friend in the village agrees, and ask the tourist to stay back and avoid photos",
+          "Accept and charge extra to cover the risk of villagers objecting",
+          "Explain the community's rules and let the tourist decide whether to go alone"
+        ],
+        correctAnswerIndex: 0,
         topic: "Respecting local culture"
       },
       {
         q: "A guest who has fully used a spa treatment asks for a refund, saying it was \"not relaxing enough.\" Policy allows refunds only for service failures, and the manager is off duty. What is the best response?",
-        options: ["Politely refuse, quoting the policy that refunds are only for service failures, and wish the guest a pleasant day", "Refund the fee in full, since an unhappy guest can damage the spa's reputation and the amount is small", "Listen to what fell short, apologize sincerely, explain the policy, and ask the manager to review a possible credit tomorrow", "Offer a 10% voucher on the spot to end the discussion, even though the policy does not provide for one"],
+        options: [
+          "Politely refuse, quoting the policy, and wish the guest a pleasant day",
+          "Refund the fee in full, since an unhappy guest can hurt the spa's reputation",
+          "Listen, apologize, explain the policy, and ask the manager to review a credit tomorrow",
+          "Offer a 10% voucher on the spot to end the discussion, even though policy does not allow it"
+        ],
         correctAnswerIndex: 2,
         topic: "Handling refund requests"
       },
       {
         q: "A guest with a severe peanut allergy orders a dessert, and you are not sure whether the sauce contains peanuts. What is the best response?",
-        options: ["Say it is probably fine, since no nuts are listed on the menu, and mention the allergy to the kitchen afterward", "Serve it without the sauce, since taking off the sauce removes any risk from the dish for this guest", "Hand the guest the sauce label and let them decide for themselves, since it is their health to manage", "Check the ingredients with the kitchen, and offer a confirmed-safe dessert if the sauce cannot be verified"],
-        correctAnswerIndex: 3,
+        options: [
+          "Check the ingredients with the kitchen, and offer a safe dessert if it cannot be verified",
+          "Say it is probably fine since no nuts are listed on the menu, and mention the allergy afterward",
+          "Serve it without the sauce, since that removes any risk",
+          "Hand the guest the sauce label and let them decide"
+        ],
+        correctAnswerIndex: 0,
         topic: "Guest safety"
       },
       {
         q: "A regular guest who is friends with the manager asks you to hold the last free table for his party, arriving in 30 minutes. The restaurant is full, and a family with a small child has been waiting 20 minutes for a table. The manager is not on the floor. What is the best response?",
-        options: ["Hold the table for the regular guest, since regulars bring repeat business, and offer the family a free drink while they wait", "Tell both parties the restaurant is fully booked and that you cannot promise anyone a table, to keep things fair for everyone", "Seat the waiting family first, then offer the regular guest the next free table and a drink at the bar", "Call the manager and wait for instructions before seating anyone, so the decision does not rest on you alone, whatever the delay"],
+        options: [
+          "Hold the table for the regular guest, since regulars bring repeat business, and give the family a free drink",
+          "Tell both parties the restaurant is fully booked and you cannot promise anyone a table",
+          "Seat the waiting family first, then offer the regular guest the next free table and a drink at the bar",
+          "Call the manager and wait for instructions before seating anyone, whatever the delay"
+        ],
         correctAnswerIndex: 2,
         topic: "Fairness to guests"
       },
       {
         q: "At 11 p.m., a guest in Room 305 calls the front desk to complain that a group next door is loudly celebrating. The group is a wedding party that has booked most of the floor, and they are not breaking any hotel rule yet.\n\nWhat is the best response?",
-        options: ["Explain that the wedding party booked most of the floor, that noise is part of their event, and that it will end soon", "Tell the guest you will pass the complaint to the day manager, and ask them to put it in writing at checkout", "Move the guest to another room immediately and offer a free night, so there is no need to speak to the party", "Apologize, politely ask the wedding party to lower the volume, then check back and offer another room if the noise continues"],
-        correctAnswerIndex: 3,
+        options: [
+          "Explain that the wedding party booked most of the floor and that the noise will end soon enough",
+          "Apologize, politely ask the party to lower the volume, then check back and offer another room",
+          "Move the guest to another room immediately with a free night, without speaking to the party",
+          "Pass the complaint to the day manager and ask the guest to put it in writing at checkout"
+        ],
+        correctAnswerIndex: 1,
         topic: "Handling noise complaints"
       },
       {
         q: "A guest at the front desk asks for a quiet, inexpensive place for dinner. A lively, expensive restaurant nearby pays hotel staff a small commission for each guest sent there. A simple café two streets away would suit this guest much better.\n\nWhat is the best response?",
-        options: ["Recommend the restaurant, since it has a partnership with the hotel, and describe it honestly as lively so the guest can decide", "Recommend the café that fits what the guest asked for, and tell your supervisor about the commission offer", "Recommend both places equally without mentioning which one pays you, and let the guest make the final choice alone", "Decline to recommend anything and hand the guest a printed list of every restaurant within walking distance"],
-        correctAnswerIndex: 1,
+        options: [
+          "Recommend the restaurant because of the hotel partnership, and describe it honestly as lively",
+          "Recommend both places equally without mentioning which one pays you",
+          "Recommend the café that suits the guest, and tell your supervisor about the commission offer",
+          "Decline to recommend anything and hand over a printed list of every restaurant nearby"
+        ],
+        correctAnswerIndex: 2,
         topic: "Honest recommendations"
       },
       {
         q: "During a busy breakfast service, a coworker arrives 20 minutes late for the third time this week, and you have been covering part of their tables. You are getting tired and a little resentful.\n\nWhat is the best next step?",
-        options: ["Keep covering quietly, since guests are being served and raising the problem would only create tension on the team", "Tell the supervisor straight away, in front of the rest of the team, so the lateness is dealt with immediately", "Stop covering their tables from tomorrow, so they feel the effect of arriving late and learn to be on time", "Speak to the coworker privately about the effect on you and the guests, and tell the supervisor if it continues"],
+        options: [
+          "Keep covering quietly, since raising it would only create tension",
+          "Tell the supervisor straight away in front of the rest of the team so it is dealt with at once",
+          "Stop covering their tables from tomorrow, so they feel the effect of being late and learn to be on time",
+          "Talk to the coworker privately about the effect on you and the guests, and escalate if it continues"
+        ],
         correctAnswerIndex: 3,
         topic: "Teamwork under pressure"
       }
