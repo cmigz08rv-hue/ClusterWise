@@ -38,6 +38,13 @@ const STRANDS = {
     focus: "Deep, theory-first study of the natural and physical sciences, paired with advanced mathematics.",
     highlight: "theory-first",
     subjects: ["Pre-Calculus & Basic Calculus", "General Physics", "General Chemistry", "General Biology", "Research"],
+    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+      "Pre-Calculus & Basic Calculus": "You work with functions, graphs, and trigonometry, then learn how quantities change using limits and derivatives.",
+      "General Physics": "You study motion, forces, energy, electricity, and waves, and use math to explain how the physical world behaves.",
+      "General Chemistry": "You explore what everything is made of, how substances react, and why, with hands-on lab work.",
+      "General Biology": "You study living things, from cells and genetics to evolution and ecosystems, and how life systems work.",
+      "Research": "You plan and carry out your own small investigation, from asking a question to presenting what you found.",
+    },
     skills: ["Analytical & logical reasoning", "Data interpretation", "Scientific methodology", "Precision & patience with detail"],
     courses: ["Engineering (all branches)", "Computer Science", "Medicine & Allied Health Sciences", "Architecture", "Applied Mathematics"],
     careers: ["Engineer", "Researcher / Scientist", "Doctor", "Architect", "Data Analyst"],
@@ -53,6 +60,13 @@ const STRANDS = {
     focus: "The study of human behavior, society, communication, and the humanities.",
     highlight: "human behavior, society",
     subjects: ["Creative Writing", "Philosophy", "Communication", "Politics & Governance", "Disciplines & Ideas in Social Sciences"],
+    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+      "Creative Writing": "You write stories, poems, and essays, and learn what makes writing stand out.",
+      "Philosophy": "You ask big questions about truth, right and wrong, and how we know what we know.",
+      "Communication": "You study how people share ideas, and practice speaking, presenting, and reading media critically.",
+      "Politics & Governance": "You learn how governments work, how decisions get made, and how citizens take part.",
+      "Disciplines & Ideas in Social Sciences": "You get a first look at fields like psychology, sociology, and anthropology.",
+    },
     skills: ["Writing & public speaking", "Critical & reflective thinking", "Research & interviewing", "Empathy & cultural awareness"],
     courses: ["Communication / Journalism", "Political Science", "Education", "Psychology", "Law (pre-law)"],
     careers: ["Teacher / Professor", "Lawyer", "Journalist", "Psychologist", "Public Servant"],
@@ -68,6 +82,13 @@ const STRANDS = {
     focus: "The fundamentals of business operations, finance, and management practices.",
     highlight: "business operations, finance",
     subjects: ["Fundamentals of ABM", "Business Finance", "Organization & Management", "Applied Economics", "Business Math"],
+    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+      "Fundamentals of ABM": "You learn the basics of accounting and how a business keeps track of what it earns and spends.",
+      "Business Finance": "You learn how businesses raise, manage, and invest money, and how to read financial statements.",
+      "Organization & Management": "You study how businesses are organized and led, including planning, teamwork, and decision-making.",
+      "Applied Economics": "You use ideas like supply, demand, and cost to understand real business and market situations.",
+      "Business Math": "You practice the everyday math of business, like percentages, interest, profit, and pricing.",
+    },
     skills: ["Budgeting & financial literacy", "Planning & organizing", "Negotiation & leadership", "Numerical reasoning"],
     courses: ["Accountancy", "Business Administration", "Entrepreneurship", "Marketing Management", "Economics"],
     careers: ["Accountant", "Entrepreneur", "Marketing Manager", "Financial Analyst", "Human Resources Officer"],
@@ -83,6 +104,13 @@ const STRANDS = {
     focus: "Hands-on training in food, service, hospitality, and tourism-related work.",
     highlight: "food, service, hospitality",
     subjects: ["Cookery", "Food & Beverage Services", "Housekeeping", "Tourism Promotion", "Caregiving"],
+    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+      "Cookery": "You learn to prepare food, from knife skills and cooking methods to kitchen safety and plating.",
+      "Food & Beverage Services": "You practice serving guests in a restaurant: setting tables, taking orders, serving drinks, and handling customers.",
+      "Housekeeping": "You learn how hotels and lodgings keep rooms clean, ready, and comfortable for guests.",
+      "Tourism Promotion": "You study tourist destinations and learn how places, culture, and attractions are promoted to travelers.",
+      "Caregiving": "You learn the basics of caring for children, older adults, and people who need help, with safety and respect first.",
+    },
     skills: ["Practical service skills", "Attention to hygiene & detail", "Customer care", "Teamwork under pressure"],
     courses: ["Hotel & Restaurant Management", "Tourism Management", "Nutrition & Dietetics", "Nursing", "Culinary Arts"],
     careers: ["Chef / Cook", "Hotel & Restaurant Staff", "Tour Coordinator", "Caregiver", "Flight Attendant"],
@@ -97,6 +125,13 @@ const STRANDS = {
     focus: "Practical, skills-based training in computer systems, software, and digital media.",
     highlight: "skills-based training",
     subjects: ["Computer Programming", "Computer Systems Servicing", "Animation", "Technical Drafting", "Web/App Development"],
+    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+      "Computer Programming": "You learn to write code that tells a computer what to do, starting with logic and simple programs.",
+      "Computer Systems Servicing": "You assemble, install, and troubleshoot computers and networks, and fix common hardware and software problems.",
+      "Animation": "You make moving images, from drawing and storyboarding to bringing characters and scenes to life on a computer.",
+      "Technical Drafting": "You learn to draw precise plans and technical drawings, by hand and with software.",
+      "Web/App Development": "You build websites and apps, designing how they look and coding how they work.",
+    },
     skills: ["Programming & logic building", "Troubleshooting", "Digital design", "Systematic thinking"],
     courses: ["Computer Science", "Information Technology", "Multimedia Arts", "Computer Engineering", "Digital Design"],
     careers: ["Software Developer", "IT Support Specialist", "UI/UX Designer", "Network Administrator", "Game Developer"],
@@ -112,6 +147,13 @@ const STRANDS = {
     focus: "Technical-vocational training in electrical systems, installation, and maintenance work.",
     highlight: "Technical-vocational training",
     subjects: ["Electrical Installation", "Industrial Wiring", "Occupational Health & Safety", "Technical Drawing", "Electronics"],
+    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+      "Electrical Installation": "You learn to install and maintain wiring and electrical systems in homes and buildings, safely.",
+      "Industrial Wiring": "You work with the wiring, motors, and controls used in factories and larger buildings.",
+      "Occupational Health & Safety": "You learn to spot hazards and keep a workplace safe, including proper gear and procedures.",
+      "Technical Drawing": "You read and make technical drawings for machines and structures, using standard symbols and measurements.",
+      "Electronics": "You learn how circuits and electronic parts work, and practice building, testing, and repairing simple devices.",
+    },
     skills: ["Manual dexterity & precision", "Practical troubleshooting", "Safety-conscious work habits", "Tool & equipment handling"],
     courses: ["Electrical Engineering", "Electronics Engineering", "Industrial Technology", "Mechanical Technology", "Automotive Technology"],
     careers: ["Electrician", "Electrical Technician", "Maintenance Engineer", "Industrial Electrician", "Building Technician"],
@@ -400,38 +442,54 @@ function openHub(mode) {
 }
 
 document.getElementById("start-btn").addEventListener("click", openHub);
-document.getElementById("nav-home").addEventListener("click", () => showView("view-home"));
-document.getElementById("nav-explore").addEventListener("click", () => {
+document.getElementById("start-btn-2").addEventListener("click", openHub);
+document.getElementById("nav-home").addEventListener("click", () => confirmLeave(() => showView("view-home")));
+document.getElementById("nav-explore").addEventListener("click", () => confirmLeave(() => {
   showView("view-home");
   setTimeout(() => {
     document.getElementById("explore-strands").scrollIntoView({ behavior: "smooth", block: "start" });
   }, 50);
-});
+}));
 
 /* ---------- Explore Strands cards (home page) ---------- */
+/* The two groups shown on the home page (labels are what PCSHS calls them) */
+const STRAND_GROUPS = [
+  { label: "Academic", codes: ["STEM", "ASSH", "BM"] },
+  { label: "TechPro",  codes: ["HT", "ICT", "IA"] }
+];
+
 function renderStrandGrid() {
   const grid = document.getElementById("strand-grid");
   grid.innerHTML = "";
-  STRAND_ORDER.forEach(code => {
-    const info = STRANDS[code];
-    const card = document.createElement("button");
-    card.className = "strand-card";
-    card.style.setProperty("--sc", info.color);
-    card.innerHTML = `
-      <span class="strand-card-badge" aria-hidden="true">${STRAND_ICONS[code]}</span>
-      <span class="strand-card-content">
-        <span class="strand-card-name">${info.name}</span>
-        <span class="strand-card-full">${info.full}</span>
-        ${info.formerly ? `<span class="strand-card-former">Formerly ${info.formerly}</span>` : ""}
-        <p class="strand-card-blurb">${info.overview}</p>
-        <span class="strand-card-cta">View subjects, courses & careers &rsaquo;</span>
-      </span>
-    `;
-    card.addEventListener("click", () => {
-      renderStrandDetail(code);
-      showView("view-strand-detail");
+  STRAND_GROUPS.forEach(group => {
+    const label = document.createElement("h3");
+    label.className = "strand-group-label";
+    label.textContent = group.label;
+    grid.appendChild(label);
+
+    group.codes.forEach(code => {
+      const info = STRANDS[code];
+      const card = document.createElement("button");
+      card.className = "strand-card";
+      card.style.setProperty("--sc", info.color);
+      card.innerHTML = `
+        <span class="strand-card-badge" aria-hidden="true">${STRAND_ICONS[code]}</span>
+        <span class="strand-card-content">
+          <span class="strand-card-head">
+            <span class="strand-card-name">${info.name}</span>
+            ${info.formerly ? `<span class="strand-card-former">Formerly ${info.formerly}</span>` : ""}
+          </span>
+          <span class="strand-card-full">${info.full}</span>
+          <p class="strand-card-blurb">${info.overview}</p>
+          <span class="strand-card-cta">View subjects, courses & careers &rsaquo;</span>
+        </span>
+      `;
+      card.addEventListener("click", () => {
+        renderStrandDetail(code);
+        showView("view-strand-detail");
+      });
+      grid.appendChild(card);
     });
-    grid.appendChild(card);
   });
 }
 
@@ -507,6 +565,111 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
     setTimeout(tick, delay);
   }
   setTimeout(tick, 900);
+}
+
+/* ---------- ICT frame: replays the build on a loop ----------
+   The markup in STRAND_FRAMES.ICT is the finished picture. When motion is allowed this puts it back to
+   "empty" and plays: Java compiles and runs in the terminal, each subject says ok, a cursor
+   draws a logo on the design canvas, then a ring hops across the palette, recoloring the logo and the
+   wireframe while the layers list steps along. Loop is about 13.5 seconds.
+   Like the typewriter: stops when the student leaves the page, and "reduce motion" keeps the finished picture.
+   To change the wording: the lines are in STRAND_FRAMES.ICT. To change the pace: the numbers in run() below (milliseconds). */
+const ICT_THEMES = [                       // one per palette dot, in the order the dots appear
+  { sq: "#7A56D1", ci: "#FFD36E", sp: "#C39BFF" },   // the finished logo: violet square, gold circle, lavender spark
+  { sq: "#C39BFF", ci: "#5B3FA8", sp: "#FFD36E" },
+  { sq: "#FFD36E", ci: "#7A56D1", sp: "#C39BFF" },
+  { sq: "#5B3FA8", ci: "#C39BFF", sp: "#FFD36E" }
+];
+const ICT_HOPS = [[2, 0], [1, 1], [3, 2], [0, 3]];   // [palette dot, layer], so Header, Image, Text, Button in turn
+let ictToken = 0;
+function initIctFrame(root, viewId = "view-strand-detail") {
+  const frame = root.querySelector(".fr-ict");
+  if (!frame) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const view = document.getElementById(viewId);
+  const token = ++ictToken;                          // a newer render cancels older loops
+  const alive = () => token === ictToken && frame.isConnected && view && view.classList.contains("active");
+
+  const q = sel => frame.querySelector(sel);
+  const qa = sel => Array.from(frame.querySelectorAll(sel));
+  const lines = qa(".ict-line"), blocks = qa(".ict-b"), layers = qa(".ict-li"), dots = qa(".ict-sw i"), grips = qa(".ict-hs rect");
+  const cv = q(".ict-cv"), dot = q(".ict-dot"), spk = q(".ict-spk"), hs = q(".ict-hs"), cur = q(".ict-cur");
+  const fill = q(".ict-fill"), pct = q(".ict-pct");
+  let timers = [], raf = 0;
+
+  const setP = n => { fill.style.width = n + "%"; pct.textContent = n; };
+  const layer = i => layers.forEach((el, k) => el.classList.toggle("act", k === i));
+  const pick = n => dots.forEach((el, k) => el.classList.toggle("sel", k === n));
+  const theme = n => { const t = ICT_THEMES[n]; frame.style.setProperty("--sq", t.sq); frame.style.setProperty("--ci", t.ci); frame.style.setProperty("--sp", t.sp); };
+  const place = (x, y) => cur.setAttribute("transform", "translate(" + x + "," + y + ")");
+  const ease = t => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+  const grab = (x, y, w, h) => [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach((p, i) => {
+    grips[i].setAttribute("x", p[0] - 3); grips[i].setAttribute("y", p[1] - 3);
+  });
+  function hop(dotIdx, layerIdx) {
+    pick(dotIdx); theme(dotIdx); layer(layerIdx);
+    blocks.filter(b => Number(b.dataset.g) === layerIdx).forEach(b => b.classList.add("on"));
+  }
+
+  function reset() {
+    timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf);
+    frame.classList.add("ict-snap", "ict-live");                    // snap: no transitions while resetting
+    frame.classList.remove("ict-fade", "ict-done", "ict-sw-on");
+    lines.forEach(el => el.classList.remove("on"));
+    blocks.forEach(b => b.classList.remove("on", "ol"));
+    cv.classList.remove("done"); cv.setAttribute("width", 0); cv.setAttribute("height", 0);
+    dot.setAttribute("r", 0);
+    spk.setAttribute("transform", "translate(97,40) scale(0)");
+    hs.style.opacity = 0; cur.style.opacity = 0; place(25, 70);
+    pick(-1); theme(0); layer(-1); setP(0);
+    void frame.offsetWidth;
+    frame.classList.remove("ict-snap");
+  }
+
+  /* the cursor drags out a square, drops a circle in it, then a spark (about 2.2 s) */
+  function draw() {
+    const t0 = performance.now();
+    cur.style.opacity = 1;
+    function f(now) {
+      if (!alive()) return;
+      const e = now - t0;
+      let t;
+      if (e < 300) { t = ease(e / 300); place(25 + 15 * t, 70 - 42 * t); }
+      else if (e < 1000) {
+        t = ease((e - 300) / 700);
+        const w = 70 * t, h = 48 * t;
+        cv.setAttribute("width", w); cv.setAttribute("height", h);
+        hs.style.opacity = 1; grab(40, 28, w, h); place(40 + w, 28 + h);
+      }
+      else if (e < 1300) { t = ease((e - 1000) / 300); place(110 - 28 * t, 76 - 20 * t); }
+      else if (e < 1650) { t = Math.min((e - 1300) / 350, 1); cv.classList.add("done"); dot.setAttribute("r", 11 * ease(t)); }
+      else if (e < 1900) { t = ease((e - 1650) / 250); place(82 + 15 * t, 56 - 12 * t); }
+      else if (e < 2200) { t = ease((e - 1900) / 300); spk.setAttribute("transform", "translate(97,40) scale(" + t + ")"); }
+      else { cur.style.opacity = 0; hs.style.opacity = 0; return; }
+      raf = requestAnimationFrame(f);
+    }
+    raf = requestAnimationFrame(f);
+  }
+
+  function run() {
+    if (!alive()) return;
+    reset();
+    const at = (ms, fn) => timers.push(setTimeout(() => { if (alive()) fn(); }, ms));
+    const type = i => lines[i].classList.add("on");
+    at(300,  () => type(0));                                                     // > javac Main.java
+    at(900,  () => { type(1); setP(10); });                                       // compiling...
+    at(1500, () => type(2));                                                     // > java Main
+    at(2100, () => type(3));                                                     // Hello, PCSHS!
+    at(2900, () => { type(4); setP(25); });                                       // java ok
+    at(3800, () => { type(5); blocks.forEach(b => b.classList.add("ol")); setP(45); });   // web/app dev ok: wireframe outlined
+    at(4700, () => { type(6); draw(); setP(70); });                               // animation ok: the cursor draws
+    at(7100, () => { type(7); blocks.forEach(b => b.classList.remove("ol")); frame.classList.add("ict-sw-on"); });   // ui/ux design ok: palette appears
+    ICT_HOPS.forEach((h, n) => at(7700 + n * 550, () => hop(h[0], h[1])));       // the ring hops, layers step along
+    at(9900,  () => { layer(-1); setP(100); frame.classList.add("ict-done"); });  // settles on the finished logo
+    at(13000, () => frame.classList.add("ict-fade"));
+    at(13500, run);
+  }
+  setTimeout(() => { if (alive()) run(); }, 600);
 }
 
 /* ---------- Strand page: gentle scroll reveal (reuses .reveal / .reveal-in from style2.css) ---------- */
@@ -644,13 +807,55 @@ const STRAND_FRAMES = {
     <path class="k" d="M0 160H320"/>
   </svg>`,
 
-  ICT: `<div class="fr-term">
-    <p style="--n:9;--d:0s">&gt; run ICT</p>
-    <p style="--n:19;--d:.9s">loading subjects...</p>
-    <p style="--n:14;--d:1.8s">programming ok</p>
-    <p style="--n:14;--d:2.7s">web/app dev ok</p>
-    <p style="--n:12;--d:3.6s">animation ok</p>
-    <p class="fr-ready" style="--n:7;--d:4.5s">&gt; ready<span class="fr-caret"></span></p>
+  /* ICT: a mini workspace. Terminal (Java) + design canvas + layers + wireframe + progress bar.
+     The markup below is the FINISHED picture (what "reduce motion" shows). initIctFrame() replays the build in a loop.
+     Look: style2.css under "ICT frame". */
+  ICT: `<div class="fr-ict">
+    <div class="ict-main">
+      <div class="ict-pnl ict-term">
+        <div class="ict-bar"><i style="background:#6B44A8"></i><i style="background:#9A73E6"></i><i style="background:#D9CCFF"></i><span>~/ict</span></div>
+        <div class="ict-line" style="--n:17">&gt; javac Main.java</div>
+        <div class="ict-line" style="--n:12">compiling...</div>
+        <div class="ict-line" style="--n:11">&gt; java Main</div>
+        <div class="ict-line ict-out" style="--n:13">Hello, PCSHS!</div>
+        <div class="ict-line" style="--n:9">&gt; java <span class="ict-ok">ok</span></div>
+        <div class="ict-line" style="--n:16">&gt; web/app dev <span class="ict-ok">ok</span></div>
+        <div class="ict-line" style="--n:14">&gt; animation <span class="ict-ok">ok</span></div>
+        <div class="ict-line" style="--n:17">&gt; ui/ux design <span class="ict-ok">ok</span></div>
+      </div>
+      <div class="ict-right">
+        <div class="ict-row2">
+          <div class="ict-pnl"><span class="ict-lb">design</span>
+            <svg viewBox="18 12 108 86" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" focusable="false">
+              <path d="M20 30H140M20 60H140M20 85H140" stroke="#3A2A63" stroke-width="2" stroke-linecap="round" stroke-dasharray="0 30" fill="none"/>
+              <rect class="ict-cv done" x="40" y="28" width="70" height="48" rx="8" stroke-width="1.5"/>
+              <circle class="ict-dot" cx="68" cy="56" r="11"/>
+              <path class="ict-spk" d="M0-7L2-2L7 0L2 2L0 7L-2 2L-7 0L-2-2Z" transform="translate(97,40) scale(1)"/>
+              <g class="ict-hs"><rect width="6" height="6"/><rect width="6" height="6"/><rect width="6" height="6"/><rect width="6" height="6"/></g>
+              <g class="ict-cur" transform="translate(25,70)"><path d="M0 0L0 13L4 10L7 16L9 15L6 9L11 9Z" fill="#fff" stroke="#1B1230" stroke-width="1"/><rect x="10" y="14" width="24" height="10" rx="2.5" fill="#C39BFF"/><text x="13.5" y="21.6">you</text></g>
+            </svg>
+          </div>
+        </div>
+        <div class="ict-row3">
+          <div class="ict-pnl ict-lay"><span class="ict-lb">layers</span>
+            <div class="ict-li">Header</div><div class="ict-li">Image</div><div class="ict-li">Text</div><div class="ict-li">Button</div>
+          </div>
+          <div class="ict-pnl ict-wf"><span class="ict-lb">index.html</span>
+            <div class="ict-b ict-hdr" data-g="0"></div>
+            <div class="ict-b ict-img" data-g="1"><i></i></div>
+            <div class="ict-b ict-t" data-g="2"></div>
+            <div class="ict-b ict-t" data-g="2"></div>
+            <div class="ict-b ict-t ict-t-short" data-g="2"></div>
+            <div class="ict-b ict-btn" data-g="3"></div>
+            <div class="ict-sw"><i class="sel" style="background:#7A56D1"></i><i style="background:#C39BFF"></i><i style="background:#FFD36E"></i><i style="background:#5B3FA8"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ict-prog">
+      <span class="ict-lab"><span class="ict-lab-run">compiling / rendering… <span class="ict-pct">100</span>%</span><span class="ict-lab-done">build complete</span></span>
+      <div class="ict-track"><div class="ict-fill"></div></div>
+    </div>
   </div>`,
 
   IA: FR_OPEN + `
@@ -696,6 +901,10 @@ function strandSceneHTML(code) {
 function strandPageHTML(code, withClosing = true) {
   const info = STRANDS[code];
   const li = arr => arr.map(s => `<li>${s}</li>`).join("");
+  const subjLi = info => info.subjects.map(s => {
+    const note = info.subjectNotes && info.subjectNotes[s];
+    return `<li><span class="sd-subj-text"><span class="sd-subj-name">${s}</span>${note ? `<span class="sd-subj-desc">${note}</span>` : ""}</span></li>`;
+  }).join("");
   const others = STRAND_ORDER.filter(s => s !== code);
   const nameTag = withClosing ? "h1" : "h2";   // the results page already has its own h1
 
@@ -735,7 +944,7 @@ function strandPageHTML(code, withClosing = true) {
         <div>
           <h2 class="sd-h">Possible subjects you may take</h2>
           <p class="sd-note">These are typical for the strand. The subjects PCSHS actually offers can vary by school year.</p>
-          <ul class="sd-subjects">${li(info.subjects)}</ul>
+          <ul class="sd-subjects">${subjLi(info)}</ul>
         </div>
         <div>
           <h2 class="sd-h">Skills you'll build</h2>
@@ -783,6 +992,7 @@ function renderStrandDetail(code) {
 
   const root = document.getElementById("strand-detail-content");
   initStrandTypewriter(root, info);
+  initIctFrame(root);
   initStrandMotion(root);
   root.querySelector("#sd-start").addEventListener("click", openHub);
   root.querySelector("#sd-back").addEventListener("click", () => showView("view-home"));
@@ -910,10 +1120,12 @@ function renderHub() {
       </div>
 
       <p class="hub-lock-hint" id="hub-lock-hint"><span aria-hidden="true">&#128274;</span> Tick the box above to unlock the tests.</p>
+      <p class="hub-tab-note" id="hub-tab-note"><span aria-hidden="true">&#9888;</span> Keep this tab open. Your answers are only kept while it stays open, and closing it means starting over.</p>
       <div class="strand-grid" id="hub-grid"></div>
     </div>
     <div class="wrap results-footer">
-      <button class="btn btn-primary" id="hub-results-btn" disabled>See Overall Results</button>
+      <button class="btn btn-primary" id="hub-results-btn" disabled aria-describedby="hub-results-note"></button>
+      <p class="hub-results-note" id="hub-results-note"></p>
     </div>
   `;
 
@@ -975,6 +1187,19 @@ function renderHub() {
   const resultsBtn = document.getElementById("hub-results-btn");
   resultsBtn.disabled = !allDone();
   resultsBtn.addEventListener("click", startResultsLoading);
+  // Padlock while locked, open padlock once every part is done (icon only, the label stays the same)
+  const svgOpen = '<svg class="results-lock" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  const lockIcon = allDone()
+    ? svgOpen + '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>'
+    : svgOpen + '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  resultsBtn.innerHTML = lockIcon + "<span>See Overall Results</span>";
+
+  // Say why it is locked (or that it is ready) so a greyed-out button is never a mystery
+  const note = document.getElementById("hub-results-note");
+  const left = [...MODULE_ORDER, "INTEREST"].filter(c => !isDone(c));
+  if (left.length === 0) note.textContent = "All seven parts are done. Your results are ready.";
+  else if (left.length === totalSteps) note.textContent = `Finish all ${totalSteps} parts to unlock your results.`;
+  else note.textContent = `${left.length} ${left.length === 1 ? "part" : "parts"} left: ${left.map(c => STEP_LABELS[c]).join(", ")}.`;
 }
 
 /* Lock or unlock the hub's test cards to match the honesty pledge */
@@ -1145,7 +1370,7 @@ function renderQuestion() {
   `;
   qCard.classList.add("card-in");
 
-  document.getElementById("q-exit").addEventListener("click", exitToHub);
+  document.getElementById("q-exit").addEventListener("click", () => confirmLeave(exitToHub));
 
   qCard.querySelectorAll(".option").forEach(label => {
     label.addEventListener("click", () => {
@@ -1451,7 +1676,7 @@ function renderInterestItem() {
     }));
   }
   qCard.classList.add("card-in");
-  document.getElementById("q-exit").addEventListener("click", exitToHub);
+  document.getElementById("q-exit").addEventListener("click", () => confirmLeave(exitToHub));
 
   btnBack.disabled = pos === 0;
   btnNext.disabled = !interestItemDone();
@@ -1533,12 +1758,14 @@ function showResults() {
    speeds up, stalls near 80%, then finishes. Plays once per browser session;
    after that the hub button goes straight to the results.
    Not saved in browser history, so Back never lands on it.
-   Tweak the feel here: LOADER_BAR_MS, LOADER_HOLD_MS, LOADER_PHRASES, LOADER_STOPS.
+   Tweak the feel here: LOADER_BAR_MS, LOADER_HOLD_MS, LOADER_TITLE, LOADER_TILE_AT, LOADER_STOPS.
    ========================================================= */
 const LOADER_KEY = "strandwise.loader.v1";
 const LOADER_BAR_MS = 3800;    // how long the bar takes to reach 100%
 const LOADER_HOLD_MS = 700;    // pause on "Got it!" before the results open
-const LOADER_PHRASES = ["Tallying answers…", "Calculating results…", "Comparing skills and interests…", "Picking your best strand…"];
+const LOADER_TITLE = "Working on your results…";
+const LOADER_TILE_AT = [14, 28, 42, 56, 70, 80];   // bar percent at which each strand tile (in STRAND_ORDER) lights up
+const LOADER_CHECK_AT = [30, 62];                  // checklist lines 1 and 2 tick here; line 3 ticks at the finish
 const LOADER_DONE_PHRASE = "Got it! Opening your results…";
 const LOADER_STOPS = [[0, 0], [0.25, 30], [0.55, 62], [0.75, 80], [0.88, 82], [1, 100]];   // [time share, percent]
 const loader = { active: false, raf: 0, timer: 0, swap: 0 };
@@ -1561,6 +1788,29 @@ function stopLoader() {
   loader.active = false;
 }
 
+function buildLoaderTiles() {
+  const box = document.getElementById("load-tiles");
+  box.innerHTML = STRAND_ORDER.map(code => `
+    <span class="load-tile" style="--sc:${STRANDS[code].color}">
+      <span class="load-tile-box">${STRAND_ICONS[code]}</span>
+      <span class="load-tile-name">${STRANDS[code].name}</span>
+    </span>`).join("");
+  return Array.from(box.querySelectorAll(".load-tile"));
+}
+
+function loaderBurst(host) {
+  const n = 10;
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const s = document.createElement("span");
+    s.className = "load-spark" + (i % 2 ? " alt" : "");
+    s.style.setProperty("--dx", Math.round(Math.cos(a) * 66) + "px");
+    s.style.setProperty("--dy", Math.round(Math.sin(a) * 66) + "px");
+    host.appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+}
+
 function startResultsLoading() {
   if (loader.active || !allDone()) return;            // blocks double-taps
   if (loaderSeen()) { showResults(); return; }        // already watched it this session
@@ -1575,6 +1825,12 @@ function startResultsLoading() {
   const fill = document.getElementById("load-fill");
   const pct = document.getElementById("load-pct");
   const btn = document.getElementById("hub-results-btn");
+  const compass = document.querySelector("#view-loading .load-compass");
+  const tiles = buildLoaderTiles();
+  const checks = Array.from(document.querySelectorAll("#load-checks li"));
+  checks.forEach(li => li.classList.remove("on"));
+  fill.classList.remove("is-done");
+  compass.classList.remove("is-popping");
 
   function setPhrase(text) {
     clearTimeout(loader.swap);
@@ -1586,6 +1842,11 @@ function startResultsLoading() {
     needle.classList.remove("is-searching");
     needle.classList.add("is-done");
     card.classList.remove("is-searching");
+    card.classList.add("is-finished");
+    fill.classList.add("is-done");
+    checks[2].classList.add("on");
+    tiles.forEach(t => t.classList.add("on"));
+    if (!reduce) { compass.classList.add("is-popping"); loaderBurst(compass); }
     setPhrase(LOADER_DONE_PHRASE);
     loader.timer = setTimeout(() => {
       stopLoader();
@@ -1597,7 +1858,8 @@ function startResultsLoading() {
   // reset to the starting look
   fill.style.width = "0%";
   pct.textContent = "0%";
-  phrase.textContent = LOADER_PHRASES[0];
+  phrase.textContent = LOADER_TITLE;
+  card.classList.remove("is-finished");
   phrase.classList.remove("is-swapping");
   needle.classList.remove("is-done");
   needle.classList.add("is-searching");
@@ -1608,15 +1870,14 @@ function startResultsLoading() {
   showView("view-loading", "none");
 
   const t0 = performance.now();
-  let lastIdx = 0;
   const tick = now => {
     if (!loader.active) return;
     const p = Math.min((now - t0) / barMs, 1);
     const v = loaderPct(p);
     fill.style.width = v + "%";
     pct.textContent = Math.round(v) + "%";
-    const idx = Math.min(Math.floor(p * LOADER_PHRASES.length), LOADER_PHRASES.length - 1);
-    if (idx !== lastIdx) { lastIdx = idx; setPhrase(LOADER_PHRASES[idx]); }
+    tiles.forEach((t, i) => { if (v >= LOADER_TILE_AT[i]) t.classList.add("on"); });
+    LOADER_CHECK_AT.forEach((at, i) => { if (v >= at) checks[i].classList.add("on"); });
     if (p < 1) loader.raf = requestAnimationFrame(tick);
     else finish();
   };
@@ -1937,6 +2198,7 @@ function renderRecommendedInfo(ps) {
   const show = code => {
     panel.innerHTML = strandPageHTML(code, false);
     initStrandTypewriter(panel, STRANDS[code], "view-results");
+    initIctFrame(panel, "view-results");
     initStrandMotion(panel);
     tabsEl.querySelectorAll(".chip").forEach(c => {
       const on = c.dataset.code === code;
@@ -2318,7 +2580,7 @@ function initHomeMotion() {
   if ("IntersectionObserver" in window) {
     const targets = document.querySelectorAll(
       ".manual, .manual-list li, .explore-strands-section .section-title, " +
-      ".explore-strands-section .section-sub, #strand-grid .strand-card"
+      ".explore-strands-section .section-sub, #strand-grid .strand-group-label, #strand-grid .strand-card, .explore-cta"
     );
     const io = new IntersectionObserver(entries => {
       let n = 0;
@@ -2332,6 +2594,168 @@ function initHomeMotion() {
     targets.forEach(el => { el.classList.add("reveal"); io.observe(el); });
   }
 }
+
+/* =========================================================
+   HUB + TEST QUALITY-OF-LIFE
+   1. "Leave this test?" dialog      2. Closing-the-tab warning      3. Keyboard shortcuts on the test screens
+   ========================================================= */
+
+/* ---------- 1. "Leave this test?" dialog ----------
+   A small in-page dialog (not the browser pop-up). It defaults to "Keep going" so a stray Enter never leaves. */
+let cwModal = null, cwModalResolve = null, cwModalReturnFocus = null;
+
+function buildModal() {
+  cwModal = document.createElement("div");
+  cwModal.className = "cw-modal";
+  cwModal.hidden = true;
+  cwModal.innerHTML = `
+    <div class="cw-modal-card" role="alertdialog" aria-modal="true" aria-labelledby="cw-modal-title" aria-describedby="cw-modal-body">
+      <h3 id="cw-modal-title"></h3>
+      <p id="cw-modal-body"></p>
+      <div class="cw-modal-actions">
+        <button type="button" class="btn btn-ghost" id="cw-modal-leave"></button>
+        <button type="button" class="btn btn-primary" id="cw-modal-stay"></button>
+      </div>
+    </div>`;
+  document.body.appendChild(cwModal);
+
+  const stayBtn = cwModal.querySelector("#cw-modal-stay");
+  const leaveBtn = cwModal.querySelector("#cw-modal-leave");
+  const close = ok => {
+    cwModal.hidden = true;
+    document.body.classList.remove("cw-modal-open");
+    const resolve = cwModalResolve;
+    cwModalResolve = null;
+    if (!ok && cwModalReturnFocus && document.contains(cwModalReturnFocus)) cwModalReturnFocus.focus();
+    if (resolve) resolve(ok);
+  };
+  stayBtn.addEventListener("click", () => close(false));
+  leaveBtn.addEventListener("click", () => close(true));
+  cwModal.addEventListener("click", e => { if (e.target === cwModal) close(false); });   // click outside = keep going
+  cwModal.addEventListener("keydown", e => {
+    if (e.key === "Escape") { e.preventDefault(); close(false); return; }
+    if (e.key !== "Tab") return;                                                          // keep Tab inside the dialog
+    const first = leaveBtn, last = stayBtn;
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+}
+
+function askConfirm({ title, body, leave, stay }) {
+  if (!cwModal) buildModal();
+  cwModal.querySelector("#cw-modal-title").textContent = title;
+  cwModal.querySelector("#cw-modal-body").textContent = body;
+  cwModal.querySelector("#cw-modal-leave").textContent = leave;
+  cwModal.querySelector("#cw-modal-stay").textContent = stay;
+  cwModalReturnFocus = document.activeElement;
+  document.body.classList.add("cw-modal-open");
+  cwModal.hidden = false;
+  cwModal.querySelector("#cw-modal-stay").focus();
+  return new Promise(resolve => { cwModalResolve = resolve; });
+}
+
+/* True when the student has answered something in the test or questionnaire that is on screen */
+function hasAnswersInRun() {
+  if (ist.active) return ist.a.some(v => v !== null) || ist.b.some(x => x !== null);
+  if (state.activeModule && state.phase === "question") return state.draft.some(a => a !== null);
+  return false;
+}
+
+/* Runs `go` straight away unless the student is mid-test with answers, in which case it asks first.
+   (Answers are already saved either way, so this only protects against an accidental tap.) */
+function confirmLeave(go) {
+  if (currentViewId !== "view-assessment" || !hasAnswersInRun()) { go(); return; }
+  askConfirm({
+    title: ist.active ? "Leave the questionnaire?" : "Leave this test?",
+    body: "Your answers so far are saved. You can pick up right where you stopped, as long as you keep this browser tab open.",
+    leave: "Save & leave",
+    stay: "Keep going"
+  }).then(ok => { if (ok) go(); });
+}
+
+/* ---------- 2. Closing-the-tab warning ----------
+   Progress lives in sessionStorage, so closing the tab wipes it. The browser shows its own generic
+   message (sites can't change the wording). A refresh also triggers it even though a refresh is safe.
+   Phones often skip this prompt, which is why the hub also carries a written note. */
+function hasProgressToLose() {
+  return countDone() > 0 || Boolean(state.interest) ||
+    MODULE_ORDER.some(c => answeredCount(c) > 0) ||
+    Boolean(state.iprog && interestAnswered(state.iprog) > 0) ||
+    hasAnswersInRun();
+}
+window.addEventListener("beforeunload", e => {
+  if (currentViewId === "view-results" || !hasProgressToLose()) return;   // results have their own Save button
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+/* ---------- 3. Keyboard shortcuts on the test screens ----------
+   Skill tests: A-D or 1-4 pick an answer.  Interests Part A: 1-5 rate.
+   Everywhere: Enter or the right arrow = Next, left arrow = Back, Enter on a rules screen = Begin.
+   On the last question Enter only moves focus to "Finish", so a test can never be locked by one keystroke. */
+const assessBodyEl = document.querySelector("#view-assessment .assess-body");
+const kbdHint = document.createElement("p");
+kbdHint.className = "kbd-hint";
+kbdHint.hidden = true;
+if (assessBodyEl) assessBodyEl.appendChild(kbdHint);
+
+function updateKbdHint() {
+  let txt = "";
+  if (qCard.querySelector(".option")) txt = "Keyboard: A\u2013D to answer \u00B7 Enter for next \u00B7 \u2190 \u2192 to move";
+  else if (qCard.querySelector(".rate-btn")) txt = "Keyboard: 1\u20135 to rate \u00B7 Enter for next \u00B7 \u2190 \u2192 to move";
+  else if (qCard.querySelector(".pick-list")) txt = "Keyboard: Enter for next \u00B7 \u2190 \u2192 to move";
+  else if (qCard.querySelector("#intro-begin, #trans-go")) txt = "Press Enter to continue";
+  kbdHint.textContent = txt;
+  kbdHint.hidden = !txt;
+}
+new MutationObserver(updateKbdHint).observe(qCard, { childList: true });
+
+document.addEventListener("keydown", e => {
+  if (currentViewId !== "view-assessment") return;
+  if (cwModal && !cwModal.hidden) return;                       // the dialog handles its own keys
+  if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+  const t = e.target, tag = t && t.tagName;
+  if (tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable) ||
+      (tag === "INPUT" && t.type !== "radio" && t.type !== "checkbox")) return;
+  const key = e.key;
+
+  // Pick an answer
+  const opts = qCard.querySelectorAll(".option");
+  const rates = qCard.querySelectorAll(".rate-btn");
+  if (opts.length) {
+    let i = -1;
+    if (/^[a-d]$/i.test(key)) i = key.toLowerCase().charCodeAt(0) - 97;
+    else if (/^[1-4]$/.test(key)) i = Number(key) - 1;
+    if (opts[i]) { e.preventDefault(); opts[i].click(); return; }
+  } else if (rates.length && /^[1-5]$/.test(key) && rates[Number(key) - 1]) {
+    e.preventDefault(); rates[Number(key) - 1].click(); return;
+  }
+
+  if (e.repeat) return;                                          // holding a key must not skip screens
+
+  // Rules / transition screens: Enter = the big button
+  const begin = qCard.querySelector("#intro-begin, #trans-go");
+  if (begin) {
+    if (key === "Enter" && tag !== "BUTTON" && tag !== "A") { e.preventDefault(); begin.click(); }
+    return;
+  }
+
+  // Next / Back. Enter on a button normally presses that button, except an answer button that is already
+  // chosen (rating, Most/Least): there Enter means "go on".
+  const isLink = tag === "BUTTON" || tag === "A";
+  const chosenBtn = Boolean(t && t.matches && t.matches(".rate-selected, .pick-on"));
+  const goNext = (key === "Enter" && (!isLink || (chosenBtn && !btnNext.disabled))) || key === "ArrowRight";
+  const goBack = key === "ArrowLeft";
+  if (goNext) {
+    if (btnNext.disabled) return;
+    e.preventDefault();
+    if (/^Finish/.test(btnNext.textContent)) btnNext.focus();    // never lock a test with one keystroke
+    else btnNext.click();
+  } else if (goBack && !btnBack.disabled) {
+    e.preventDefault();
+    btnBack.click();
+  }
+});
 
 /* ---------- Back / Forward buttons ----------
    Rebuilds the screen stored in the history entry. Screens that are no longer valid
