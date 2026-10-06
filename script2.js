@@ -2377,51 +2377,56 @@ function renderRecommendedInfo(ps) {
    score on a stamp. rec always holds 1 or 2 strands (see pickRecommended), and when there are 2
    they are tied, so the score is shown once. Sets data-count (1 or 2) and --rc1 / --rc2 on
    .results-hero for style2.css. A low skill score gets calmer wording and no confetti. */
-function renderResultsHero(pick, results, lowSignal) {
+function renderResultsHero(pick, results, lowSignal, m) {
   const hero = document.querySelector(".results-hero");
   const h1 = document.getElementById("result-headline");
   if (!hero || !h1) return;
 
-  const rec = pick.rec;
-  const two = rec.length > 1;
-  const colors = rec.map(r => STRANDS[r.strand].color);
-  const pct = results[0].percentage;
-  const tie = pick.tiedAll.length > 1;
-
-  hero.dataset.count = String(rec.length);
+  const c = m.c, rec = pick.rec, ints = m.ps.intSet, ui = rvCaseUI(m);
+  const lead = c.family === "merged" ? [c.shared[0]] : c.family === "shared" ? c.shared.concat(c.sOnly, c.iOnly) : rec.concat(ints);
+  const colors = lead.map(r => STRANDS[r.strand].color);
+  hero.dataset.count = c.family === "columns" ? "2" : "1";   // style2.css: "2" = two compact side-by-side cards
+  hero.dataset.layout = c.family;                             // merged | shared | columns
+  hero.dataset.case = String(c.caseNo);
   hero.classList.toggle("res-low", lowSignal);
-  hero.style.setProperty("--rc1", colors[0]);
-  hero.style.setProperty("--rc2", colors[1] || colors[0]);
+  hero.classList.toggle("res-perfect", c.caseNo === 1);
+  hero.classList.toggle("res-calm", c.calm);
+  hero.style.setProperty("--rc1", colors[0] || "#D98E2B");
+  hero.style.setProperty("--rc2", colors[1] || colors[0] || "#D98E2B");
 
-  const sticker = (r, i) => {
-    const info = STRANDS[r.strand];
-    const tilt = two && i === 1 ? "2.5deg" : "-3deg";
-    const stamp = two ? "" : `<span class="res-stamp"><b>${pct}%</b><small>Skill score</small></span>`;
-    return `<span class="res-item${i ? " res-item-b" : ""}">
-      <span class="res-sticker" style="--sc:${info.color};--tilt:${tilt}">
-        <span class="res-icon" aria-hidden="true">${STRAND_ICONS[r.strand]}</span>
-        <span class="res-name">${info.name}</span>
-      </span>${stamp}
-    </span>`;
-  };
+  const stk = (r, tilt) => { const info = STRANDS[r.strand]; return `<span class="res-sticker" style="--sc:${info.color};--tilt:${tilt}"><span class="res-icon" aria-hidden="true">${STRAND_ICONS[r.strand]}</span><span class="res-name">${info.name}</span></span>`; };
+  const cap = t => `<span class="rv-cap">${t}</span>`;
+  const star = c.calm ? "" : `<span class="rv-star" aria-hidden="true">\u2605</span>`;
+  const withStar = (r, tilt) => `<span class="rv-wrap">${stk(r, tilt)}${star}</span>`;
+  let items;
 
-  const label = lowSignal
-    ? (two ? "Your highest scores" : "Your highest score")
-    : (tie ? "It\u2019s a tie \u00B7 your top matches" : "Your top match");
-  const items = two
-    ? `${sticker(rec[0], 0)}<span class="res-and" aria-hidden="true">&amp;</span>${sticker(rec[1], 1)}`
-    : sticker(rec[0], 0);
-  const pill = two
-    ? `<span class="res-pill"><b>${pct}%</b><span>Both scored the same</span></span>`
-    : "";
-  const line = lowSignal ? "may be worth exploring." : "may be worth exploring based on your skill scores.";
+  if (c.family === "merged") {                       /* cases 1 and 2 */
+    const r = c.shared[0];
+    items = `<span class="res-item"><span class="rv-cap rv-cap-top">Top skill and top interest</span>${stk(r, "-3deg")}<span class="res-stamp"><b>${r.percentage}%</b><small>Skill score</small></span></span>`;
+  } else if (c.family === "shared") {                /* cases 4, 6, 8, 9: the shared strand is lifted and starred */
+    if (c.caseNo === 8) {
+      items = `<span class="rv-duo">${c.shared.map((r, i) => `<span class="res-item rv-side">${cap("On both lists")}${withStar(r, i ? "2.5deg" : "-3deg")}<span class="rv-sub">Tied on both</span></span>`).join("")}</span>`;
+    } else {
+      const r = c.shared[0];
+      const sub = `${r.percentage}% skill, ${c.iTied ? "tied " : ""}${ordinal(r.irank)} interest`;
+      const faded = (list, label, tilt) => list.map(o => `<span class="res-item rv-faded">${cap(label)}${stk(o, tilt)}</span>`).join("");
+      items = `<span class="rv-main">${cap("On both lists")}${withStar(r, "-3deg")}<span class="rv-sub">${sub}</span></span>`
+        + (c.sOnly.length || c.iOnly.length ? `<span class="rv-others">${faded(c.sOnly, "Skill only", "-3deg")}${faded(c.iOnly, "Interest only", "2.5deg")}</span>` : "");
+    }
+  } else {                                           /* columns: skills left, interests right (cases 3, 5, 7, 10, flat) */
+    const none = `<span class="res-sticker res-none" style="--sc:var(--ink-soft);--tilt:2.5deg"><span class="res-name">None yet</span></span>`;
+    const stack = (list, tilt) => `<span class="rv-stk${list.length > 1 ? " rv-stack" : ""}">${list.map((r, i) => (i ? `<span class="rv-eq" aria-hidden="true">=</span>` : "") + stk(r, tilt)).join("")}</span>`;
+    const side = (capTxt, inner, sub) => `<span class="res-item rv-side">${cap(capTxt)}${inner}<span class="rv-sub">${sub}</span></span>`;
+    const iNone = !ints.length, p0 = results[0].percentage;
+    items = side(c.sTied ? "Top skills, tied" : "Top skill", c.flatSkill ? none : stack(rec, "-3deg"), c.flatSkill ? "Same score on all six" : c.sTied ? `${p0}% on both` : `${p0}% on its test`)
+      + `<span class="res-and" aria-hidden="true">${ui.mid}</span>`
+      + side(c.iTied ? "Top interests, tied" : "Top interest", iNone ? none : stack(ints, "2.5deg"), iNone ? "Spread evenly" : c.iTied ? `Tied ${ordinal(ints[0].irank)}` : `${ordinal(ints[0].irank)} of six`);
+  }
 
-  h1.innerHTML = `<span class="res-match">
-      <span class="res-label">${label}</span>
-      <span class="res-row">${items}</span>${pill}
-    </span><span class="res-line">${line}</span>`;
+  const label = ui.label ? `<span class="res-label">${ui.label}</span>` : "";
+  h1.innerHTML = `<span class="res-match">${label}<span class="res-row">${items}</span><span class="res-pill"><b aria-hidden="true">${ui.sym}</b><span>${ui.pill}</span></span></span><span class="res-line">${ui.line}</span>`;
 
-  /* Background layer: two color blobs, sparkles, and (once per visit) a small confetti burst */
+  /* Background layer: two color blobs, sparkles, and a confetti burst sized to the result */
   const old = hero.querySelector(".res-decor");
   if (old) old.remove();
   const decor = document.createElement("div");
@@ -2433,132 +2438,220 @@ function renderResultsHero(pick, results, lowSignal) {
   hero.insertBefore(decor, hero.firstChild);
 
   const calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!lowSignal && !calm) {
+  const n = CONFETTI_COUNT[c.confetti] || 0;
+  if (n && !lowSignal && !calm) {
     const palette = colors.concat(["#FFD25E", "#22262B"]);
-    for (let i = 0; i < 24; i++) {
-      const c = document.createElement("span");
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement("span");
       const a = Math.random() * Math.PI * 2, d = 140 + Math.random() * 190;
-      c.className = "res-confetti";
-      c.style.setProperty("--dx", Math.round(Math.cos(a) * d * 1.3) + "px");
-      c.style.setProperty("--dy", Math.round(Math.sin(a) * d * 0.8 + 60) + "px");
-      c.style.setProperty("--rot", Math.round(Math.random() * 720 - 360) + "deg");
-      c.style.background = palette[i % palette.length];
-      c.style.animationDelay = (0.5 + Math.random() * 0.2) + "s";
-      if (i % 3 === 0) c.style.borderRadius = "50%";
-      c.addEventListener("animationend", () => c.remove());
-      decor.appendChild(c);
+      p.className = "res-confetti";
+      p.style.setProperty("--dx", Math.round(Math.cos(a) * d * 1.3) + "px");
+      p.style.setProperty("--dy", Math.round(Math.sin(a) * d * 0.8 + 60) + "px");
+      p.style.setProperty("--rot", Math.round(Math.random() * 720 - 360) + "deg");
+      p.style.background = palette[i % palette.length];
+      p.style.animationDelay = (0.5 + Math.random() * 0.2) + "s";
+      if (i % 3 === 0) p.style.borderRadius = "50%";
+      p.addEventListener("animationend", () => p.remove());
+      decor.appendChild(p);
     }
   }
 }
 
-function renderResults() {
-  const results = state.results;
-  const pick = pickRecommended(results);
-  const rec = pick.rec;
-  const top = rec[0];
-  const lowSignal = results[0].percentage < LOW_SIGNAL_PCT;
-  renderResultsHero(pick, results, lowSignal);
-  document.getElementById("result-sub").textContent = lowSignal
-    ? `Your skill scores were low and close together, so they don't point strongly to any strand. Lean on your interest results below and explore each strand's page. This is a starting point, not a final decision \u2014 you know yourself best.`
-    : `This is a starting point for exploration, not a final decision \u2014 you know yourself best. It's only as accurate as your answers.`;
+/* =========================================================
+   RESULTS PAGE v2: dual hero, one comparison chart, reasoning, reactive FAQ.
+   Skill and interest are shown side by side and never merged.
+   kind: perfect  = same #1 strand in both AND skill >= SKILL_HIGH_PCT (exclusive gold hero)
+         building = same #1 strand in both, skill still below SKILL_HIGH_PCT
+         near     = the two top strands are one step apart (skill #1 is interest #2, or the reverse)
+         apart    = different paths     flat = interests too even to name a favorite
+   ========================================================= */
+const CONFETTI_COUNT = { full: 48, medium: 28, small: 14 };   // none = no entry
+const rvNames = list => list.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(" and ");
+const rvChip = r => { const i = STRANDS[r.strand]; return `<span class="rv-chip" style="--sc:${i.color}"><span class="rv-ico" aria-hidden="true">${STRAND_ICONS[r.strand]}</span><span class="rv-name">${i.name}</span></span>`; };
 
-  /* Bar chart: bar height = percentage correct, label shows the raw score */
-  const chart = document.getElementById("bar-chart");
-  chart.innerHTML = "";
-  results.forEach(r => {
-    const info = STRANDS[r.strand];
-    const bar = document.createElement("div");
-    bar.className = "bar-col";
-    bar.innerHTML = `
-      <div class="bar-pct">${r.percentage}%</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="background:${info.color};" data-target="${r.percentage}"></div>
-      </div>
-      <div class="bar-label">${info.name}<br>${r.correct}/${r.total}</div>
-    `;
-    chart.appendChild(bar);
-  });
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      document.querySelectorAll(".bar-fill").forEach(el => {
-        el.style.height = el.dataset.target + "%";
-      });
-    }, 50);
-  });
-
-  renderInterestSection(results, rec);
-
-  const ps = pickShown(results, rec);
-  renderExplain(results, pick, ps);
-
-  renderRecommendedInfo(ps);
-
-  renderFAQ(pick);
+/* Sorts the result into one of the 12 cases (13 = every skill score equal).
+   Skills: one strand or tied. Interests: one, tied, or flat. Overlap: strands on both lists.
+   "Tied" means equal skill percentage, or equal rounded interest percentage (ipct is already rounded).
+   family: merged  = 1 and 2 (same single strand on both sides)
+           shared  = 4, 6, 8, 9 (a tie exists and at least one strand is on both lists)
+           columns = 3, 5, 7, 10, 11, 12, 13 (skills left, interests right)
+   calm = a strand is shared but its skill is under SKILL_HIGH_PCT: no gold, no star, no confetti. */
+function resultsCase(results, pick, ps) {
+  const rec = pick.rec, ints = ps.intSet;
+  const flatSkill = results[0].percentage === results[results.length - 1].percentage;
+  const sCount = flatSkill ? results.length : pick.tiedAll.length;
+  const iCount = ps.flat ? 0 : ints.length + ps.alsoTop.length;
+  const sTied = !flatSkill && sCount > 1, iTied = iCount > 1;
+  const shared = (flatSkill || ps.flat) ? [] : rec.filter(r => ints.includes(r));
+  const sOnly = rec.filter(r => !shared.includes(r)), iOnly = ints.filter(r => !shared.includes(r));
+  const high = shared.length > 0 && shared[0].percentage >= SKILL_HIGH_PCT;
+  let caseNo;
+  if (flatSkill) caseNo = 13;
+  else if (ps.flat) caseNo = sTied ? 12 : 11;
+  else if (!sTied && !iTied) caseNo = shared.length ? (high ? 1 : 2) : 3;
+  else if (!sTied) caseNo = shared.length ? 4 : 5;
+  else if (!iTied) caseNo = shared.length ? 6 : 7;
+  else caseNo = shared.length >= 2 ? 8 : shared.length === 1 ? 9 : 10;
+  const family = caseNo <= 2 ? "merged" : [4, 6, 8, 9].includes(caseNo) ? "shared" : "columns";
+  const calm = shared.length > 0 && !high;
+  const confetti = calm || caseNo >= 11 ? "none" : caseNo === 1 ? "full" : family === "shared" ? "medium" : "small";
+  return { caseNo, family, shared, sOnly, iOnly, sTied, iTied, sCount, iCount, flatSkill, flatInt: ps.flat, high, calm, confetti };
 }
 
-/* ---------- FAQ ---------- */
-function renderFAQ(pick) {
-  const { rec, tiedAll } = pick;
-  const top = rec[0], topInfo = STRANDS[top.strand];
-  const names = list => list.map(r => STRANDS[r.strand].name).join(" and ");
-  const faqs = [
-    {
-      q: "How was my score calculated?",
-      a: `Each of the six skill tests has multiple-choice questions with one correct answer. Your score for a strand is the number you got right, shown as a raw score and a percentage. The strand with the highest percentage is your top skill strand.`
-    },
-    {
-      q: "How was my interest result calculated?",
-      a: `The Interests questionnaire has no right or wrong answers. Part A (ratings) and Part B (most and least) are each turned into a 0 to 100 score per strand and averaged. Your strands are then ranked against each other, so the result shows what you prefer compared with your own other strands. It is kept separate from your skill score on purpose.`
-    },
-    {
-      q: rec.length > 1 ? "Why were these strands recommended for me?" : "Why was this strand recommended for me?",
-      a: pick.arbitrary
-        ? `${names(tiedAll)} all tied for your highest score (${top.correct}/${top.total}, ${top.percentage}%), and your interest results could not separate them either. Only two strands are shown at a time, so ${names(rec)} appear here. Treat all ${tiedAll.length} as worth exploring.`
-        : pick.byInterest
-          ? `${names(tiedAll)} all tied for your highest score (${top.correct}/${top.total}, ${top.percentage}%). Only two strands are shown at a time, so your interest results were used to choose ${names(rec)}. The other tied strands are not ruled out.`
-          : rec.length > 1
-            ? `${names(rec)} tied for your highest score (${top.correct}/${top.total}, ${top.percentage}%), so both are equally strong matches on this assessment.`
-            : `${topInfo.name} was your highest-scoring test at ${top.correct}/${top.total} (${top.percentage}%).`
-    },
-    {
-      q: "Does a low score mean I can't take that strand?",
-      a: `No. Each test is a short snapshot of your current skills, not a limit. Skills can be built with practice, and a strand you enjoy may be worth choosing even if you scored lower there.`
-    },
-    {
-      q: `What subjects are included in ${names(rec)}?`,
-      a: rec.map(r => `${STRANDS[r.strand].name} typically includes subjects like ${STRANDS[r.strand].subjects.join(", ")}.`).join(" ")
-    },
-    {
-      q: "What college courses are related to this strand?",
-      a: rec.length > 1
-        ? `Common related courses include ${rec.map(r => `${STRANDS[r.strand].courses.join(", ")} (${STRANDS[r.strand].name})`).join("; ")} — though many courses accept graduates from other strands too.`
-        : `Common related courses include ${topInfo.courses.join(", ")} — though many courses accept graduates from other strands too.`
-    },
-    {
-      q: "Can I still choose another strand?",
-      a: `Yes. This result is a suggestion based on how you performed today, not a requirement. Strand choice is ultimately yours, and it's worth talking it over with your parents, teachers, or guidance counselor.`
-    }
-  ];
+function resultsModel(results, pick) {
+  const ps = pickShown(results, pick.rec);
+  const c = resultsCase(results, pick, ps);
+  const sRank = r => 1 + results.filter(o => o.percentage > r.percentage).length;
+  let kind;
+  if (c.caseNo >= 11) kind = "flat";
+  else if (c.caseNo === 1) kind = "perfect";
+  else if (c.caseNo === 2) kind = "building";
+  else if (c.family === "shared") kind = "shared";
+  else if (c.caseNo === 3) kind = (pick.rec.some(r => r.irank <= 2) || ps.intSet.some(r => sRank(r) <= 2)) ? "near" : "apart";
+  else kind = "split";
+  return { ps, kind, both: c.shared, c, low: results[0].percentage < LOW_SIGNAL_PCT };
+}
 
-  const faqEl = document.getElementById("faq-list");
-  faqEl.innerHTML = "";
-  faqs.forEach(item => {
-    const wrap = document.createElement("div");
-    wrap.className = "faq-item";
-    wrap.innerHTML = `
-      <button class="faq-question" aria-expanded="false">
-        <span>${item.q}</span>
-        <span class="faq-icon">+</span>
-      </button>
-      <div class="faq-answer"><p>${item.a}</p></div>
-    `;
-    const btn = wrap.querySelector(".faq-question");
-    btn.addEventListener("click", () => {
-      const isOpen = wrap.classList.toggle("faq-open");
-      btn.setAttribute("aria-expanded", String(isOpen));
-    });
-    faqEl.appendChild(wrap);
+/* Symbol, pill, headline and optional label for each case. The symbol is decorative (aria-hidden), the pill text says it in words. */
+const tiedWord = n => ({ 2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six" }[n] || String(n));
+function rvCaseUI(m) {
+  const c = m.c, ints = m.ps.intSet, nm = r => STRANDS[r.strand].name;
+  const sh = c.shared[0], topS = m.ps.rec[0];
+  const lab = m.low ? "Your highest skill and interest" : "Your top skill and your top interest";
+  const allN = tiedWord(new Set(m.ps.rec.concat(ints).map(r => r.strand)).size).toLowerCase();
+  const t = {
+    1:  { sym: "\u2713", pill: "Perfect match", line: "Your skills and your interest agree.", label: "A perfect match" },
+    2:  { sym: "~", pill: "Same pick, skills still building", line: "Same pick. Your skills are still building.", label: lab },
+    3:  m.kind === "near"
+        ? { sym: "\u2248", pill: "Close: one step apart", line: "Your top picks sit one step apart.", label: lab }
+        : { sym: "\u2260", pill: "Different paths", line: "Your skills and interests point different ways.", label: lab },
+    4:  sh && { sym: "=", pill: "Your skill broke the tie", line: `${tiedWord(c.iCount)} strands tied on interest. Your skill points to ${nm(sh)}.` },
+    5:  { sym: "\u2260", pill: "Different paths", line: `Your skill points to ${nm(topS)}. Your interests are tied.` },
+    6:  sh && { sym: "=", pill: "Your interest broke the tie", line: `${tiedWord(c.sCount)} strands tied on skill. Your interest points to ${nm(sh)}.` },
+    7:  { sym: "\u2260", pill: "Different paths", line: `Your interest points to ${ints[0] ? nm(ints[0]) : "one strand"}. Your skills are tied.` },
+    8:  { sym: "\u2713", pill: "Double match", line: "Both strands tie on skill and on interest." },
+    9:  sh && { sym: "=", pill: "One strand on both lists", line: `${nm(sh)} shows up in both.` },
+    10: { sym: "\u2260", pill: "Wide open", line: `No strand overlaps. All ${allN} are worth a look.` },
+    11: { sym: "\u2026", pill: "Skills lead the way", line: "Your skills are the clearer guide right now.", label: lab },
+    12: { sym: "\u2026", pill: "Skills lead the way", line: "Your skills are the clearer guide right now.", label: lab },
+    13: c.flatInt
+        ? { sym: "\u2026", pill: "Explore to decide", line: "Nothing stands out yet. Explore each strand.", label: lab }
+        : { sym: "\u2026", pill: "Interests lead the way", line: "Your interests are the clearer guide right now.", label: lab }
+  }[c.caseNo];
+  return Object.assign({ mid: c.flatInt || c.flatSkill ? "\u2026" : "\u2260", label: "" }, t);
+}
+
+/* Results v2 helpers. Message under the hero: custom for perfect/building, else the existing interestMessage(). */
+function rvMessage(m, results, pick) {
+  const r = m.both[0], nm = r ? rvNames([r]) : "";
+  if (m.kind === "perfect") return `Your skills and your interests both put ${nm} first. That is the strongest signal this assessment can give, though it is still a snapshot, not a verdict.`;
+  if (m.kind === "building") return `Your skills and your interests both put ${nm} first, but your skill score is still modest. Interest is a great start. ${STRANDS[r.strand].name} is ${STRAND_DEMANDS[r.strand]}.`;
+  const c = m.c;
+  if (c.flatSkill) {
+    const same = `You scored the same on all six tests (${results[0].percentage}%), so your skills don't point to one strand.`;
+    return c.flatInt
+      ? `${same} Your interests are spread evenly too, so nothing stands out yet. Explore each strand's page to see what appeals to you.`
+      : `${same} Your strongest interest is in ${rvNames(m.ps.intSet)}. Use that and the strand pages to see which daily work appeals to you.`;
+  }
+  if (m.kind === "shared") {
+    const sNames = rvNames(pick.rec), iNames = rvNames(m.ps.intSet);
+    const lead = {
+      4: `Your interests tied across ${iNames}, and your skill result points to ${nm}.`,
+      6: `Your skills tied across ${sNames}, and your interest points to ${nm}.`,
+      8: `${rvNames(c.shared)} tie on skill and on interest, so neither beats the other.`,
+      9: `Your skills tied across ${sNames} and your interests tied across ${iNames}. ${nm} is the one on both lists.`
+    }[c.caseNo];
+    return c.calm
+      ? `${lead} Your skill score is still modest, so read the strand page to see whether the practice it asks for would be worth it.`
+      : `${lead} That overlap is a good sign, though it is still a snapshot, not a verdict.`;
+  }
+  return interestMessage(results, pick.rec);
+}
+
+/* Two bar graphs: skill and interest. Each is sorted best-first, the first bar gets the star. #bar-chart stays the id (savecard.js watches it). */
+function renderRvCharts(m, results) {
+  const root = document.getElementById("bar-chart");
+  const byInt = results.slice().sort((a, b) => b.ipct - a.ipct);
+  const col = (r, pct, sub) => `<div class="bar-col"><div class="bar-pct">${pct}%</div><div class="bar-track"><div class="bar-fill" style="background:${STRANDS[r.strand].color};" data-target="${pct}"></div></div><div class="bar-label">${STRANDS[r.strand].name}<br>${sub}</div></div>`;
+  root.innerHTML = `<div class="rv-chart"><span class="rv-tab">Skill<small>how you did on the tests</small></span><div class="bar-chart">${results.map(r => col(r, r.percentage, `${r.correct}/${r.total}`)).join("")}</div></div>
+    <div class="rv-chart rv-int"><span class="rv-tab">Interest<small>ranked against your own strands</small></span><div class="bar-chart">${byInt.map(r => col(r, r.ipct, ordinal(r.irank))).join("")}</div></div>`;
+  requestAnimationFrame(() => setTimeout(() => root.querySelectorAll(".bar-fill").forEach(el => { el.style.height = el.dataset.target + "%"; }), 50));
+}
+
+/* Skills and interests, strand by strand */
+function renderRvRows(m, results) {
+  const root = document.getElementById("interest-section"), { ps } = m;
+  root.innerHTML = `<h3>Skills and interests, strand by strand</h3>
+    <div class="si-grid">${results.map(r => {
+      const info = STRANDS[r.strand], ts = ps.rec.includes(r), ti = ps.intSet.includes(r);
+      const badges = (ts ? `<span class="rv-badge">Top skill</span>` : "") + (ti ? `<span class="rv-badge rv-badge-i">Top interest</span>` : "");
+      return `<div class="si-row${ts || ti ? " rv-row-top" : ""}" style="--sc:${info.color}">
+        <span class="si-name"><span class="dot" style="background:${info.color}"></span>${info.name}${badges}</span>
+        <div class="si-line"><span class="si-tag">Skill</span><div class="si-track"><div class="si-fill" data-w="${r.percentage}" style="width:0"></div></div><span class="si-val">${r.percentage}%</span></div>
+        <div class="si-line"><span class="si-tag">Interest</span><div class="si-track"><div class="si-fill si-fill-int" data-w="${r.ipct}" style="width:0"></div></div><span class="si-val">${ordinal(r.irank)}, ${interestLabel(r.ipct).toLowerCase()}</span></div></div>`;
+    }).join("")}</div>
+    <p class="si-note">Solid bars are skill, striped bars are interest. Interest is ranked against your own other strands, so "1st" means your strongest interest, not a fixed score. The two are never combined, so any gap stays visible.</p>`;
+  requestAnimationFrame(() => setTimeout(() => root.querySelectorAll(".si-fill").forEach(el => { el.style.width = el.dataset.w + "%"; }), 60));
+}
+
+/* FAQ: grouped, and the questions change with the result (kind) and use the student's own strands and numbers */
+function renderRvFaq(m, results, pick) {
+  const { ps, kind } = m, rec = pick.rec, top = rec[0];
+  const names = list => list.map(r => STRANDS[r.strand].name).join(" and ");
+  const sName = names(rec), iName = ps.intSet.length ? names(ps.intSet) : "";
+  const focus = m.both[0];
+  const fa = focus ? names([focus]) : "";
+  const c = m.c, iAll = ps.intSet.concat(ps.alsoTop);
+  const sNames = names(pick.tiedAll), iNames = names(iAll), pct = focus ? focus.percentage : 0;
+  const kindMap = {
+    perfect: () => ({ q: "Does a perfect match guarantee I'll do well?", a: `No. It means ${fa} came first in both your skills (${focus.percentage}%) and your interests, which is a strong sign. But it is based on ${focus.total} questions and a questionnaire, not a promise. Read the strand page to check that the daily work still appeals to you.` }),
+    building: () => ({ q: `My interest in ${fa} is high but my skills are modest. Should I still choose it?`, a: `You can. Interest is what keeps people going when work gets hard, and your ${focus.percentage}% shows where you are today, not your limit. ${fa} is ${STRAND_DEMANDS[focus.strand]}. Ask yourself whether you would put in that practice.` }),
+    near: () => ({ q: "My skills and interests are one step apart. What does that mean?", a: `Your strongest skill is ${sName} and your strongest interest is ${iName}, but each ranks near the top on the other measure. That makes both realistic options, so compare the two strand pages and picture the daily work.` }),
+    apart: () => ({ q: "Why did my skills and interests point to different strands?", a: `Being good at something and wanting to spend your days on it are different things. Your strongest skill is ${sName} and your strongest interest is ${iName}. Neither is wrong: skills can be built, and interest is what keeps you going.` }),
+    flat: () => ({ q: "Why didn't my interests point to one strand?", a: `Your interest scores were close together across all six strands, so no single one stood out. That is common and not a problem. Use your skill results as the guide for now, and read each strand page to notice what appeals to you.` }),
+    flatSkill: () => ({ q: "Why didn't my skills point to one strand?", a: `You scored the same on all six tests, so no strand stood out on skills. That can happen with short tests. Use your interest results and the strand pages as your guide for now.` }),
+    split: () => ({ q: "Why don't my skills and interests share a strand?", a: `Your top skill result is ${sName} and your top interest is ${iName}, so no strand is on both lists. That is common: skills can be built, and interest is what keeps you going. Compare the strand pages and picture the daily work.` }),
+    s4: () => ({ q: `Why did ${iNames} tie on interest, and why does ${fa} lead?`, a: `${iNames} landed on the same interest score. Your skill test put ${fa} ahead (${pct}%), so it is the strand on both lists. The others are not ruled out.` }),
+    s6: () => ({ q: `Why did ${sNames} tie on skill, and why does ${fa} lead?`, a: `${sNames} scored the same on their tests (${pct}%). Your interest ranked ${fa} first, so it is on both lists. The other tied strand is still a strong skill result.` }),
+    s8: () => ({ q: "What does a double match mean?", a: `${names(c.shared)} tied on both your skills and your interests, so neither beats the other. Treat both as equally good fits and read both strand pages.` }),
+    s9: () => ({ q: `Why is ${fa} highlighted?`, a: `Your skills tied across ${sNames} and your interests tied across ${iNames}. ${fa} is the only strand on both lists, so it gets the star. The others are still worth a look.` })
+  };
+  const kindQ = kindMap[c.flatSkill ? "flatSkill" : kind === "shared" ? "s" + c.caseNo : kind]();
+  const tieQ = pick.tiedAll.length > 1 && !c.flatSkill ? { q: `Why were ${names(rec)} shown for my skills?`, a: pick.arbitrary
+    ? `${names(pick.tiedAll)} tied for your highest score (${top.percentage}%), and your interests could not separate them. Only two are shown, so treat all ${pick.tiedAll.length} as worth exploring.`
+    : `${names(pick.tiedAll)} tied for your highest score (${top.percentage}%).${pick.byInterest ? " Only two can be shown, so your interest results chose them. The others are not ruled out." : " Treat them as equally strong fits."}` } : null;
+  const iTieQ = c.iTied && (kind !== "shared" || ps.alsoTop.length) ? { q: `Why are ${iNames} tied for interest?`, a: `After the two parts of the questionnaire were combined and rounded, ${iNames} landed on the same score (${iAll[0].ipct}%). ${ps.alsoTop.length ? `Only two can be shown, so your skill scores chose which appear (${names(ps.alsoTop)} also tied). ` : ""}Treat them as equally appealing.` } : null;
+  const groups = [
+    { title: "About your result", items: [
+      { q: "How was my skill score calculated?", a: `Each skill test has multiple-choice questions with one correct answer. Your score for a strand is the number you got right, shown as a raw score and a percentage.` },
+      { q: "How was my interest result calculated?", a: `The questionnaire has no right or wrong answers. Part A (ratings) and Part B (most and least) are each turned into a 0 to 100 score per strand, then averaged. Strands are ranked against each other, so the result shows what you prefer compared with your own other strands.` },
+      kindQ, tieQ, iTieQ ].filter(i => i && i.a) },
+    { title: "About your strands", items: [
+      { q: `What subjects are in ${names(ps.shown)}?`, a: ps.shown.map(r => `${STRANDS[r.strand].name} typically includes ${STRANDS[r.strand].subjects.join(", ")}.`).join(" ") },
+      { q: "What college courses are related?", a: ps.shown.map(r => `${STRANDS[r.strand].name}: ${STRANDS[r.strand].courses.join(", ")}.`).join(" ") + " Many courses accept graduates from other strands too." } ] },
+    { title: "What to do next", items: [
+      { q: "Does a low score mean I can't take that strand?", a: `No. Each test is a short snapshot of your current skills, not a limit. Skills can be built with practice, and a strand you enjoy may be worth choosing even if you scored lower there.` },
+      { q: "Can I still choose another strand?", a: `Yes. This result is a suggestion based on today, not a requirement. Talk it over with your parents, teachers, or guidance counselor.` } ] }
+  ];
+  const el = document.getElementById("faq-list");
+  el.innerHTML = groups.map(g => `<div class="rv-faq-group"><h4 class="rv-faq-title">${g.title}</h4>${g.items.map(it => `
+    <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>${it.q}</span><span class="faq-icon">+</span></button>
+    <div class="faq-answer"><p>${it.a}</p></div></div>`).join("")}</div>`).join("");
+  el.querySelectorAll(".faq-item").forEach(w => {
+    const b = w.querySelector(".faq-question");
+    b.addEventListener("click", () => b.setAttribute("aria-expanded", String(w.classList.toggle("faq-open"))));
   });
+}
+
+function renderResults() {
+  const results = state.results, pick = pickRecommended(results), m = resultsModel(results, pick);
+  renderResultsHero(pick, results, m.low, m);
+  document.getElementById("result-sub").innerHTML = rvMessage(m, results, pick) + `<br><small>${m.low ? "Your skill scores were low and close together, so lean on your interests and explore each strand. " : ""}This is a starting point, not a final decision. You know yourself best.</small>`;
+  renderRvCharts(m, results);
+  renderRvRows(m, results);
+  renderExplain(results, pick, m.ps);      // the folder tabs (Skills | Interests)
+  renderRecommendedInfo(m.ps);             // "Get to know your strands"
+  renderRvFaq(m, results, pick);
 }
 
 /* ---------- Hero decoration: 8 sparkles (they twinkle via style2.css) ----------
