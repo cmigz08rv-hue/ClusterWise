@@ -7,11 +7,11 @@
 <link rel="canonical" href="https://pcshs-clusterwise.vercel.app/">
 
 <!-- Search description + link preview (Messenger, Facebook, etc.) -->
-<meta name="description" content="PCSHS ClusterWise is a free tool for Pasay City South High School (PCSHS) students to find their ideal Senior High School strand through six skill tests and an interests questionnaire.">
+<meta name="description" content="PCSHS ClusterWise is a free tool for Pasay City South High School (PCSHS) learners to find their ideal Senior High School strand through six skill tests and an interests questionnaire.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PCSHS ClusterWise">
 <meta property="og:title" content="PCSHS ClusterWise — Find Your SHS Strand | Pasay City South High School">
-<meta property="og:description" content="PCSHS ClusterWise is a free tool for Pasay City South High School (PCSHS) students to find their ideal Senior High School strand through six skill tests and an interests questionnaire.">
+<meta property="og:description" content="PCSHS ClusterWise is a free tool for Pasay City South High School (PCSHS) learners to find their ideal Senior High School strand through six skill tests and an interests questionnaire.">
 <meta property="og:url" content="https://pcshs-clusterwise.vercel.app/">
 <meta property="og:image" content="https://pcshs-clusterwise.vercel.app/images/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -32,7 +32,7 @@
   "name": "PCSHS ClusterWise",
   "alternateName": "Pasay City South High School ClusterWise",
   "url": "https://pcshs-clusterwise.vercel.app/",
-  "description": "A free strand-matching tool for Pasay City South High School (PCSHS) students. Six skill tests and an interests questionnaire show which Senior High School strand fits best.",
+  "description": "A free strand-matching tool for Pasay City South High School (PCSHS) learners. Six skill tests and an interests questionnaire show which Senior High School strand fits best.",
   "applicationCategory": "EducationalApplication",
   "operatingSystem": "Any",
   "inLanguage": "en",
@@ -54,6 +54,7 @@
     </button>
     <nav class="nav-links">
       <button class="nav-link" id="nav-explore"><span class="nav-opt">Explore </span>Strands</button>
+      <button class="nav-link" id="nav-faq">FAQ</button>
     </nav>
   </div>
 </header>
@@ -63,7 +64,7 @@
   <div class="home-hero">
     <div class="wrap">
       <h1>Discover Your Ideal Senior High <span>Strand</span> here in PCSHS</h1>
-      <p class="lede"><strong>PCSHS ClusterWise</strong> is a free online tool that helps students of Pasay City South High School (PCSHS) choose a Senior High School strand. Take six short skill tests, one for each strand, plus a quick questionnaire about what you enjoy. ClusterWise shows your skills and your interests side by side, so you can see where they line up.</p>
+      <p class="lede"><strong>PCSHS ClusterWise</strong> is a free online tool that helps learners of Pasay City South High School (PCSHS) choose a Senior High School strand. Take six short skill tests, one for each strand, plus a quick questionnaire about what you enjoy. ClusterWise shows your skills and your interests side by side, so you can see where they line up.</p>
       <button class="btn btn-primary btn-compass" id="start-btn">
         <span>Start Assessment</span>
         <span class="btn-compass-icon" aria-hidden="true"></span>
@@ -76,13 +77,19 @@
     <div class="manual">
       <p class="manual-title">How it works</p>
       <ol class="manual-list">
-        <li>Click <strong>Start Assessment</strong> to open the Assessment Hub.</li>
+        <li>Click <strong>Start Assessment</strong> and confirm that you are in Grade 10 or below. The Assessment Hub then opens.</li>
         <li>The hub has six skill tests, one per strand, with 15 multiple-choice questions each (90 in total), plus an Interests questionnaire (30 questions, no right or wrong answers). Take them in any order.</li>
         <li>Every skill question has one correct answer. Answers are not revealed and a finished part cannot be retaken, so take your time.</li>
         <li>Once all seven parts are done, <strong>See Overall Results</strong> unlocks.</li>
         <li>Your results show your skill score and interest ranking for every strand, one main takeaway from comparing them, and a breakdown of your strengths. Then explore that strand's subjects, skills, and career paths.</li>
       </ol>
     </div>
+
+    <aside class="stakes" aria-labelledby="stakes-title">
+      <h2 class="stakes-title" id="stakes-title">Your strand shapes your next two years</h2>
+      <p>You choose a strand once, then stay in it for all of Grade 11 and Grade 12. PCSHS does not allow learners to switch strands, so there is no second try.</p>
+      <p>A strand that does not fit your skills and interests can make those two years harder than they need to be, and it can hold you back from what you are capable of. <strong>Check where you stand before you commit.</strong></p>
+    </aside>
   </div>
 
   <div class="wrap wrap-wide">
@@ -94,7 +101,7 @@
         <p class="strand-tracks-intro">ClusterWise covers six strands at Pasay City South High School (PCSHS), grouped into two tracks.</p>
         <div class="track-cards">
           <section class="track-card" aria-labelledby="track-academic">
-            <h3 class="track-name" id="track-academic">Academic track</h3>
+            <h3 class="track-name" id="track-academic">Academic tracks</h3>
             <ul class="track-list">
               <li><b class="track-code" style="--sc:#1E8578">STEM</b><span>Science, Technology, Engineering &amp; Mathematics</span></li>
               <li><b class="track-code" style="--sc:#C2457F">ASSH</b><span>Arts, Social Sciences, and Humanities</span></li>
@@ -102,7 +109,7 @@
             </ul>
           </section>
           <section class="track-card" aria-labelledby="track-techpro">
-            <h3 class="track-name" id="track-techpro">TechPro track</h3>
+            <h3 class="track-name" id="track-techpro">TechPro tracks</h3>
             <ul class="track-list">
               <li><b class="track-code" style="--sc:#3457D5">HT</b><span>Hospitality and Tourism</span></li>
               <li><b class="track-code" style="--sc:#6A3EA1">ICT</b><span>Information and Communications Technology</span></li>
@@ -125,21 +132,30 @@
 
   <!-- Home-page FAQ: native <details> so the text is in the HTML for Google, no JavaScript needed -->
   <div class="wrap home-faq" id="faq">
-    <h2 class="section-title">Frequently asked questions</h2>
+    <div class="hfaq-intro">
+      <h2 class="section-title">Frequently asked questions</h2>
+      <p class="hfaq-lede">Quick answers about how ClusterWise works and what happens to your answers.</p>
+    </div>
+    <div class="hfaq-list">
 
     <details class="hfaq-item" open>
       <summary class="hfaq-q"><span>What is PCSHS ClusterWise?</span><span class="hfaq-icon" aria-hidden="true">+</span></summary>
-      <p class="hfaq-a">PCSHS ClusterWise is a free strand-matching tool for students of Pasay City South High School. No account is needed. Six skill tests (one per strand) and an interests questionnaire show where your skills and interests line up, so you can see which strand fits you.</p>
+      <p class="hfaq-a">PCSHS ClusterWise is a free strand-matching tool for Junior High School learners here in Pasay City South High School. No account is needed. Six skill tests (one per strand) and an interests questionnaire show where your skills and interests line up, so you can see which strand fits you.</p>
     </details>
 
     <details class="hfaq-item">
       <summary class="hfaq-q"><span>Who is it for?</span><span class="hfaq-icon" aria-hidden="true">+</span></summary>
-      <p class="hfaq-a">It is made for Junior High School students at Pasay City South High School (PCSHS), ideally Grade 10, who are deciding which Senior High School strand to take.</p>
+      <p class="hfaq-a">ClusterWise is made for Junior High School learners at Pasay City South High School (PCSHS), ideally Grade 10, who are deciding which Senior High School strand to take. When you press <strong>Start Assessment</strong>, you are asked which grade you are in, because the assessment is only for learners in Grade 10 and below. If you choose Grade 11–12, the assessment stays locked in that browser tab.</p>
+    </details>
+
+    <details class="hfaq-item">
+      <summary class="hfaq-q"><span>Can I change my strand later?</span><span class="hfaq-icon" aria-hidden="true">+</span></summary>
+      <p class="hfaq-a">No. PCSHS does not allow learners to switch strands. The strand you choose is the one you stay in for Grade 11 and Grade 12, so compare your skills and interests before you decide, and talk with your guidance counselor if you are unsure.</p>
     </details>
 
     <details class="hfaq-item">
       <summary class="hfaq-q"><span>How long does it take?</span><span class="hfaq-icon" aria-hidden="true">+</span></summary>
-      <p class="hfaq-a">There are 90 skill questions (15 per strand) and 30 interest questions, split into seven short parts. The exam takes around 45 minutes average. <!-- TODO: add a rough time estimate once you have timed a few students, e.g. "Most students finish in about 45 minutes." --></p>
+      <p class="hfaq-a">There are 90 skill questions (15 per strand) and 30 interest questions, split into seven short parts. Take them in any order, and do one part at a time if you like. Most learners finish in about 45 minutes.</p>
     </details>
 
     <details class="hfaq-item">
@@ -161,6 +177,7 @@
       <summary class="hfaq-q"><span>Is the result final?</span><span class="hfaq-icon" aria-hidden="true">+</span></summary>
       <p class="hfaq-a">No. ClusterWise is a guide, not a decision. Use your results together with advice from your teachers, guidance counselor, and family.</p>
     </details>
+    </div>
   </div>
 </section>
 
@@ -261,7 +278,7 @@
   <div id="strand-detail-content"></div>
 </section>
 
-<footer class="site-footer">ClusterWise — a strand exploration tool for prospective Senior High School students of Pasay City South High School (PCSHS).</footer>
+<footer class="site-footer">ClusterWise — a strand exploration tool for prospective Junior High School learners of Pasay City South High School (PCSHS).</footer>
 
 <!-- Floating "Save my results" button: only visible while the results page is open (savecard.js toggles it) -->
 <button class="save-fab" id="save-fab" type="button" data-save-results aria-label="Save my results as a picture">
