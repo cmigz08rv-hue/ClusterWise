@@ -77,18 +77,19 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 40px;
 }
 
 .nav-link {
   font-family: 'Work Sans', sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.97rem;
   font-weight: 600;
+  white-space: nowrap;
   color: var(--ink-soft);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px 2px;
+  padding: 8px 2px;
   position: relative;
 }
 .nav-link::after {
@@ -921,7 +922,8 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
   color: var(--ink);
 }
 .bar-col:first-child .bar-label {
-  text-decoration: underline wavy var(--amber);
+  text-decoration: underline solid var(--amber);
+  text-decoration-thickness: 3px;
   text-underline-offset: 4px;
 }
 
@@ -1284,7 +1286,7 @@ footer.site-footer {
 }
 
 @media (max-width: 600px) {
-  .nav-link:not(#nav-explore) { display: none; }
+  .nav-link:not(#nav-explore):not(#nav-faq) { display: none; }
   .header-inner { gap: 8px; }
 }
 
@@ -1412,11 +1414,9 @@ footer.site-footer {
 .section-title {
   font-weight: 800;
   font-variation-settings: "SOFT" 100, "WONK" 1;
-  text-decoration: underline wavy var(--amber);
-  text-decoration-thickness: 3px;
-  text-underline-offset: 8px;
 }
-.section-title::before { display: none; }
+/* short amber bar above the title (replaces the old wavy underline) */
+.section-title::before { display: block; }
 
 /* ---- Strand cards → bold sticker cards ---- */
 .strand-card {
@@ -2931,20 +2931,23 @@ footer.site-footer {
 .site-header .mark-word { font-size: 1.35rem; white-space: nowrap; }
 .brand-compass { width: 38px; height: 38px; flex-shrink: 0; display: block; }
 
-@media (max-width: 420px) {
+@media (max-width: 520px) {
   .brand-divider { display: none; }
-  .nav-opt { display: none; }
-  .site-header .brand { gap: 10px; }
-  .site-header .mark-word { font-size: 1.2rem; }
-  .brand-compass { width: 34px; height: 34px; }
+  .nav-opt { display: none; }          /* "Explore Strands" becomes "Strands" */
+  .site-header .wrap { padding: 0 16px; }
+  .site-header .brand { gap: 6px; }
+  .brand-seal { width: 36px; height: 36px; }
+  .brand-compass { width: 28px; height: 28px; }
+  .site-header .mark-word { font-size: 1.05rem; }
+  .nav-links { gap: 20px; }
+  .nav-link { font-size: 0.88rem; }
 }
 @media (max-width: 340px) {
-  .brand-seal { width: 38px; height: 38px; }
-  .site-header .brand { gap: 8px; }
-  .site-header .mark-word { font-size: 1.1rem; }
-  .brand-compass { width: 30px; height: 30px; }
-  .site-header .wrap { padding: 0 14px; }
-  .nav-link { font-size: 0.85rem; }
+  .brand-seal { width: 32px; height: 32px; }
+  .brand-compass { width: 24px; height: 24px; }
+  .site-header .mark-word { font-size: 0.95rem; }
+  .nav-links { gap: 14px; }
+  .nav-link { font-size: 0.8rem; }
 }
 
 /* ============================================================
@@ -4306,62 +4309,247 @@ body.cw-modal-open { overflow: hidden; }
 .track-code { font-size: 1rem; font-weight: 800; letter-spacing: 0.01em; color: var(--sc); }
 @media (max-width: 640px) { .track-cards { grid-template-columns: 1fr; } }
 
-.home-faq { max-width: 760px; padding: 56px 24px 80px; }
-.home-faq .section-title { margin-bottom: 26px; }
+/* ================= HOME FAQ ================= */
+.home-faq {
+  max-width: 1080px;
+  padding: 72px 24px 96px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr);
+  gap: 56px;
+  align-items: start;
+}
 
-.hfaq-item {
+/* Left: title + short intro, stays in view while the list is read */
+.hfaq-intro {
+  position: sticky;
+  top: calc(var(--header-h) + 28px);
+}
+.home-faq .section-title { text-align: left; margin-bottom: 18px; }
+.home-faq .section-title::before { margin-left: 0; }
+.hfaq-lede {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 34ch;
+}
+
+/* Right: one panel, rows divided by lines instead of seven separate pills */
+.hfaq-list {
   background: #fff;
   border: 2px solid var(--ink);
-  border-radius: 16px;
-  margin-bottom: 12px;
+  border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--sun);
   overflow: hidden;
-  box-shadow: 3px 3px 0 var(--sun);
-  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
-.hfaq-item[open] { background: #FFF8DC; }
-.hfaq-item:hover { box-shadow: 4px 4px 0 var(--sun); }
-.hfaq-q:hover .hfaq-icon { background: var(--amber); }
+.hfaq-item { border-top: 1.5px solid var(--line); transition: background 0.2s ease, box-shadow 0.2s ease; }
+.hfaq-item:first-child { border-top: 0; }
+.hfaq-item:hover { background: #FFFCF0; }
+.hfaq-item[open] { background: #FFF8DC; box-shadow: inset 5px 0 0 var(--amber); }
 
 .hfaq-q {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  padding: 16px 20px;
+  gap: 18px;
+  padding: 20px 24px;
   cursor: pointer;
   list-style: none;
-  font-family: 'Work Sans', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.08rem;
+  font-weight: 650;
+  line-height: 1.35;
   color: var(--ink);
 }
 .hfaq-q::-webkit-details-marker { display: none; }
-.hfaq-q:focus-visible { outline: 3px solid var(--amber-deep); outline-offset: -3px; border-radius: 14px; }
+.hfaq-q:focus-visible { outline: 3px solid var(--amber-deep); outline-offset: -3px; }
 
+/* "+" drawn with CSS so it is always perfectly centered; turns into "x" when open */
 .hfaq-icon {
-  display: grid;
-  place-items: center;
-  width: 30px; height: 30px;
+  position: relative;
   flex-shrink: 0;
+  width: 32px; height: 32px;
+  font-size: 0;
   background: var(--sun);
   border: 2px solid var(--ink);
   border-radius: 50%;
-  color: var(--ink);
-  font-size: 1.15rem;
-  line-height: 1;
-  transition: transform 0.25s ease, background 0.2s ease, color 0.2s ease;
+  transition: transform 0.3s ease, background 0.2s ease;
 }
-.hfaq-item[open] .hfaq-icon { transform: rotate(45deg); background: var(--ink); color: var(--sun); }
+.hfaq-icon::before,
+.hfaq-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 12px; height: 2.5px;
+  margin: -1.25px 0 0 -6px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+.hfaq-icon::after { transform: rotate(90deg); }
+.hfaq-q:hover .hfaq-icon { background: var(--amber); }
+.hfaq-item[open] .hfaq-icon { transform: rotate(45deg); background: var(--ink); }
+.hfaq-item[open] .hfaq-icon::before,
+.hfaq-item[open] .hfaq-icon::after { background: var(--sun); }
 
 .hfaq-a {
   margin: 0;
-  padding: 0 20px 20px;
+  padding: 0 72px 24px 24px;
   color: var(--ink-soft);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+/* ---- Smooth open / close (modern browsers), fade-in fallback elsewhere ---- */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) and selector(::details-content) {
+    .hfaq-item { interpolate-size: allow-keywords; }
+    .hfaq-item::details-content {
+      block-size: 0;
+      opacity: 0;
+      overflow: clip;
+      transition: block-size 0.35s ease, opacity 0.25s ease, content-visibility 0.35s allow-discrete;
+    }
+    .hfaq-item[open]::details-content { block-size: auto; opacity: 1; }
+  }
+  @supports not ((interpolate-size: allow-keywords) and selector(::details-content)) {
+    .hfaq-item[open] .hfaq-a { animation: hfaqIn 0.3s ease; }
+  }
+}
+@keyframes hfaqIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Tablet / phone: stack the columns ---- */
+@media (max-width: 860px) {
+  .home-faq { grid-template-columns: 1fr; gap: 28px; padding: 56px 20px 72px; }
+  .hfaq-intro { position: static; }
+  .hfaq-lede { max-width: none; }
+}
 @media (max-width: 640px) {
-  .home-faq { padding: 44px 16px 64px; }
-  .hfaq-q { padding: 14px 16px; font-size: 0.95rem; }
-  .hfaq-a { padding: 0 16px 16px; }
+  .hfaq-q { padding: 16px 18px; font-size: 1rem; }
+  .hfaq-a { padding: 0 18px 20px; }
+  .hfaq-list { box-shadow: 4px 4px 0 var(--sun); }
+}
+
+/* ================= HOME: "why choose carefully" callout ================= */
+.stakes {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 26px 30px 28px 34px;
+  background: #FFF8DC;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: inset 6px 0 0 var(--amber), 6px 6px 0 var(--sun);
+}
+.stakes-title {
+  margin: 0 0 12px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.3rem, 3.2vw, 1.65rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--navy);
+}
+.stakes p { margin: 0 0 12px; line-height: 1.65; color: var(--ink); }
+.stakes p:last-child { margin-bottom: 0; }
+.stakes strong { color: var(--ink); font-weight: 700; }
+@media (max-width: 640px) {
+  .stakes { padding: 20px 18px 22px 24px; box-shadow: inset 5px 0 0 var(--amber), 4px 4px 0 var(--sun); }
+}
+
+/* ================= Grade check dialog (reuses the .cw-modal look) ================= */
+.cw-gate-card { width: min(480px, 100%); }
+.cw-gate-card p { margin: 0 0 16px; }
+.cw-gate-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.cw-gate-radios { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cw-gate-opt { position: relative; display: block; cursor: pointer; }
+.cw-gate-opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.cw-gate-face {
+  display: flex; flex-direction: column; gap: 3px;
+  height: 100%;
+  padding: 14px 14px 16px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--sun);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.cw-gate-opt:hover .cw-gate-face { background: #FFFCF0; }
+.cw-gate-opt input:checked + .cw-gate-face { background: #FFF8DC; transform: translateY(-3px); box-shadow: 5px 5px 0 var(--amber); }
+.cw-gate-opt input:focus-visible + .cw-gate-face { outline: 3px solid var(--amber-deep); outline-offset: 3px; }
+
+.cw-gate-check {
+  position: relative;
+  width: 24px; height: 24px;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  transition: background 0.2s ease, transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.cw-gate-check::after {
+  content: "";
+  position: absolute; left: 7px; top: 2px;
+  width: 6px; height: 11px;
+  border: solid var(--sun);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.cw-gate-opt input:checked + .cw-gate-face .cw-gate-check { background: var(--ink); transform: scale(1.08); }
+.cw-gate-opt input:checked + .cw-gate-face .cw-gate-check::after { transform: rotate(45deg) scale(1); }
+.cw-gate-opt-title { font-weight: 700; font-size: 1rem; color: var(--ink); line-height: 1.25; }
+.cw-gate-opt-sub { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.35; }
+
+.cw-gate-card .cw-modal-actions { margin-top: 18px; }
+.cw-gate-card .cw-modal-actions .btn { width: 100%; }
+
+/* the "Grade 10 and below" message */
+.cw-gate-options { display: grid; gap: 12px; }
+.cw-gate-btn {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 20px;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--sun);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cw-gate-btn:hover { background: var(--sun-soft); transform: translateY(-1px); box-shadow: 4px 4px 0 var(--sun); }
+.cw-gate-btn:active { transform: translateY(0); box-shadow: 2px 2px 0 var(--sun); }
+.cw-gate-btn:focus-visible { outline: 3px solid var(--amber-deep); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .cw-modal:not([hidden]) .cw-gate-card { animation: cwGateIn 0.25s ease; }
+}
+@keyframes cwGateIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 380px) { .cw-gate-radios { grid-template-columns: 1fr; } }
+
+/* ---- Start Assessment buttons while the tab is locked (Grade 11-12) ---- */
+body.grade-locked #start-btn,
+body.grade-locked #start-btn-2,
+body.grade-locked #sd-start {
+  background: #DDD6C4;
+  color: var(--ink-soft);
+  box-shadow: none;
+  border-color: transparent;
+}
+body.grade-locked #start-btn:hover,
+body.grade-locked #start-btn-2:hover,
+body.grade-locked #sd-start:hover { background: #D3CBB6; transform: none; }
+body.grade-locked .btn-compass-icon,
+body.grade-locked .btn-compass::after { display: none; }
+body.grade-locked #start-btn::before,
+body.grade-locked #start-btn-2::before,
+body.grade-locked #sd-start::before {
+  content: "";
+  display: inline-block;
+  width: 16px; height: 16px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B6169' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat;
 }
