@@ -34,7 +34,7 @@ const STRANDS = {
     name: "STEM",
     full: "Science, Technology, Engineering & Mathematics",
     color: "#1E8578",
-    overview: "STEM is built for students who like asking why something works and proving it. Expect heavy math, laboratory science, and a lot of problem sets.",
+    overview: "STEM is built for learners who like asking why something works and proving it. Expect heavy math, laboratory science, and a lot of problem sets.",
     focus: "Deep, theory-first study of the natural and physical sciences, paired with advanced mathematics.",
     highlight: "theory-first",
     subjects: ["Pre-Calculus & Basic Calculus", "General Physics", "General Chemistry", "General Biology", "Research"],
@@ -49,14 +49,14 @@ const STRANDS = {
     courses: ["Engineering (all branches)", "Computer Science", "Medicine & Allied Health Sciences", "Architecture", "Applied Mathematics"],
     careers: ["Engineer", "Researcher / Scientist", "Doctor", "Architect", "Data Analyst"],
     videoId: "NO-INaxhY-w",
-    videoCaption: "A quick recap of what STEM students actually study and build."
+    videoCaption: "A quick recap of what STEM learners actually study and build."
   },
   ASSH: {
     name: "ASSH",
     full: "Arts, Social Sciences, and Humanities",
     color: "#C2457F",
     formerly: "HUMMS",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
-    overview: "ASSH is for students drawn to people, culture, language, and ideas — how societies work and how to write and argue well about them.",
+    overview: "ASSH is for learners drawn to people, culture, language, and ideas — how societies work and how to write and argue well about them.",
     focus: "The study of human behavior, society, communication, and the humanities.",
     highlight: "human behavior, society",
     subjects: ["Creative Writing", "Philosophy", "Communication", "Politics & Governance", "Disciplines & Ideas in Social Sciences"],
@@ -71,14 +71,14 @@ const STRANDS = {
     courses: ["Communication / Journalism", "Political Science", "Education", "Psychology", "Law (pre-law)"],
     careers: ["Teacher / Professor", "Lawyer", "Journalist", "Psychologist", "Public Servant"],
     videoId: "QjYIQNZpRyw",
-    videoCaption: "A quick recap of what ASSH students read, discuss, and write about."
+    videoCaption: "A quick recap of what ASSH learners read, discuss, and write about."
   },
   BM: {
     name: "BM",
     full: "Business and Management",
     color: "#E4572E",
     formerly: "ABM",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
-    overview: "BM suits students curious about how businesses run, how money moves, and how to lead or manage an organization.",
+    overview: "BM suits learners curious about how businesses run, how money moves, and how to lead or manage an organization.",
     focus: "The fundamentals of business operations, finance, and management practices.",
     highlight: "business operations, finance",
     subjects: ["Fundamentals of ABM", "Business Finance", "Organization & Management", "Applied Economics", "Business Math"],
@@ -93,7 +93,7 @@ const STRANDS = {
     courses: ["Accountancy", "Business Administration", "Entrepreneurship", "Marketing Management", "Economics"],
     careers: ["Accountant", "Entrepreneur", "Marketing Manager", "Financial Analyst", "Human Resources Officer"],
     videoId: "4Oog3D2xK10",
-    videoCaption: "A quick recap of how BM students learn to plan, manage, and grow a business."
+    videoCaption: "A quick recap of how BM learners learn to plan, manage, and grow a business."
   },
   HT: {
     name: "HT",
@@ -115,13 +115,13 @@ const STRANDS = {
     courses: ["Hotel & Restaurant Management", "Tourism Management", "Nutrition & Dietetics", "Nursing", "Culinary Arts"],
     careers: ["Chef / Cook", "Hotel & Restaurant Staff", "Tour Coordinator", "Caregiver", "Flight Attendant"],
     videoId: "j7XlkEx2IHA",
-    videoCaption: "A quick recap of the hands-on service skills HT students practice."
+    videoCaption: "A quick recap of the hands-on service skills HT learners practice."
   },
   ICT: {
     name: "ICT",
     full: "Information and Communications Technology",
     color: "#6A3EA1",
-    overview: "ICT fits students who like building and fixing digital things — apps, websites, networks, and systems.",
+    overview: "ICT fits learners who like building and fixing digital things — apps, websites, networks, and systems.",
     focus: "Practical, skills-based training in computer systems, software, and digital media.",
     highlight: "skills-based training",
     subjects: ["Computer Programming", "Computer Systems Servicing", "Animation", "Technical Drafting", "Web/App Development"],
@@ -136,14 +136,14 @@ const STRANDS = {
     courses: ["Computer Science", "Information Technology", "Multimedia Arts", "Computer Engineering", "Digital Design"],
     careers: ["Software Developer", "IT Support Specialist", "UI/UX Designer", "Network Administrator", "Game Developer"],
     videoId: "7uVoBJf70m0",
-    videoCaption: "A quick recap of what ICT students build, code, and design."
+    videoCaption: "A quick recap of what ICT learners build, code, and design."
   },
   IA: {
     name: "IA",
     full: "Industrial Arts",
     color: "#B71C1C",
     formerly: "EIM",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
-    overview: "IA is a hands-on technical track for students who like building, wiring, and fixing things with tools and machinery.",
+    overview: "IA is a hands-on technical track for learners who like building, wiring, and fixing things with tools and machinery.",
     focus: "Technical-vocational training in electrical systems, installation, and maintenance work.",
     highlight: "Technical-vocational training",
     subjects: ["Electrical Installation", "Industrial Wiring", "Occupational Health & Safety", "Technical Drawing", "Electronics"],
@@ -158,7 +158,7 @@ const STRANDS = {
     courses: ["Electrical Engineering", "Electronics Engineering", "Industrial Technology", "Mechanical Technology", "Automotive Technology"],
     careers: ["Electrician", "Electrical Technician", "Maintenance Engineer", "Industrial Electrician", "Building Technician"],
     videoId: "2GhjbMmD56o",
-    videoCaption: "A quick recap of the hands-on electrical and technical work IA students do."
+    videoCaption: "A quick recap of the hands-on electrical and technical work IA learners do."
   }
 };
 
@@ -438,17 +438,150 @@ function showView(id, mode = "push") {
    ========================================================= */
 /* Every "Start Assessment" entry point opens the hub */
 function openHub(mode) {
+  if (typeof gradeLocked === "function" && gradeLocked()) { openGate("blocked"); return; }
   renderHub();
   showView("view-hub", typeof mode === "string" ? mode : "push");   // a click passes an Event, not a string
 }
 
-document.getElementById("start-btn").addEventListener("click", openHub);
-document.getElementById("start-btn-2").addEventListener("click", openHub);
+/* ---------- Grade check before the assessment ----------
+   Self-declared: the site has no logins, so it cannot verify a grade.
+     "ok"     = chose Grade 10 or below -> the hub opens.
+     "locked" = chose Grade 11-12 -> every Start Assessment button is locked and shows a message instead.
+   WHERE IT IS KEPT: sessionStorage, so it is cleared when the tab closes (same as the rest of the progress).
+   To keep the lock after the tab closes, make gradeStore() return localStorage instead. */
+const GRADE_KEY = "strandwise.grade.v1";
+const gradeStore = () => sessionStorage;
+let gradeMem = null;   // used if the browser blocks storage
+function gradeGet() { try { return gradeStore().getItem(GRADE_KEY) || gradeMem; } catch (e) { return gradeMem; } }
+function gradeSet(v) { gradeMem = v; try { gradeStore().setItem(GRADE_KEY, v); } catch (e) { /* storage blocked: kept in memory */ } }
+const gradeLocked = () => gradeGet() === "locked";
+
+/* Greys out the Start buttons (the look is in CSS, keyed on body.grade-locked) */
+function applyGradeLock() {
+  const locked = gradeLocked();
+  document.body.classList.toggle("grade-locked", locked);
+  document.querySelectorAll("#start-btn, #start-btn-2, #sd-start").forEach(btn => {
+    if (locked) btn.setAttribute("aria-disabled", "true"); else btn.removeAttribute("aria-disabled");
+  });
+}
+
+let cwGate = null, cwGateReturnFocus = null;
+
+function closeGate(restoreFocus) {
+  cwGate.hidden = true;
+  document.body.classList.remove("cw-modal-open");
+  if (restoreFocus && cwGateReturnFocus && document.contains(cwGateReturnFocus)) cwGateReturnFocus.focus();
+}
+
+/* step = "ask" (radio cards) or "blocked" (the Grade 10-and-below message) */
+function showGateStep(step) {
+  const ask = cwGate.querySelector("#cw-gate-ask");
+  const blocked = cwGate.querySelector("#cw-gate-blocked");
+  ask.hidden = step !== "ask";
+  blocked.hidden = step !== "blocked";
+  cwGate.querySelector(".cw-gate-card").setAttribute("aria-labelledby", step === "ask" ? "cw-gate-title-ask" : "cw-gate-title-blocked");
+  if (step === "ask") {
+    cwGate.querySelectorAll('input[name="cw-grade"]').forEach(r => { r.checked = false; });
+    cwGate.querySelector("#cw-gate-continue").disabled = true;
+    cwGate.querySelector('input[name="cw-grade"]').focus();
+  } else {
+    cwGate.querySelector("#cw-gate-explore").focus();
+  }
+}
+
+function openGate(step) {
+  if (!cwGate) buildGate();
+  cwGateReturnFocus = document.activeElement;
+  document.body.classList.add("cw-modal-open");
+  cwGate.hidden = false;
+  showGateStep(step);
+}
+
+function buildGate() {
+  cwGate = document.createElement("div");
+  cwGate.className = "cw-modal";
+  cwGate.hidden = true;
+  cwGate.innerHTML = `
+    <div class="cw-modal-card cw-gate-card" role="dialog" aria-modal="true">
+      <div id="cw-gate-ask">
+        <h3 id="cw-gate-title-ask">Which grade are you in?</h3>
+        <p>ClusterWise is made for learners who have not chosen a Senior High School strand yet.</p>
+        <fieldset class="cw-gate-radios">
+          <legend class="cw-gate-sr">Your grade level</legend>
+          <label class="cw-gate-opt">
+            <input type="radio" name="cw-grade" value="ok">
+            <span class="cw-gate-face">
+              <span class="cw-gate-check" aria-hidden="true"></span>
+              <span class="cw-gate-opt-title">Grade 10 or below</span>
+              <span class="cw-gate-opt-sub">Still choosing a strand</span>
+            </span>
+          </label>
+          <label class="cw-gate-opt">
+            <input type="radio" name="cw-grade" value="locked">
+            <span class="cw-gate-face">
+              <span class="cw-gate-check" aria-hidden="true"></span>
+              <span class="cw-gate-opt-title">Grade 11–12</span>
+              <span class="cw-gate-opt-sub">Already in a strand</span>
+            </span>
+          </label>
+        </fieldset>
+        <div class="cw-modal-actions"><button type="button" class="btn btn-primary" id="cw-gate-continue" disabled>Continue</button></div>
+      </div>
+      <div id="cw-gate-blocked" hidden>
+        <h3 id="cw-gate-title-blocked">ClusterWise is for Grade 10 and below</h3>
+        <p>Learners in Grade 11 and 12 are already in a strand, and PCSHS does not allow switching, so these results could not change anything for you. You can still read about each strand.</p>
+        <div class="cw-gate-options">
+          <button type="button" class="cw-gate-btn" id="cw-gate-explore">Explore strands</button>
+          <button type="button" class="cw-gate-btn" id="cw-gate-faq">FAQ</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(cwGate);
+
+  const cont = cwGate.querySelector("#cw-gate-continue");
+  cwGate.querySelectorAll('input[name="cw-grade"]').forEach(r => r.addEventListener("change", () => {
+    cont.disabled = false;
+  }));
+  cont.addEventListener("click", () => {
+    const picked = cwGate.querySelector('input[name="cw-grade"]:checked');
+    if (!picked) return;
+    if (picked.value === "ok") { gradeSet("ok"); closeGate(false); openHub(); }
+    else { gradeSet("locked"); applyGradeLock(); showGateStep("blocked"); }
+  });
+  cwGate.querySelector("#cw-gate-explore").addEventListener("click", () => { closeGate(false); document.getElementById("nav-explore").click(); });
+  cwGate.querySelector("#cw-gate-faq").addEventListener("click", () => { closeGate(false); document.getElementById("nav-faq").click(); });
+
+  cwGate.addEventListener("click", e => { if (e.target === cwGate) closeGate(true); });   // click outside = close
+  cwGate.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); closeGate(true); } });
+  document.addEventListener("focusin", e => {                                              // keep focus inside the dialog
+    if (cwGate.hidden || cwGate.contains(e.target)) return;
+    const step = cwGate.querySelector("#cw-gate-ask").hidden ? "#cw-gate-explore" : 'input[name="cw-grade"]';
+    cwGate.querySelector(step).focus();
+  });
+}
+
+/* Every "Start Assessment" button goes through here */
+function startAssessment() {
+  const g = gradeGet();
+  if (g === "ok") { openHub(); return; }
+  openGate(g === "locked" ? "blocked" : "ask");
+}
+applyGradeLock();
+
+document.getElementById("start-btn").addEventListener("click", startAssessment);
+document.getElementById("start-btn-2").addEventListener("click", startAssessment);
 document.getElementById("nav-home").addEventListener("click", () => confirmLeave(() => showView("view-home")));
 document.getElementById("nav-explore").addEventListener("click", () => confirmLeave(() => {
   showView("view-home");
   setTimeout(() => {
     document.getElementById("explore-strands").scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 50);
+}));
+
+document.getElementById("nav-faq").addEventListener("click", () => confirmLeave(() => {
+  showView("view-home");
+  setTimeout(() => {
+    document.getElementById("faq").scrollIntoView({ behavior: "smooth", block: "start" });
   }, 50);
 }));
 
@@ -995,7 +1128,8 @@ function renderStrandDetail(code) {
   initStrandTypewriter(root, info);
   initIctFrame(root);
   initStrandMotion(root);
-  root.querySelector("#sd-start").addEventListener("click", openHub);
+  root.querySelector("#sd-start").addEventListener("click", startAssessment);
+  applyGradeLock();
   root.querySelector("#sd-back").addEventListener("click", () => showView("view-home"));
   root.querySelectorAll(".sd-other").forEach(btn => {
     btn.addEventListener("click", () => {
