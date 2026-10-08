@@ -6,7 +6,10 @@
    SCREEN FLOW (state transitions)
    ---------------------------------------------------------
    view-home
-      │  "Start Assessment" (home or strand page)   -> openHub()
+      │  "Start Assessment" (home or strand page)   -> grade check
+      ▼
+   view-stakes   (strand notice, once per session; Continue locked for STAKES_WAIT_MS)
+      │  Continue                                   -> openHub()
       ▼
    view-hub  ◄──────────────────────────────────────────────┐
       │  click an unfinished module card -> startModule(code)│
@@ -356,6 +359,7 @@ function restoreSession() {
       showView("view-assessment");
       return true;
     }
+    if (s.view === "view-stakes") { openStakes(); return true; }
     if (s.view === "view-hub") { openHub(); return true; }
     if (s.view === "view-results" && allDone()) { showResults(); return true; }
     if (s.view === "view-loading") {   // refreshed mid-animation: skip it, never leave the student stuck
@@ -424,6 +428,7 @@ function recordHistory(id, mode) {
 /* ---------- View switching ---------- */
 function showView(id, mode = "push") {
   if (unlock.active) endUnlock();   // any screen change cuts the unlock cutscene short
+  if (id !== "view-stakes" && stakesTimer) stopStakesTimer();   // leaving the notice cancels its countdown
   if (id !== "view-loading" && loader.active) stopLoader();   // leaving the loading screen early (Back, logo) cancels its timer
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -545,7 +550,7 @@ function buildGate() {
   cont.addEventListener("click", () => {
     const picked = cwGate.querySelector('input[name="cw-grade"]:checked');
     if (!picked) return;
-    if (picked.value === "ok") { gradeSet("ok"); closeGate(false); openHub(); }
+    if (picked.value === "ok") { gradeSet("ok"); closeGate(false); proceedAfterGrade(); }
     else { gradeSet("locked"); applyGradeLock(); showGateStep("blocked"); }
   });
   cwGate.querySelector("#cw-gate-explore").addEventListener("click", () => { closeGate(false); document.getElementById("nav-explore").click(); });
@@ -560,10 +565,60 @@ function buildGate() {
   });
 }
 
+/* ---------- Strand notice (view-stakes) ----------
+   Shown once per tab session, after the grade check and before the hub. Continue stays locked for
+   STAKES_WAIT_MS so the student has to sit with it for a moment. Once Continue has been pressed, the
+   notice is "seen" for the rest of the session (sessionStorage, cleared when the tab closes) and later
+   Start Assessment clicks go straight to the hub. Back/Forward onto it shows it with Continue unlocked. */
+const STAKES_KEY = "strandwise.stakes.v1";
+const STAKES_WAIT_MS = 5000;   // how long Continue stays locked (change this to lengthen/shorten the wait)
+let stakesSeen = false;
+try { stakesSeen = sessionStorage.getItem(STAKES_KEY) === "1"; } catch (e) { stakesSeen = false; }
+let stakesTimer = null;
+
+function stopStakesTimer() {
+  if (stakesTimer) { clearInterval(stakesTimer); stakesTimer = null; }
+  const v = document.getElementById("view-stakes");
+  if (v) v.classList.remove("stakes-locked");   // the "!" badge only pulses while Continue is locked
+}
+
+function runStakesCountdown() {
+  const btn = document.getElementById("stakes-continue");
+  stopStakesTimer();
+  if (stakesSeen) { btn.disabled = false; btn.textContent = "Continue"; return; }
+  const end = Date.now() + STAKES_WAIT_MS;   // clock-based, so a throttled background tab can't stretch or skip it
+  btn.disabled = true;
+  document.getElementById("view-stakes").classList.add("stakes-locked");
+  const tick = () => {
+    const left = Math.ceil((end - Date.now()) / 1000);
+    if (left <= 0) { stopStakesTimer(); btn.disabled = false; btn.textContent = "Continue"; return; }
+    btn.textContent = `Continue (${left})`;
+  };
+  tick();
+  stakesTimer = setInterval(tick, 250);
+}
+
+function openStakes(mode) {
+  if (gradeGet() !== "ok") { startAssessment(); return; }   // no valid grade check yet (or Grade 11-12): back to the gate
+  runStakesCountdown();
+  showView("view-stakes", typeof mode === "string" ? mode : "push");
+}
+
+function proceedAfterGrade() {
+  if (stakesSeen) openHub(); else openStakes();
+}
+
+document.getElementById("stakes-continue").addEventListener("click", () => {
+  if (document.getElementById("stakes-continue").disabled) return;
+  stakesSeen = true;
+  try { sessionStorage.setItem(STAKES_KEY, "1"); } catch (e) { /* storage blocked: kept in memory */ }
+  openHub();
+});
+
 /* Every "Start Assessment" button goes through here */
 function startAssessment() {
   const g = gradeGet();
-  if (g === "ok") { openHub(); return; }
+  if (g === "ok") { proceedAfterGrade(); return; }
   openGate(g === "locked" ? "blocked" : "ask");
 }
 applyGradeLock();
@@ -3130,6 +3185,11 @@ window.addEventListener("popstate", e => {
 
     case "view-hub":
       renderHub();
+      showView(s.view, "none");
+      break;
+
+    case "view-stakes":
+      runStakesCountdown();
       showView(s.view, "none");
       break;
 
