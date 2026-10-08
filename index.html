@@ -77,19 +77,13 @@
     <div class="manual">
       <p class="manual-title">How it works</p>
       <ol class="manual-list">
-        <li>Click <strong>Start Assessment</strong> and confirm that you are in Grade 10 or below. The Assessment Hub then opens.</li>
+        <li>Click <strong>Start Assessment</strong> and confirm that you are in Grade 10 or below. After a short notice about choosing a strand, the Assessment Hub opens.</li>
         <li>The hub has six skill tests, one per strand, with 15 multiple-choice questions each (90 in total), plus an Interests questionnaire (30 questions, no right or wrong answers). Take them in any order.</li>
         <li>Every skill question has one correct answer. Answers are not revealed and a finished part cannot be retaken, so take your time.</li>
         <li>Once all seven parts are done, <strong>See Overall Results</strong> unlocks.</li>
         <li>Your results show your skill score and interest ranking for every strand, one main takeaway from comparing them, and a breakdown of your strengths. Then explore that strand's subjects, skills, and career paths.</li>
       </ol>
     </div>
-
-    <aside class="stakes" aria-labelledby="stakes-title">
-      <h2 class="stakes-title" id="stakes-title">Your strand shapes your next two years</h2>
-      <p>You choose a strand once, then stay in it for all of Grade 11 and Grade 12. PCSHS does not allow learners to switch strands, so there is no second try.</p>
-      <p>A strand that does not fit your skills and interests can make those two years harder than they need to be, and it can hold you back from what you are capable of. <strong>Check where you stand before you commit.</strong></p>
-    </aside>
   </div>
 
   <div class="wrap wrap-wide">
@@ -116,6 +110,12 @@
             </ul>
           </section>
         </div>
+      </div>
+
+      <div class="strand-hint">
+        <span class="strand-hint-pill">Meet the 6 strands</span>
+        <p class="strand-hint-text">Scroll down and tap a card to see its subjects, courses &amp; careers</p>
+        <svg class="strand-hint-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </div>
 
       <div class="strand-grid" id="strand-grid"></div>
@@ -176,6 +176,23 @@
       <summary class="hfaq-q"><span>Is the result final?</span><span class="hfaq-icon" aria-hidden="true">+</span></summary>
       <p class="hfaq-a">No. ClusterWise is a guide, not a decision. Use your results together with advice from your teachers, guidance counselor, and family.</p>
     </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STRAND NOTICE ============
+     Shown once per tab session, between the grade check and the hub.
+     Continue stays locked for STAKES_WAIT_MS (script2.js) so the student reads it. -->
+<section id="view-stakes" class="view" aria-labelledby="stakes-title">
+  <div class="wrap stakes-screen">
+    <div class="stakes">
+      <span class="stakes-badge" aria-hidden="true">!</span>
+      <h2 class="stakes-title" id="stakes-title">Your strand shapes your next two years here in PCSHS</h2>
+      <p>You choose a strand once, then stay in it for all of Grade 11 and Grade 12. PCSHS does not allow learners to switch strands, so there is no second try.</p>
+      <p><strong>A strand that does not fit your skills and interests can make those two years harder than they need to be, and it can hold you back from what you are capable of. Check where you stand before you commit.</strong></p>
+    </div>
+    <div class="stakes-actions">
+      <button type="button" class="btn btn-primary" id="stakes-continue" disabled>Continue</button>
     </div>
   </div>
 </section>
