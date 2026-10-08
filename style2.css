@@ -4577,3 +4577,124 @@ body.grade-locked #sd-start::before {
   vertical-align: -2px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B6169' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / contain no-repeat;
 }
+
+/* ---- Home: "scroll for the strand cards" hint (sits between the track boxes and the cards) ---- */
+.strand-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: -6px auto 26px;
+  text-align: center;
+}
+.strand-hint-pill {
+  display: inline-block;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--sun);
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.strand-hint-text {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.strand-hint-arrow { color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .strand-hint-arrow { animation: strandHintBounce 1.6s ease-in-out infinite; }
+}
+@keyframes strandHintBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* ---- Strand notice screen (shown once before the hub; reuses the .stakes card) ----
+   The screen fills the space between header and footer (like the loading screen) so the footer
+   sits at the bottom and the card is centred. 98px / 78px = footer height on phone / desktop. */
+#view-stakes.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-h) - 98px);
+  min-height: calc(100dvh - var(--header-h) - 98px);
+}
+@media (min-width: 641px) {
+  #view-stakes.active {
+    min-height: calc(100vh - var(--header-h) - 78px);
+    min-height: calc(100dvh - var(--header-h) - 78px);
+  }
+}
+.stakes-screen { width: 100%; padding-top: clamp(40px, 7vw, 64px); padding-bottom: clamp(32px, 6vw, 56px); }
+.stakes-screen .stakes { position: relative; padding-top: 42px; }
+.stakes-actions { max-width: 720px; margin: 28px auto 0; display: flex; justify-content: center; }
+#stakes-continue { min-width: 190px; }
+
+/* the "!" sticker: sun disc, ink outline, hard offset shadow (same language as the cards) */
+.stakes-badge {
+  position: absolute;
+  top: -26px;
+  right: 22px;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  padding-bottom: 3px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--sun);
+  box-shadow: 3px 3px 0 var(--ink);
+  color: var(--ink);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  rotate: 8deg;
+}
+.stakes-badge::after {            /* the pulse ring (animated only while Continue is locked) */
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #view-stakes.active .stakes { animation: stakesPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25) 0.12s both; }
+  #view-stakes.active .stakes-actions { animation: stakesPopFade 0.4s ease 0.5s both; }
+  #view-stakes.active .stakes-badge {
+    animation:
+      stakesBadgeIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.55s both,
+      stakesWiggle 0.7s ease-in-out 1.1s both;
+  }
+  #view-stakes.stakes-locked .stakes-badge::after { animation: stakesRing 1.2s ease-out 1.8s infinite; }
+}
+@keyframes stakesPop {
+  from { opacity: 0; transform: translateY(26px) scale(0.86); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes stakesPopFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes stakesBadgeIn {
+  from { opacity: 0; transform: translateY(-16px) scale(0.3); }
+  60% { opacity: 1; transform: translateY(2px) scale(1.18); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes stakesWiggle {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-16deg); }
+  40% { transform: rotate(13deg); }
+  60% { transform: rotate(-8deg); }
+  80% { transform: rotate(4deg); }
+}
+@keyframes stakesRing {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
