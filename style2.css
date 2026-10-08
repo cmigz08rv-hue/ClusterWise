@@ -4281,33 +4281,57 @@ body.cw-modal-open { overflow: hidden; }
 }
 
 /* ================= HOME: static strand list + FAQ (SEO content) ================= */
-.strand-tracks { max-width: 760px; margin: 0 auto 32px; text-align: center; }
-.strand-tracks-intro { max-width: 52ch; margin: 0 auto 18px; font-size: 0.95rem; line-height: 1.6; }
-.track-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; text-align: left; }
+.strand-tracks { max-width: 900px; margin: 0 auto 40px; }
+.explore-strands-section > .section-sub { max-width: 58ch; margin-bottom: 40px; }
+.section-sub b { color: var(--ink); font-weight: 600; }
+.track-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; text-align: left; }
 .track-card {
   background: #fff;
   border: 2px solid var(--ink);
-  border-radius: 16px;
-  padding: 16px 18px 16px;
-  box-shadow: 3px 3px 0 var(--sun);
+  border-radius: 22px;
+  box-shadow: 6px 6px 0 var(--sun);
+  overflow: hidden;
 }
+.track-card--techpro { box-shadow: 6px 6px 0 #9CC0FF; }
+.track-head { padding: 16px 22px; border-bottom: 2px solid var(--ink); background: #FFF0C2; }
+.track-card--techpro .track-head { background: #E1EBFF; }
 .track-name {
   display: inline-block;
-  margin: 0 0 12px;
-  padding: 3px 12px;
+  margin: 0;
+  padding: 7px 14px;
   border-radius: 999px;
   background: var(--ink);
   color: var(--sun);
   font-family: 'Work Sans', sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.track-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.track-list li { display: grid; grid-template-columns: 52px 1fr; align-items: baseline; gap: 10px; font-size: 0.88rem; line-height: 1.4; color: var(--ink-soft); }
-.track-code { font-size: 1rem; font-weight: 800; letter-spacing: 0.01em; color: var(--sc); }
-@media (max-width: 640px) { .track-cards { grid-template-columns: 1fr; } }
+.track-card--techpro .track-name { color: #9CC0FF; }
+.track-list { list-style: none; margin: 0; padding: 8px 22px 12px; display: block; }
+.track-list li { display: flex; align-items: center; gap: 16px; padding: 13px 0; font-size: 1rem; line-height: 1.4; font-weight: 500; color: var(--ink-soft); }
+.track-list li + li { border-top: 1.5px dashed #E4DACA; }
+/* chip uses a slightly darker shade of the strand color so white text stays readable */
+.track-code {
+  flex: none;
+  min-width: 74px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--sc);
+  background: color-mix(in srgb, var(--sc) 88%, #000);
+}
+@media (max-width: 640px) {
+  .track-cards { grid-template-columns: 1fr; gap: 22px; }
+  .track-card { box-shadow: 4px 4px 0 var(--sun); }
+  .track-card--techpro { box-shadow: 4px 4px 0 #9CC0FF; }
+}
 
 /* ================= HOME FAQ ================= */
 .home-faq {
