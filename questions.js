@@ -511,14 +511,14 @@ const MODULES = {
         topic: "Reading a flowchart"
       },
       {
-        q: "Which pair correctly names one input device and one output device?",
+        q: "A self-service kiosk has a screen where customers tap their choices, and the same screen displays the menu. How is a touchscreen classified?",
         options: [
-          "Monitor (input) and mouse (output)",
-          "Speakers (input) and microphone (output)",
-          "Keyboard (input) and printer (output)",
-          "Printer (input) and keyboard (output)"
+          "Input only, because the user touches it",
+          "Output only, because it displays information",
+          "A storage device",
+          "Both an input and an output device"
         ],
-        correctAnswerIndex: 2,
+        correctAnswerIndex: 3,
         topic: "Computer hardware"
       },
       {
@@ -533,26 +533,26 @@ const MODULES = {
         topic: "Hardware and performance"
       },
       {
-        q: "What is the main job of a computer's CPU?",
+        q: "A game's frame rate drops during big battles. A monitoring tool shows the GPU at 45%, RAM at 50% used, and one CPU core at 100% while the other cores are mostly idle. What is the most likely bottleneck?",
         options: [
-          "It runs instructions and does the calculations",
-          "It stores the user's files permanently",
-          "It shows the picture on the screen",
-          "It supplies electricity to every part"
+          "The GPU, because it is not fully used",
+          "The CPU, because the game is limited by how fast a single core can work",
+          "The RAM, because half of it is still free",
+          "The SSD, because games load from it"
         ],
-        correctAnswerIndex: 0,
-        topic: "Computer hardware"
+        correctAnswerIndex: 1,
+        topic: "Diagnosing performance"
       },
       {
-        q: "A student saves a photo and then turns the computer off. Which part keeps the photo while the power is off?",
+        q: "A PC with a mechanical hard drive takes over two minutes to boot. Task Manager shows disk usage at 100% during startup while CPU and RAM stay under 30%. Which upgrade would improve boot time the most?",
         options: [
-          "RAM",
-          "The CPU",
-          "The graphics card",
-          "The hard drive or SSD"
+          "Adding more RAM",
+          "Installing a faster CPU",
+          "Replacing the hard drive with an SSD",
+          "Adding a graphics card"
         ],
-        correctAnswerIndex: 3,
-        topic: "Computer hardware"
+        correctAnswerIndex: 2,
+        topic: "Hardware and performance"
       },
       {
         q: "A robot on a grid starts facing north. Its commands are:\n\nF = move one square forward\nR = turn 90° to the right\nL = turn 90° to the left\n\nIt follows this program: F, F, R, F\n\nWhere does the robot end up?",
@@ -566,14 +566,14 @@ const MODULES = {
         topic: "Tracing a program"
       },
       {
-        q: "What is the main job of the motherboard?",
+        q: "Which motherboard specification decides whether a particular CPU can be installed on it?",
         options: [
-          "It stores the operating system and all the files",
-          "It connects the CPU, memory, and other parts so they can work together",
-          "It keeps the computer cool",
-          "It makes the screen show images"
+          "Form factor (ATX or micro-ATX)",
+          "Number of PCIe slots",
+          "Number of RAM slots",
+          "Socket type (and chipset support)"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 3,
         topic: "Computer hardware"
       },
       {
@@ -588,47 +588,47 @@ const MODULES = {
         topic: "Logic rules"
       },
       {
-        q: "A web page has the site's logo and menu at the top, the main article in the middle, and the copyright notice at the bottom.\n\nWhich HTML elements fit these three parts, in that order?",
+        q: "A developer wants screen readers to announce a site's menu links as a navigation area, without relying on how it looks. Which element is designed for this?",
         options: [
-          "footer, main, header",
-          "main, header, footer",
-          "header, main, footer",
-          "header, footer, main"
+          "&lt;menu&gt;",
+          "&lt;nav&gt;",
+          "&lt;aside&gt;",
+          "&lt;section id=\"links\"&gt;"
+        ],
+        correctAnswerIndex: 1,
+        topic: "Web basics"
+      },
+      {
+        q: "Which CSS rule colors only the paragraphs that are inside an element with the class note?",
+        options: [
+          "p.note { color: red; }",
+          "#note p { color: red; }",
+          ".note p { color: red; }",
+          "note p { color: red; }"
         ],
         correctAnswerIndex: 2,
         topic: "Web basics"
       },
       {
-        q: "Which of these jobs is done by CSS and not by HTML?",
+        q: "A technician plugs in a new printer, but the operating system can't use it until the manufacturer's driver is installed. What does the driver do?",
         options: [
-          "Adding a paragraph of text to the page",
-          "Putting an image on the page",
-          "Making every heading blue with a bigger font size",
-          "Creating a link to another page"
+          "It stores print jobs inside the printer while it is off",
+          "It converts the printer's USB signal into a different cable format",
+          "It scans documents for malware before printing",
+          "It lets the operating system communicate with and control the printer"
         ],
-        correctAnswerIndex: 2,
-        topic: "Web basics"
-      },
-      {
-        q: "Which of the following is software and not hardware?",
-        options: [
-          "A web browser",
-          "A keyboard",
-          "A hard drive",
-          "A motherboard"
-        ],
-        correctAnswerIndex: 0,
+        correctAnswerIndex: 3,
         topic: "Hardware and software"
       },
       {
-        q: "A student's laptop will not connect to the school Wi-Fi, but a phone next to it connects fine. What is the most sensible first step?",
+        q: "A laptop shows full Wi-Fi signal but no website opens. Other devices on the same network work fine. When the technician types a site's IP address directly into the browser, the page loads. What is the most likely problem?",
         options: [
-          "Restart the router for the whole school",
-          "Check that the laptop's Wi-Fi is turned on and it is joined to the right network",
-          "Reinstall the laptop's operating system",
-          "Ask the phone's owner to share the phone's password"
+          "DNS is not working on the laptop, so site names are not being translated into IP addresses",
+          "The laptop failed to get an IP address from the router (DHCP)",
+          "The school's internet connection is down",
+          "The browser's cache is full"
         ],
-        correctAnswerIndex: 1,
+        correctAnswerIndex: 0,
         topic: "Troubleshooting"
       }
     ]
