@@ -2899,42 +2899,53 @@ function initHeroType() {
   const h1 = hero && hero.querySelector("h1");
   if (!h1 || hero.querySelector(".hero-type")) return;
 
-  const prefix = "Are you a future ";
-  const names = HERO_CAREERS.map(c => c.text);
-  const spoken = "Are you a future " + names.slice(0, -1).join(", ") + ", or " + names[names.length - 1] + "?";
+  /* Language: English by default. In Filipino mode (translations.js) the whole line is typed in Filipino,
+     letter by letter, so nothing is typed in English and swapped afterwards. */
+  const fil = () => !!(window.CW_i18n && window.CW_i18n.lang() === "fil");
+  const prefixNow = () => fil() ? "Ikaw ba ang susunod na " : "Are you a future ";
+  const wordNow = i => fil() ? window.CW_i18n.career(HERO_CAREERS[i].text) : HERO_CAREERS[i].text;
+  const spokenNow = () => {
+    const names = HERO_CAREERS.map((c, i) => wordNow(i));
+    return prefixNow() + names.slice(0, -1).join(", ") + (fil() ? ", o " : ", or ") + names[names.length - 1] + "?";
+  };
 
   const p = document.createElement("p");
   p.className = "hero-type";
+  p.setAttribute("data-no-i18n", "");      // the translation watcher leaves this line alone; this script owns both languages
   p.innerHTML = `
-    <span class="sd-sr">${spoken}</span>
+    <span class="sd-sr"></span>
     <span class="hero-type-box" aria-hidden="true">
-      <span class="hero-type-line">${prefix}<span class="hero-type-word"></span><span class="hero-type-caret"></span>?</span>
+      <span class="hero-type-line"><span class="hero-type-prefix"></span><span class="hero-type-word"></span><span class="hero-type-caret"></span>?</span>
     </span>
     <span class="hero-type-measure" aria-hidden="true"></span>`;
   h1.insertAdjacentElement("afterend", p);
 
+  const sr = p.querySelector(".sd-sr");
   const box = p.querySelector(".hero-type-box");
+  const prefixEl = p.querySelector(".hero-type-prefix");
   const word = p.querySelector(".hero-type-word");
   const caret = p.querySelector(".hero-type-caret");
   const measure = p.querySelector(".hero-type-measure");   // invisible copy used only to measure widths
   const paint = c => { p.style.setProperty("--wc", STRANDS[c.strand].color); };
+  const setTexts = () => { prefixEl.textContent = prefixNow(); sr.textContent = spokenNow(); };
+  setTexts();
 
   /* Width of the whole sentence for one career (+4px of slack so it never wraps by a sub-pixel) */
   function sentenceWidth(text) {
-    measure.innerHTML = `${prefix}<span class="hero-type-word">${text}</span>?`;
+    measure.innerHTML = `${prefixNow()}<span class="hero-type-word">${text}</span>?`;
     return measure.getBoundingClientRect().width + 4;
   }
 
   let w = 0;   // index of the career currently shown
   let wasHidden = true;   // true while the home page is not showing (a hidden element measures 0px wide)
-  function fit() {
+  function fit(snap) {
     const avail = p.clientWidth;
     // Home page hidden (display:none): everything measures 0. Writing that would squeeze the box
     // to 0px and wrap the sentence word by word, so leave the last good width alone.
     if (!avail) { wasHidden = true; return; }
-    const target = Math.min(Math.ceil(sentenceWidth(HERO_CAREERS[w].text)), avail) + "px";
-    if (wasHidden) {
-      // Just came back (or first paint): snap to the right width instead of gliding from the old one
+    const target = Math.min(Math.ceil(sentenceWidth(wordNow(w))), avail) + "px";
+    if (wasHidden || snap === true) {
+      // Just came back (or first paint, or language switch): snap to the right width instead of gliding from the old one
       box.style.transition = "none";
       box.style.width = target;
       void box.offsetWidth;          // flush so the snap isn't animated
@@ -2944,38 +2955,51 @@ function initHeroType() {
       box.style.width = target;
     }
     // on a very narrow screen the longest sentence wraps to two lines: keep room for that
-    const widest = Math.max(...HERO_CAREERS.map(c => sentenceWidth(c.text)));
+    const widest = Math.max(...HERO_CAREERS.map((c, i) => sentenceWidth(wordNow(i))));
     p.classList.toggle("hero-type-wrap", widest > avail);
   }
   // Re-measure whenever the line's own size changes: window resize AND the home page
   // appearing again after another screen (display:none -> block), which "resize" never reports.
-  if ("ResizeObserver" in window) new ResizeObserver(fit).observe(p);
-  else window.addEventListener("resize", fit);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);   // re-measure once web fonts load
+  const refit = () => fit();
+  if ("ResizeObserver" in window) new ResizeObserver(refit).observe(p);
+  else window.addEventListener("resize", refit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);   // re-measure once web fonts load
 
   paint(HERO_CAREERS[0]);
   fit();
 
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    word.textContent = HERO_CAREERS[0].text;
+  const reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  let n = 0, deleting = false;
+
+  /* Language switched while the home page is open: swap the line at once, restart the current word
+     from empty in the new language (no English left on screen), and re-measure with the new text. */
+  window.addEventListener("cw-langchange", () => {
+    setTexts();
+    n = 0; deleting = false;
+    word.textContent = reduced ? wordNow(0) : "";
+    fit(true);
+  });
+
+  if (reduced) {
+    word.textContent = wordNow(0);
     caret.hidden = true;
     return;
   }
 
   const homeView = document.getElementById("view-home");
-  let n = 0, deleting = false;
   function tick() {
     if (document.hidden || !homeView.classList.contains("active")) { setTimeout(tick, 500); return; }
-    const cur = HERO_CAREERS[w];
+    const full = wordNow(w);
     let delay;
     if (!deleting) {
       n++;
-      word.textContent = cur.text.slice(0, n);
-      if (n === cur.text.length) { deleting = true; delay = 1600; } else { delay = 80; }
+      word.textContent = full.slice(0, n);
+      if (n >= full.length) { n = full.length; deleting = true; delay = 1600; } else { delay = 80; }
     } else {
       n--;
-      word.textContent = cur.text.slice(0, n);
-      if (n === 0) {
+      word.textContent = full.slice(0, Math.max(n, 0));
+      if (n <= 0) {
+        n = 0;
         deleting = false;
         w = (w + 1) % HERO_CAREERS.length;
         paint(HERO_CAREERS[w]);
