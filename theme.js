@@ -4,6 +4,7 @@
 (function () {
   "use strict";
   var KEY = "strandwise_theme";
+  var COOLDOWN_MS = 3000;               /* wait this long between switches (stops spam-tapping lag on phones) */
   var DEFAULT_THEME = "light";          /* "light" or "system" */
   var root = document.documentElement;
 
@@ -33,7 +34,17 @@
     var sw = document.getElementById("theme-switch");
     if (!sw) return;
     sw.setAttribute("aria-checked", String(current() === "dark"));
+    var cooling = false;
     sw.addEventListener("click", function () {
+      if (cooling) return;                       /* cooldown: ignore taps while the last switch is still settling */
+      cooling = true;
+      sw.classList.add("is-cooling");
+      sw.setAttribute("aria-disabled", "true");
+      setTimeout(function () {
+        cooling = false;
+        sw.classList.remove("is-cooling");
+        sw.removeAttribute("aria-disabled");
+      }, COOLDOWN_MS);
       var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
       try { sessionStorage.setItem(KEY, next); } catch (e) { /* storage blocked: still switches for this visit */ }
       apply(next, true);
