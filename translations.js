@@ -403,7 +403,8 @@
   window.CW_i18n = {
     lang: () => lang,
     typePrefix,
-    careerWords: careers => careers.map(careerInline)
+    careerWords: careers => careers.map(careerInline),
+    career: c => CAREER_FIL[c] || c      /* Filipino title with its capital letter, used by the typed line on the home page */
   };
 
   /* settings panel (gear in the header): opens/closes with a class so it can animate */
