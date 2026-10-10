@@ -50,4 +50,3 @@ footer a{margin:0 8px}
 :root[data-theme="dark"]{--ink:#ECE7DB;--cream:#12151B;--soft:#2A2619;--muted:#A9AFBA;--line:#333A46;--navy:#F0EBDD;color-scheme:dark}
 :root[data-theme="dark"] main a,:root[data-theme="dark"] footer a{color:#E8A23F}
 :root[data-theme="dark"] .todo{background:#1C2129}
-body{transition:background-color .3s ease,color .3s ease}
