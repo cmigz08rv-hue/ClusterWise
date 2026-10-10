@@ -1097,19 +1097,6 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 }
 .sd-overview { font-size: 1.05rem; color: var(--ink); max-width: 46ch; margin: 0; }
 
-/* ---- Focus statement ---- */
-.sd-focus { padding: 72px 0 60px; }
-.sd-focus-text {
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
-  font-weight: 500;
-  line-height: 1.28;
-  color: var(--navy);
-  max-width: 30ch;
-  margin: 0;
-  padding-left: 24px;
-  border-left: 5px solid var(--sc);
-}
 
 /* ---- Subjects + skills ---- */
 .sd-cols {
@@ -1277,7 +1264,7 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
   .sd-cols { grid-template-columns: 1fr; gap: 44px; }
   .sd .sd-cols { padding-top: 44px; }
   .sd-path-grid { grid-template-columns: 1fr; }
-  .sd-path-start { margin-bottom: 8px; }
+  .sd-path-start { margin-bottom: 8px; justify-self: start; }
   .sd-path-col { padding: 0 0 24px 32px; margin-left: 41px; border-left: 2px solid var(--sc); }
   .sd-path-col::before, .sd-path-col::after { display: none; }
   .sd-path-col h3 { padding-top: 4px; }
@@ -1327,30 +1314,6 @@ footer.site-footer {
 /* keep the compass ring, just toned down slightly so it sits under the sparkles */
 .home-hero::before { opacity: 0.9; }
 
-.home-hero > .wrap::before {
-  content: var(--hero-badge, "✦ Discover your best-fit strand ✦");   /* script2.js sets this same text */
-  display: inline-block;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: var(--ink-bg);
-  color: var(--sun, #FFD25E);
-  padding: 8px 18px;
-  border-radius: 999px;
-  margin-bottom: 22px;
-  transform: rotate(-2deg);
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* longer badge text: tighten on small phones so it stays on one line */
-@media (max-width: 480px) {
-  .home-hero > .wrap::before { font-size: 0.7rem; letter-spacing: 0.04em; padding: 7px 14px; }
-}
-@media (max-width: 360px) {
-  .home-hero > .wrap::before { font-size: 0.64rem; letter-spacing: 0.02em; padding: 6px 10px; }
-}
 
 .home-hero h1 {
   font-weight: 800;
@@ -1502,7 +1465,6 @@ footer.site-footer {
   to   { opacity: 1; translate: 0 0; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .home-hero > .wrap::before { animation: heroIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s both; }
   .home-hero h1              { animation: heroIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.20s both; }
   .home-hero .lede           { animation: heroIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.40s both; }
   .home-hero .btn-compass    { animation: heroIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.60s both; }
@@ -1768,70 +1730,25 @@ footer.site-footer {
   .sd .sd-video    { animation: heroIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.30s both; }
 }
 
-/* ---- Focus statement: sticker pull-quote ----
-   Strand-tinted gradient background, animated accent bar (::before),
-   one-time shine sweep (::after) and a gradient-text highlight phrase. */
+/* ---- Focus statement: plain editorial line (rule + small label + sentence, keyword in the strand color) ---- */
+.sd .sd-focus-block { margin: 0 0 48px; }
+.sd .sd-focus-rule { width: 32px; height: 3px; background: var(--sc); margin: 0 0 12px; }
+.sd .sd-focus-label {
+  margin: 0 0 10px;
+  font: 600 0.84rem/1.2 'Work Sans', sans-serif;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, color-mix(in srgb, var(--sc) var(--sc-text-mix), #fff) 72%, var(--ink));
+}
 .sd .sd-focus-text {
-  position: relative;
-  overflow: hidden;
-  max-width: 32ch;
-  padding: 28px 34px 28px 46px;
-  background: linear-gradient(105deg, color-mix(in srgb, var(--sc) 15%, var(--surface)) 0%, var(--surface) 70%);
-  border: 3px solid var(--edge);
-  border-left: 0;
-  border-radius: 24px;
-  box-shadow: 7px 7px 0 var(--edge);
-  font-size: clamp(1.7rem, 3.8vw, 2.7rem);
-  font-weight: 600;
-  font-variation-settings: "SOFT" 100;
-  line-height: 1.25;
-  transform: rotate(-0.6deg);
+  margin: 0;
+  max-width: 34ch;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
 }
-.sd .sd-focus-text::before {              /* accent bar (was a border-left) */
-  content: "";
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 12px;
-  background: var(--sc);
-  transform-origin: top;
-}
-.sd .sd-focus-text::after {               /* shine sweep, hidden unless motion is allowed */
-  content: "";
-  position: absolute;
-  top: 0; bottom: 0; left: 0;
-  width: 30%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
-  opacity: 0;
-  pointer-events: none;
-}
-.sd .sd-focus-hl {
-  color: color-mix(in srgb, var(--sc) var(--sc-text-mix), #fff);
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .sd .sd-focus-hl {
-    background-image: linear-gradient(90deg, var(--sc), color-mix(in srgb, var(--sc) 55%, var(--ink)), var(--sc));
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-}
-@keyframes sdBarGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes sdFocusDrift { from { background-position: 0% 0; } to { background-position: 100% 0; } }
-@keyframes sdHlShift { from { background-position: 0% 0; } to { background-position: 100% 0; } }
-@media (prefers-reduced-motion: no-preference) {
-  .sd .sd-focus-text {
-    background-image: linear-gradient(105deg, color-mix(in srgb, var(--sc) 17%, var(--surface)) 0%, var(--surface) 45%, color-mix(in srgb, var(--sc) 8%, var(--surface)) 100%);
-    background-size: 200% 100%;
-    animation: sdFocusDrift 9s ease-in-out infinite alternate;
-  }
-  .sd .sd-focus-text::before { animation: sdBarGrow 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both; }
-  .sd .sd-focus-text::after  { animation: sdShine 1.3s ease-in-out 0.9s 1 both; }
-  .sd .sd-focus-hl { animation: sdHlShift 4s ease-in-out infinite alternate; }
-}
+.sd .sd-focus-hl { color: color-mix(in srgb, color-mix(in srgb, var(--sc) var(--sc-text-mix), #fff) 80%, var(--ink)); }
 
 /* ---- Subjects + skills ---- */
 .sd .sd-h {
@@ -1968,7 +1885,6 @@ footer.site-footer {
 
 @media (max-width: 520px) {
   .sd .sd-type { min-height: 4.6em; }
-  .sd .sd-focus-text { padding: 22px 22px 22px 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2733,7 +2649,6 @@ footer.site-footer {
 .sd .video-former {
   margin: 6px 0 0;
   font-size: 0.82rem;
-  font-style: italic;
   color: var(--ink-soft);
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -3249,10 +3164,9 @@ body.save-modal-open { overflow: hidden; }
   position: relative;
   display: block;
   padding: 7px 16px;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 0.98rem;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 0.92rem;
   font-weight: 600;
-  font-style: italic;
   color: color-mix(in srgb, var(--sc) var(--sc-text-mix), #fff);
   background: var(--surface);
   border: 2px solid var(--edge);
@@ -3537,16 +3451,12 @@ body.save-modal-open { overflow: hidden; }
 .sd-stage .sd-stage-h { margin-bottom: 26px; }
 .sd-stage-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
-  gap: 48px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 720px;
 }
 .sd .sd-stage .sd-video { animation: none; max-width: none; }
-.sd .sd-stage .sd-focus-text { max-width: none; font-size: clamp(1.5rem, 2.6vw, 2.1rem); }
 @media (max-width: 860px) {
   .sd-stage { padding: 40px 0 52px; }
-  .sd-stage-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; }
-  .sd .sd-stage .sd-focus-text { font-size: clamp(1.5rem, 6vw, 2rem); }
 }
 
 /* subject cards: each strand gets its own card shape */
@@ -4777,17 +4687,14 @@ body.grade-locked #sd-start::before {
 .theme-switch.is-cooling::after { opacity: 1; animation: themeCool 3s linear forwards; }
 @keyframes themeCool { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
-/* smooth fade between light and dark (class is only on <html> for a moment while switching) */
-html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
-  transition: background-color .4s ease, color .4s ease, border-color .4s ease, fill .4s ease, stroke .4s ease, box-shadow .4s ease !important;
-}
+/* in Filipino the header reads just "Strands" (hides the "Explore " part) */
+html[lang="fil"] .nav-opt { display: none; }
 
 @media (max-width: 520px) { .nav-links { gap: 14px; } .settings-btn { width: 34px; height: 34px; } .settings-panel { min-width: 230px; } }
 @media (prefers-reduced-motion: reduce) {
   .settings-panel, .settings-panel.is-open, .settings-panel .settings-row, .theme-thumb, .theme-thumb svg { transition-duration: .01s !important; transition-delay: 0s !important; transform: none; }
   .settings-panel { transform: none; }
   .theme-switch[aria-checked="true"] .theme-thumb { transform: translateX(24px); }
-  html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after { transition: none !important; }
 }
 
 /* ============ DARK MODE ============
