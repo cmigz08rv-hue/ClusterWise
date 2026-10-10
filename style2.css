@@ -4824,6 +4824,9 @@ html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *
 }
 [data-theme="dark"] .folder-tab { color: #B9B29C; }
 [data-theme="dark"] .hub-honesty-signed { background: #1F3A2B; }
+/* dark: the pledge panel stays yellow, so its text stays dark (the green signed state keeps light text) */
+[data-theme="dark"] .hub-honesty:not(.hub-honesty-signed) h3,
+[data-theme="dark"] .hub-honesty:not(.hub-honesty-signed) p { color: #22262B; }
 [data-theme="dark"] .pick-is-most { background: #12302C; }
 [data-theme="dark"] .pick-is-least { background: #381B1E; }
 [data-theme="dark"] .track-card--techpro .track-head { background: #1E2A45; }
