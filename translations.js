@@ -13,8 +13,8 @@
     /* settings */
     "Settings": "Mga Setting", "Language": "Wika", "Dark mode": "Dark mode",
     /* home */
-    "Discover Your Ideal Senior High": "Hanapin ang Iyong Angkop na",
-    "here in PCSHS": "sa Senior High dito sa PCSHS",
+    "Find the Senior High": "Hanapin ang Senior High",
+    "That Fits You at PCSHS": "na Angkop sa Iyo sa PCSHS",
     "is a free online tool that helps learners of Pasay City South High School (PCSHS) choose a Senior High School strand. Take six short skill tests, one for each strand, plus a quick questionnaire about what you enjoy. ClusterWise shows your skills and your interests side by side, so you can see where they line up.":
       "ay isang libreng online na tool na tumutulong sa mga mag-aaral ng Pasay City South High School (PCSHS) na pumili ng strand sa Senior High School. Sagutan ang anim na maikling skill test, isa para sa bawat strand, kasama ang maikling talatanungan tungkol sa mga bagay na gusto mo. Ipinapakita ng ClusterWise ang iyong kakayahan at interes nang magkatabi, para makita mo kung saan sila nagtutugma.",
     "Start Assessment": "Simulan ang Assessment",
@@ -41,15 +41,15 @@
     "Hospitality and Tourism": "Hospitality at Turismo",
     "Information and Communications Technology": "Information and Communications Technology",
     "Industrial Arts": "Industrial Arts",
-    "Meet the 6 strands": "Kilalanin ang 6 na strand",
+    "The 6 strands": "Ang 6 na strand",
     "Scroll down and tap a card to see its subjects, courses & careers": "Mag-scroll pababa at pindutin ang isang card para makita ang mga asignatura, kurso, at karera nito",
     "Seen enough? Find out which one fits you.": "Sapat na ba? Alamin kung alin ang bagay sa iyo.",
     /* faq */
     "Frequently asked questions": "Madalas na Itanong",
     "Quick answers about how ClusterWise works and what happens to your answers.": "Mabilis na sagot kung paano gumagana ang ClusterWise at kung ano ang nangyayari sa iyong mga sagot.",
     "What is PCSHS ClusterWise?": "Ano ang PCSHS ClusterWise?",
-    "PCSHS ClusterWise is a free strand-matching tool for Junior High School learners here in Pasay City South High School. No account is needed. Six skill tests (one per strand) and an interests questionnaire show where your skills and interests line up, so you can see which strand fits you.":
-      "Ang PCSHS ClusterWise ay isang libreng tool na tumutulong sa mga mag-aaral ng Junior High School dito sa Pasay City South High School na hanapin ang angkop na strand. Hindi kailangan ng account. Ipinapakita ng anim na skill test (isa bawat strand) at ng interests questionnaire kung saan nagtutugma ang iyong kakayahan at interes, para makita mo kung aling strand ang bagay sa iyo.",
+    "PCSHS ClusterWise is a free tool that helps Junior High School learners here in Pasay City South High School choose a strand. No account is needed. Six skill tests (one per strand) and an interests questionnaire show where your skills and interests line up, so you can see which strand fits you.":
+      "Ang PCSHS ClusterWise ay isang libreng tool na tumutulong sa mga mag-aaral ng Junior High School dito sa Pasay City South High School na pumili ng strand. Hindi kailangan ng account. Ipinapakita ng anim na skill test (isa bawat strand) at ng interests questionnaire kung saan nagtutugma ang iyong kakayahan at interes, para makita mo kung aling strand ang bagay sa iyo.",
     "Who is it for?": "Para kanino ito?",
     "ClusterWise is made for Junior High School learners at Pasay City South High School (PCSHS), ideally Grade 10, who are deciding which Senior High School strand to take. When you press":
       "Ginawa ang ClusterWise para sa mga mag-aaral ng Junior High School sa Pasay City South High School (PCSHS), mas mainam ang Grade 10, na nagpapasya kung anong strand ng Senior High School ang kukunin. Kapag pinindot mo ang",
@@ -91,7 +91,6 @@
 
   /* ---- stage 2: grade check, hub, pledge, read-first screens, interests flow ---- */
   Object.assign(FIL, {
-    "Explore": "Tuklasin ang",
     "Which grade are you in?": "Anong grade ka na?",
     "ClusterWise is made for learners who have not chosen a Senior High School strand yet.": "Ginawa ang ClusterWise para sa mga mag-aaral na hindi pa nakapipili ng strand sa Senior High School.",
     "Your grade level": "Iyong grade level", "Grade 10 or below": "Grade 10 pababa", "Still choosing a strand": "Namimili pa ng strand",
@@ -134,7 +133,7 @@
     "Answer on your own: no searching, no asking, no AI.": "Sumagot nang mag-isa: bawal mag-search, magtanong, o gumamit ng AI.",
     "Back to hub": "Bumalik sa hub", "Begin test": "Simulan ang test", "Choose the best answer.": "Piliin ang pinakamahusay na sagot.",
     /* interests flow */
-    "Interests — Before you begin": "Interes — Bago ka magsimula",
+    "Interests: Before you begin": "Interes: Bago ka magsimula",
     "This is about what you enjoy, not what you are good at.": "Tungkol ito sa gusto mo, hindi sa magaling ka.",
     "There are no right or wrong answers.": "Walang tama o maling sagot.", "Nothing here is scored as correct.": "Walang bahagi rito na ina-score bilang tama.",
     "Part A:": "Bahagi A:", "Part B:": "Bahagi B:", "Part A": "Bahagi A", "Part B": "Bahagi B",
@@ -144,7 +143,7 @@
     "to change earlier answers before you finish. You can leave with": "para baguhin ang mga naunang sagot bago ka matapos. Puwede kang umalis gamit ang",
     "and continue later (answers are kept until you close this tab).": "at magpatuloy mamaya (mananatili ang mga sagot hanggang isara mo ang tab).",
     "Finish questionnaire": "Tapusin ang talatanungan", ", your answers are locked and it can't be retaken.": ", mala-lock na ang iyong mga sagot at hindi na ito maaaring ulitin.",
-    "Begin": "Simulan", "Interests — Part A complete": "Interes — Tapos na ang Bahagi A",
+    "Begin": "Simulan", "Interests, Part A complete": "Interes, Tapos na ang Bahagi A",
     "Part A done. Part B works differently.": "Tapos na ang Bahagi A. Iba ang paraan ng Bahagi B.",
     "Each question describes six activities. You can't like everything equally, so choose:": "Bawat tanong ay may anim na aktibidad. Hindi mo magugustuhan ang lahat nang pantay, kaya piliin ang:",
     "Most:": "Pinakagusto:", "the one you would most want to do.": "ang pinakagusto mong gawin.",
@@ -171,7 +170,7 @@
     [/^Question (\d+) of (\d+)$/, m => `Tanong ${m[1]} sa ${m[2]}`],
     [/^(\d+) questions \u00B7 one attempt$/, m => `${m[1]} tanong \u00B7 isang beses lang`],
     [/^(\d+) questions \u00B7 two parts \u00B7 one attempt$/, m => `${m[1]} tanong \u00B7 dalawang bahagi \u00B7 isang beses lang`],
-    [/^Interests \u2014 Part ([AB]): (\d+) of (\d+)$/, m => `Interes \u2014 Bahagi ${m[1]}: ${m[2]} sa ${m[3]}`],
+    [/^Interests, Part ([AB]): (\d+) of (\d+)$/, m => `Interes, Bahagi ${m[1]}: ${m[2]} sa ${m[3]}`],
     [/^(\d+) statements\. Rate how much each one sounds like you, from 1 to 5\.$/, m => `${m[1]} pahayag. I-rate kung gaano ito kapareho sa iyo, mula 1 hanggang 5.`],
     [/^(\d+) short scenarios\. Pick the activity you would want$/, m => `${m[1]} maikling sitwasyon. Pumili ng aktibidad na`]
   ];
@@ -190,14 +189,14 @@
     /* one-paragraph overviews (card + strand page) */
     "STEM is built for learners who like asking why something works and proving it. Expect heavy math, laboratory science, and a lot of problem sets.":
       "Ang STEM ay para sa mga mag-aaral na mahilig magtanong kung bakit gumagana ang isang bagay at patunayan ito. Asahan ang mabigat na math, laboratory science, at maraming problem set.",
-    "ASSH is for learners drawn to people, culture, language, and ideas \u2014 how societies work and how to write and argue well about them.":
-      "Ang ASSH ay para sa mga mag-aaral na hilig ang tao, kultura, wika, at mga ideya \u2014 kung paano gumagana ang lipunan at kung paano sumulat at makipagtalo nang mahusay tungkol dito.",
+    "ASSH is for learners drawn to people, culture, language, and ideas: how societies work and how to write and argue well about them.":
+      "Ang ASSH ay para sa mga mag-aaral na hilig ang tao, kultura, wika, at mga ideya: kung paano gumagana ang lipunan at kung paano sumulat at makipagtalo nang mahusay tungkol dito.",
     "BM suits learners curious about how businesses run, how money moves, and how to lead or manage an organization.":
       "Bagay ang BM sa mga mag-aaral na usisero kung paano pinatatakbo ang mga negosyo, kung paano gumagalaw ang pera, at kung paano mamuno o mamahala ng isang organisasyon.",
-    "HT is a practical, service-oriented track \u2014 cooking, hotel and restaurant operations, and tourism skills you can apply right away.":
-      "Ang HT ay praktikal na track na nakatuon sa serbisyo \u2014 pagluluto, operasyon ng hotel at restawran, at kasanayan sa turismo na magagamit mo agad.",
-    "ICT fits learners who like building and fixing digital things \u2014 apps, websites, networks, and systems.":
-      "Bagay ang ICT sa mga mag-aaral na mahilig gumawa at mag-ayos ng mga digital na bagay \u2014 app, website, network, at sistema.",
+    "HT is a practical, service-oriented track covering cooking, hotel and restaurant operations, and tourism skills you can apply right away.":
+      "Ang HT ay praktikal na track na nakatuon sa serbisyo na sumasaklaw sa pagluluto, operasyon ng hotel at restawran, at kasanayan sa turismo na magagamit mo agad.",
+    "ICT fits learners who like building and fixing digital things, such as apps, websites, networks, and systems.":
+      "Bagay ang ICT sa mga mag-aaral na mahilig gumawa at mag-ayos ng mga digital na bagay, tulad ng app, website, network, at sistema.",
     "IA is a hands-on technical track for learners who like building, wiring, and fixing things with tools and machinery.":
       "Ang IA ay hands-on na technical track para sa mga mag-aaral na mahilig gumawa, mag-wire, at mag-ayos ng mga bagay gamit ang mga kasangkapan at makinarya.",
     /* strand page: video */
