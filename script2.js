@@ -698,7 +698,11 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
   const out = root.querySelector(".sd-type-word");
   if (!out) return;
   const reduced = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  const words = info.careers.map(withArticle);
+  /* Filipino mode (translations.js) types the Filipino career titles; English keeps "an Engineer", "a Doctor"... */
+  const i18n = () => (window.CW_i18n && window.CW_i18n.lang() === "fil") ? window.CW_i18n : null;
+  const wordsNow = () => { const t = i18n(); return t ? t.careerWords(info.careers) : info.careers.map(withArticle); };
+  const prefixNow = () => { const t = i18n(); return t ? t.typePrefix(info.name) : `${info.name} can take you to becoming `; };
+  let words = wordsNow();
 
   /* Reserve exactly the height the longest sentence needs at the current width (instead of a fixed
      guess), so the page doesn't jump while typing and there is no big empty gap when it fits on one
@@ -712,7 +716,7 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
     line.appendChild(probe);
     let tallest = 0;
     list.forEach(wd => {
-      probe.textContent = `${info.name} can take you to becoming ${wd}`;
+      probe.textContent = prefixNow() + wd;
       tallest = Math.max(tallest, probe.getBoundingClientRect().height);
     });
     probe.remove();
@@ -726,6 +730,13 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
     };
     if ("ResizeObserver" in window) new ResizeObserver(refit).observe(line);
     refit();
+    const onLang = () => {                                       // language switched while this page is open
+      if (token !== sdTypeToken || !root.isConnected) { window.removeEventListener("cw-langchange", onLang); return; }
+      words = wordsNow();
+      lastW = 0; refit();
+      if (reduced) out.textContent = words[0];
+    };
+    window.addEventListener("cw-langchange", onLang);
   }
 
   if (reduced) {
@@ -740,7 +751,10 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
     if (token !== sdTypeToken || !root.isConnected) return;
     if (!view.classList.contains("active")) return;                 // left the strand page
     if (document.hidden) { setTimeout(tick, 500); return; }         // tab in background
+    words = wordsNow();
+    if (w >= words.length) w = 0;
     const word = words[w];
+    if (n > word.length) n = word.length;
     let delay;
     if (!deleting) {
       n++;
@@ -3209,16 +3223,31 @@ validateQuestionBank();
 loadState();
 loadProgress();
 loadInterest();
-/* Homepage badge: counts come from the question data so they can't go stale */
+/* Homepage badge: friendly text on purpose (no question count here; the hub and FAQ still state the numbers) */
 (function setHeroBadge() {
   const hero = document.querySelector(".home-hero");
   if (!hero) return;
-  const parts = MODULE_ORDER.length + 1;
-  const total = MODULE_ORDER.reduce((n, c) => n + MODULES[c].questions.length, 0) + INTEREST.statements.length + INTEREST.forced.length;
-  hero.style.setProperty("--hero-badge", JSON.stringify(`\u2726 ${parts} parts \u00B7 ${total} questions \u2726`));
+  hero.style.setProperty("--hero-badge", JSON.stringify("\u2726 Discover your best-fit strand \u2726"));
+})();
+/* Homepage FAQ: only one answer open at a time (opening one closes the others) */
+(function initFaqAccordion() {
+  const items = document.querySelectorAll(".hfaq-list .hfaq-item");
+  items.forEach(item => {
+    item.addEventListener("toggle", () => {
+      if (!item.open) return;
+      items.forEach(other => { if (other !== item) other.open = false; });
+    });
+  });
 })();
 renderStrandGrid();
 initHeroDecor();
 initHeroType();
 initHomeMotion();
 if (!restoreSession()) showView("view-home");
+/* Links from the privacy/terms pages: /#strands and /#faq open those sections of the home page */
+(function openFromHash() {
+  const target = { "#strands": "nav-explore", "#faq": "nav-faq" }[location.hash];
+  if (!target) return;
+  history.replaceState(null, "", location.pathname + location.search);   // so a refresh doesn't repeat it
+  document.getElementById(target).click();
+})();
