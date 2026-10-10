@@ -1,0 +1,53 @@
+:root{--ink:#22262B;--sun:#FFD25E;--cream:#FBF7EF;--soft:#FFF4D1;--muted:#5B6169;--line:#E0D6BF;--navy:#1D2B45;--amber:#D98E2B;--amber-deep:#B5711A;--header-h:64px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:400 1.02rem/1.7 "Work Sans",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:40px 20px 64px}
+h1{font:800 2.2rem/1.15 "Fraunces",Georgia,serif;margin:0 0 6px}
+.updated{color:var(--muted);font-size:.9rem;margin:0 0 24px}
+.summary{background:var(--soft);border-left:6px solid var(--sun);border-radius:10px;padding:16px 20px;margin:0 0 28px}
+.summary p{margin:0}
+h2{font:700 1.3rem/1.3 "Fraunces",Georgia,serif;margin:32px 0 8px}
+p,li{margin:0 0 10px}
+ul{padding-left:22px;margin:0 0 10px}
+a{color:#a35f00}
+.todo{background:#fff;border:1.5px dashed var(--line);border-radius:6px;padding:0 6px}
+footer{border-top:1.5px solid var(--line);padding:20px;text-align:center;color:var(--muted);font-size:.9rem}
+footer a{margin:0 8px}
+@media(max-width:480px){h1{font-size:1.8rem}main{padding-top:28px}}
+
+/* ---- header: same look as the homepage ---- */
+.site-header{position:sticky;top:0;z-index:20;height:var(--header-h);display:flex;align-items:center;background:var(--cream);border-bottom:1px solid var(--line)}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px;width:100%}
+.header-inner{display:flex;align-items:center;justify-content:space-between;width:100%}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
+.brand-seal{width:44px;height:44px;object-fit:contain;flex-shrink:0;display:block}
+.brand-divider{width:1px;height:36px;background:var(--amber);opacity:.55;flex-shrink:0;margin:0 2px}
+.brand-compass{width:38px;height:38px;flex-shrink:0;display:block}
+.mark-word{font-family:"Fraunces",serif;font-weight:600;font-size:1.35rem;letter-spacing:.01em;white-space:nowrap;background:linear-gradient(100deg,var(--navy) 20%,var(--amber-deep) 60%,var(--amber) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:40px}
+.nav-link{font-size:.97rem;font-weight:600;white-space:nowrap;color:var(--muted);text-decoration:none;padding:8px 2px;position:relative}
+.nav-link::after{content:"";position:absolute;left:2px;right:2px;bottom:0;height:2px;background:var(--amber);transform:scaleX(0);transform-origin:left;transition:transform .2s ease}
+.nav-link:hover{color:var(--navy)}
+.nav-link:hover::after{transform:scaleX(1)}
+@media(max-width:520px){
+  .brand-divider,.nav-opt{display:none}
+  .wrap{padding:0 16px}
+  .brand{gap:6px}
+  .brand-seal{width:36px;height:36px}
+  .brand-compass{width:28px;height:28px}
+  .mark-word{font-size:1.05rem}
+  .nav-links{gap:20px}
+  .nav-link{font-size:.88rem}
+}
+@media(max-width:340px){
+  .brand-seal{width:32px;height:32px}
+  .brand-compass{width:24px;height:24px}
+  .mark-word{font-size:.95rem}
+  .nav-links{gap:14px}
+  .nav-link{font-size:.8rem}
+}
+/* ---- dark mode (set from the main page's settings; read here from session storage by theme.js) ---- */
+:root[data-theme="dark"]{--ink:#ECE7DB;--cream:#12151B;--soft:#2A2619;--muted:#A9AFBA;--line:#333A46;--navy:#F0EBDD;color-scheme:dark}
+:root[data-theme="dark"] main a,:root[data-theme="dark"] footer a{color:#E8A23F}
+:root[data-theme="dark"] .todo{background:#1C2129}
+body{transition:background-color .3s ease,color .3s ease}
