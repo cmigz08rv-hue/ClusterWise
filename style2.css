@@ -4771,6 +4771,12 @@ body.grade-locked #sd-start::before {
 .theme-switch[aria-checked="true"] .theme-thumb .i-sun { opacity: 0; transform: rotate(90deg) scale(.5); }
 .theme-switch[aria-checked="true"] .theme-thumb .i-moon { opacity: 1; transform: none; }
 
+/* cooldown (3s): the switch dims and a thin bar drains underneath while taps are ignored */
+.theme-switch.is-cooling { cursor: not-allowed; opacity: .6; }
+.theme-switch::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: -6px; height: 3px; border-radius: 3px; background: var(--amber); transform: scaleX(0); transform-origin: left; opacity: 0; }
+.theme-switch.is-cooling::after { opacity: 1; animation: themeCool 3s linear forwards; }
+@keyframes themeCool { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
 /* smooth fade between light and dark (class is only on <html> for a moment while switching) */
 html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   transition: background-color .4s ease, color .4s ease, border-color .4s ease, fill .4s ease, stroke .4s ease, box-shadow .4s ease !important;
