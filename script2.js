@@ -49,8 +49,8 @@ const STRANDS = {
       "Research": "You plan and carry out your own small investigation, from asking a question to presenting what you found.",
     },
     skills: ["Analytical & logical reasoning", "Data interpretation", "Scientific methodology", "Precision & patience with detail"],
-    courses: ["Engineering (all branches)", "Computer Science", "Medicine & Allied Health Sciences", "Architecture", "Applied Mathematics"],
-    careers: ["Engineer", "Researcher / Scientist", "Doctor", "Architect", "Data Analyst"],
+    courses: ["Engineering (all branches)", "Computer Science", "Medicine & Allied Health Sciences", "Nursing", "Architecture", "Applied Mathematics"],
+    careers: ["Engineer", "Researcher / Scientist", "Doctor", "Nurse", "Architect", "Data Analyst"],
     videoId: "NO-INaxhY-w",
     videoCaption: "A quick recap of what STEM learners actually study and build."
   },
@@ -59,7 +59,7 @@ const STRANDS = {
     full: "Arts, Social Sciences, and Humanities",
     color: "#C2457F",
     formerly: "HUMMS",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
-    overview: "ASSH is for learners drawn to people, culture, language, and ideas — how societies work and how to write and argue well about them.",
+    overview: "ASSH is for learners drawn to people, culture, language, and ideas: how societies work and how to write and argue well about them.",
     focus: "The study of human behavior, society, communication, and the humanities.",
     highlight: "human behavior, society",
     subjects: ["Creative Writing", "Philosophy", "Communication", "Politics & Governance", "Disciplines & Ideas in Social Sciences"],
@@ -103,7 +103,7 @@ const STRANDS = {
     full: "Hospitality and Tourism",
     color: "#3457D5",
     formerly: "HE",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
-    overview: "HT is a practical, service-oriented track — cooking, hotel and restaurant operations, and tourism skills you can apply right away.",
+    overview: "HT is a practical, service-oriented track covering cooking, hotel and restaurant operations, and tourism skills you can apply right away.",
     focus: "Hands-on training in food, service, hospitality, and tourism-related work.",
     highlight: "food, service, hospitality",
     subjects: ["Cookery", "Food & Beverage Services", "Housekeeping", "Tourism Promotion", "Caregiving"],
@@ -124,7 +124,7 @@ const STRANDS = {
     name: "ICT",
     full: "Information and Communications Technology",
     color: "#6A3EA1",
-    overview: "ICT fits learners who like building and fixing digital things — apps, websites, networks, and systems.",
+    overview: "ICT fits learners who like building and fixing digital things, such as apps, websites, networks, and systems.",
     focus: "Practical, skills-based training in computer systems, software, and digital media.",
     highlight: "skills-based training",
     subjects: ["Computer Programming", "Computer Systems Servicing", "Animation", "Technical Drafting", "Web/App Development"],
@@ -1135,10 +1135,14 @@ function strandPageHTML(code, withClosing = true) {
 
       <div class="sd-stage">
         <div class="wrap sd-stage-inner">
+          <div class="sd-focus-block">
+            <div class="sd-focus-rule" aria-hidden="true"></div>
+            <p class="sd-focus-label">What it focuses on</p>
+            <p class="sd-focus-text">${info.highlight ? info.focus.replace(info.highlight, `<span class="sd-focus-hl">${info.highlight}</span>`) : info.focus}</p>
+          </div>
           <h2 class="sd-h sd-stage-h">Watch the recap</h2>
           <div class="sd-stage-grid">
             ${renderStrandVideo(info)}
-            <p class="sd-focus-text">${info.highlight ? info.focus.replace(info.highlight, `<span class="sd-focus-hl">${info.highlight}</span>`) : info.focus}</p>
           </div>
         </div>
       </div>
@@ -1477,7 +1481,7 @@ function renderIntro() {
 
   stepperEl.innerHTML = stepperHTML(code);
   qProgressFill.style.width = "0%";
-  qProgressLabel.textContent = `${code} \u2014 Before you begin`;
+  qProgressLabel.textContent = `${code}: Before you begin`;
 
   qCard.classList.remove("card-in");
   void qCard.offsetWidth; // restart animation
@@ -1552,7 +1556,7 @@ function renderQuestion() {
   assessView.classList.remove("intro-mode");
   stepperEl.innerHTML = stepperHTML(code);
   qProgressFill.style.width = (state.current / total * 100) + "%";
-  qProgressLabel.textContent = `${code} — Question ${state.current + 1} of ${total}`;
+  qProgressLabel.textContent = `${code}: Question ${state.current + 1} of ${total}`;
 
   qCard.classList.remove("card-in");
   void qCard.offsetWidth; // restart animation
@@ -1740,7 +1744,7 @@ function renderInterestIntro() {
   assessView.classList.add("intro-mode");
   interestCardReset();
   qProgressFill.style.width = "0%";
-  qProgressLabel.textContent = "Interests \u2014 Before you begin";
+  qProgressLabel.textContent = "Interests: Before you begin";
   qCard.innerHTML = `
     <p class="q-eyebrow">${INTEREST.title}</p>
     <h2 class="q-text">Read this before you start</h2>
@@ -1779,7 +1783,7 @@ function renderInterestTransition() {
   assessView.classList.add("intro-mode");
   interestCardReset();
   qProgressFill.style.width = (nPartA() / (nPartA() + nPartB()) * 100) + "%";
-  qProgressLabel.textContent = "Interests \u2014 Part A complete";
+  qProgressLabel.textContent = "Interests, Part A complete";
   qCard.innerHTML = `
     <p class="q-eyebrow">${INTEREST.title}<span class="q-topic">Part B</span></p>
     <h2 class="q-text">Part A done. Part B works differently.</h2>
@@ -1815,8 +1819,8 @@ function renderInterestItem() {
   interestCardReset();
   qProgressFill.style.width = (pos / total * 100) + "%";
   qProgressLabel.textContent = isA
-    ? `Interests \u2014 Part A: ${pos + 1} of ${nA}`
-    : `Interests \u2014 Part B: ${pos - nA + 1} of ${nB}`;
+    ? `Interests, Part A: ${pos + 1} of ${nA}`
+    : `Interests, Part B: ${pos - nA + 1} of ${nB}`;
 
   const exit = `<button class="q-exit" id="q-exit" type="button">&larr; Save &amp; back to hub</button>`;
   if (isA) {
@@ -3248,11 +3252,6 @@ loadState();
 loadProgress();
 loadInterest();
 /* Homepage badge: friendly text on purpose (no question count here; the hub and FAQ still state the numbers) */
-(function setHeroBadge() {
-  const hero = document.querySelector(".home-hero");
-  if (!hero) return;
-  hero.style.setProperty("--hero-badge", JSON.stringify("\u2726 Discover your best-fit strand \u2726"));
-})();
 /* Homepage FAQ: only one answer open at a time (opening one closes the others) */
 (function initFaqAccordion() {
   const items = document.querySelectorAll(".hfaq-list .hfaq-item");
