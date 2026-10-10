@@ -4843,7 +4843,8 @@ html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *
 [data-theme="dark"] .bar-pct, [data-theme="dark"] .faq-icon, [data-theme="dark"] .manual-list li::before,
 [data-theme="dark"] .hub-guide-title, [data-theme="dark"] .hub-steps-list li::before, [data-theme="dark"] .intro-meta,
 [data-theme="dark"] .res-pill b,
-[data-theme="dark"] .stakes-badge { color: #22262B; }
+[data-theme="dark"] .stakes-badge,
+[data-theme="dark"] .manual-title { color: #22262B; }
 /* dark: the light-themed strand illustrations (STEM, HT, BM, ASSH) keep their original pastel look as bright "cards";
    ICT and IA are already dark artwork. */
 [data-theme="dark"] .sd[data-strand="STEM"] .sd-frame, [data-theme="dark"] .sd[data-strand="HT"] .sd-frame,
