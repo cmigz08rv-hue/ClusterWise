@@ -1,18 +1,30 @@
-/* ClusterWise language support (English / Filipino).
-   HOW IT WORKS: every visible text on the page is looked up here by its exact English wording. If a match
-   exists and Filipino is selected, it is swapped; anything NOT listed stays English. So the test questions,
-   answer choices and the saved results picture are never touched. A MutationObserver re-applies this
-   whenever script2.js draws a new screen, so more screens are translated just by adding lines to FIL below.
-   To review or fix the Filipino, edit only the right-hand side of FIL. Choice is kept in sessionStorage. */
 (function () {
   "use strict";
   const KEY = "strandwise_lang";
   const norm = s => s.replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, " ").trim();
 
+  // english -> filipino list. add a line here and that text gets translated. needs a filipino teacher to check it before going live lol
   const FIL = {
-    /* settings */
     "Settings": "Mga Setting", "Language": "Wika", "Dark mode": "Dark mode",
-    /* home */
+    "Privacy Policy": "Patakaran sa Privacy", "Terms of Service": "Mga Tuntunin ng Serbisyo", "Back to ClusterWise": "Bumalik sa ClusterWise",
+    "Version 1.0 · 2026": "Bersyon 1.0 · 2026",
+    "Made by Team DevSphere": "Gawa ng Team DevSphere",
+    "ClusterWise is a free strand-exploration tool built by Senior High School TechPro Track students for the Junior High School learners of Pasay City South High School (PCSHS).":
+      "Ang ClusterWise ay isang libreng tool sa pagtuklas ng strand na ginawa ng mga mag-aaral ng Senior High School TechPro Track para sa mga mag-aaral ng Junior High School ng Pasay City South High School (PCSHS).",
+    "Lead Developer": "Pangunahing Developer",
+    "Grade 12 TechPro student at PCSHS who built ClusterWise to help Grade 10 learners choose their strand with more confidence.":
+      "Mag-aaral ng Grade 12 TechPro sa PCSHS na gumawa ng ClusterWise upang matulungan ang mga mag-aaral ng Grade 10 na pumili ng kanilang strand nang may mas malaking kumpiyansa.",
+    "Quality Assurance and Feedback Team": "Koponan sa Quality Assurance at Feedback",
+    "User Testing Team": "Koponan sa User Testing",
+    "Subject Teacher": "Guro sa Asignatura", "ICT .NET Teacher": "Guro sa ICT .NET",
+    "Research behind ClusterWise": "Pananaliksik sa Likod ng ClusterWise",
+    "These studies and laws shaped how ClusterWise was designed.": "Hinubog ng mga pag-aaral at batas na ito ang disenyo ng ClusterWise.",
+    "Third-party credits": "Mga Kredito sa Ibang Pinagmulan",
+    "Fonts": "Mga Font", "Fraunces and Work Sans, from Google Fonts.": "Fraunces at Work Sans, mula sa Google Fonts.",
+    "Videos": "Mga Video", "Strand recap videos are embedded from YouTube and belong to their owners.": "Ang mga recap video ng strand ay galing sa YouTube at pag-aari ng kanilang mga may-ari.",
+    "School seal": "Sagisag ng Paaralan", "The Pasay City South High School seal belongs to PCSHS.": "Ang sagisag ng Pasay City South High School ay pag-aari ng PCSHS.",
+    "ClusterWise is a guide for learners, not an official school system. See the": "Ang ClusterWise ay gabay para sa mga mag-aaral, hindi opisyal na sistema ng paaralan. Tingnan ang",
+    "and": "at",
     "Find the Senior High": "Hanapin ang Senior High",
     "That Fits You at PCSHS": "na Angkop sa Iyo sa PCSHS",
     "is a free online tool that helps learners of Pasay City South High School (PCSHS) choose a Senior High School strand. Take six short skill tests, one for each strand, plus a quick questionnaire about what you enjoy. ClusterWise shows your skills and your interests side by side, so you can see where they line up.":
@@ -44,7 +56,6 @@
     "The 6 strands": "Ang 6 na strand",
     "Scroll down and tap a card to see its subjects, courses & careers": "Mag-scroll pababa at pindutin ang isang card para makita ang mga asignatura, kurso, at karera nito",
     "Seen enough? Find out which one fits you.": "Sapat na ba? Alamin kung alin ang bagay sa iyo.",
-    /* faq */
     "Frequently asked questions": "Madalas na Itanong",
     "Quick answers about how ClusterWise works and what happens to your answers.": "Mabilis na sagot kung paano gumagana ang ClusterWise at kung ano ang nangyayari sa iyong mga sagot.",
     "What is PCSHS ClusterWise?": "Ano ang PCSHS ClusterWise?",
@@ -75,10 +86,9 @@
     "Is the result final?": "Pinal na ba ang resulta?",
     "No. ClusterWise is a guide, not a decision. Use your results together with advice from your teachers, guidance counselor, and family.":
       "Hindi. Gabay lang ang ClusterWise, hindi desisyon. Gamitin ang resulta kasama ang payo ng iyong mga guro, guidance counselor, at pamilya.",
-    /* notice, loading, common buttons */
     "Your strand shapes your next two years here in PCSHS": "Hinuhubog ng iyong strand ang susunod mong dalawang taon dito sa PCSHS",
     "You choose a strand once, then stay in it for all of Grade 11 and Grade 12. PCSHS does not allow learners to switch strands, so there is no second try.":
-      "Minsan ka lang pipili ng strand, at mananatili ka rito sa buong Grade 11 at Grade 12. Hindi pinapayagan ng PCSHS ang pagpapalit ng strand, kaya walang ikalawang pagsubok.",
+      "Isang beses ka lang pipili ng strand, at mananatili ka rito sa buong Grade 11 at Grade 12. Hindi pinapayagan ng PCSHS ang pagpapalit ng strand, kaya walang ikalawang pagsubok.",
     "A strand that does not fit your skills and interests can make those two years harder than they need to be, and it can hold you back from what you are capable of. Check where you stand before you commit.":
       "Ang strand na hindi bagay sa iyong kakayahan at interes ay maaaring magpahirap sa dalawang taon na iyon nang higit sa kinakailangan, at puwede kang pigilan sa kaya mo talagang marating. Alamin muna kung nasaan ka bago magpasya.",
     "Continue": "Magpatuloy", "Back": "Bumalik", "Next": "Susunod",
@@ -89,7 +99,6 @@
     "Questions about your result": "Mga tanong tungkol sa iyong resulta"
   };
 
-  /* ---- stage 2: grade check, hub, pledge, read-first screens, interests flow ---- */
   Object.assign(FIL, {
     "Which grade are you in?": "Anong grade ka na?",
     "ClusterWise is made for learners who have not chosen a Senior High School strand yet.": "Ginawa ang ClusterWise para sa mga mag-aaral na hindi pa nakapipili ng strand sa Senior High School.",
@@ -98,7 +107,6 @@
     "ClusterWise is for Grade 10 and below": "Para sa Grade 10 pababa ang ClusterWise",
     "Learners in Grade 11 and 12 are already in a strand, and PCSHS does not allow switching, so these results could not change anything for you. You can still read about each strand.": "Ang mga mag-aaral sa Grade 11 at 12 ay nasa strand na, at hindi pinapayagan ng PCSHS ang pagpapalit, kaya walang mababago sa iyo ang mga resultang ito. Maaari mo pa ring basahin ang tungkol sa bawat strand.",
     "Explore strands": "Tuklasin ang mga strand",
-    /* hub */
     "Choose a test to take": "Pumili ng test na sasagutan", "Before you begin": "Bago ka magsimula",
     "Also complete the": "Sagutan din ang", "Interests": "Interes",
     "Finish all seven parts and": "Tapusin ang lahat ng pitong bahagi, at mabubuksan ang",
@@ -119,7 +127,6 @@
     "Electricity, Machines & Tool Safety": "Kuryente, Makina, at Kaligtasan sa Gamit", "How machines and circuits behave, and safe work habits.": "Kung paano kumikilos ang mga makina at circuit, at ligtas na gawi sa trabaho.",
     "Situational Judgment & Service Recovery": "Pagpapasya sa Sitwasyon at Pag-ayos ng Serbisyo", "Choosing the best response in real service situations.": "Pagpili ng pinakamainam na tugon sa totoong sitwasyon sa serbisyo.",
     "Interests & Preferences": "Mga Interes at Kagustuhan", "What you enjoy doing, with no right or wrong answers.": "Mga bagay na gusto mong gawin, walang tama o maling sagot.",
-    /* skill test: read-first + question screen */
     "Read this before you start": "Basahin ito bago magsimula",
     "Choose the best answer. Only one is correct.": "Piliin ang pinakamahusay na sagot. Isa lang ang tama.",
     "Take your time and think each question through.": "Dahan-dahan lang at pag-isipang mabuti ang bawat tanong.",
@@ -132,7 +139,6 @@
     "If a question needs calculating or working out, write it down on paper. That is part of solving it.": "Kung kailangang magkuwenta o magtrabaho sa isang tanong, isulat ito sa papel. Bahagi iyon ng pagsagot.",
     "Answer on your own: no searching, no asking, no AI.": "Sumagot nang mag-isa: bawal mag-search, magtanong, o gumamit ng AI.",
     "Back to hub": "Bumalik sa hub", "Begin test": "Simulan ang test", "Choose the best answer.": "Piliin ang pinakamahusay na sagot.",
-    /* interests flow */
     "Interests: Before you begin": "Interes: Bago ka magsimula",
     "This is about what you enjoy, not what you are good at.": "Tungkol ito sa gusto mo, hindi sa magaling ka.",
     "There are no right or wrong answers.": "Walang tama o maling sagot.", "Nothing here is scored as correct.": "Walang bahagi rito na ina-score bilang tama.",
@@ -152,11 +158,11 @@
     "Back to Part A": "Bumalik sa Bahagi A", "Start Part B": "Simulan ang Bahagi B",
     "How much does this sound like you? There is no right answer.": "Gaano ito kapareho sa iyo? Walang tamang sagot.",
     "Most": "Pinakagusto", "Least": "Pinakaayaw",
-    /* stepper labels */
     "Math & Science": "Math at Science", "Reading": "Pagbasa", "Finance": "Pananalapi", "Logic": "Lohika", "Mechanics": "Mekanika", "Service": "Serbisyo"
   });
   const LAB = { "Math & Science": "Math at Science", "Reading": "Pagbasa", "Finance": "Pananalapi", "Logic": "Lohika", "Mechanics": "Mekanika", "Service": "Serbisyo", "Interests": "Interes" };
-  const PATTERNS = [   // text with numbers in it: [regex on the English text, function returning the Filipino]
+  // for text with numbers in it, like "3 of 7 parts completed"
+  const PATTERNS = [
     [/^(\d+) of (\d+) parts completed$/, m => `${m[1]} sa ${m[2]} bahagi ang natapos`],
     [/^Take the six skill tests in any order\. Each has (\d+) multiple-choice questions \((\d+) in total\)\.$/, m => `Sagutan ang anim na skill test sa kahit anong pagkakasunod-sunod. Bawat isa ay may ${m[1]} multiple-choice na tanong (${m[2]} lahat).`],
     [/^questionnaire \((\d+) questions, no right or wrong answers\)\. It is open from the start\.$/, m => `talatanungan (${m[1]} tanong, walang tama o maling sagot). Bukas ito mula sa simula.`],
@@ -175,18 +181,11 @@
     [/^(\d+) short scenarios\. Pick the activity you would want$/, m => `${m[1]} maikling sitwasyon. Pumili ng aktibidad na`]
   ];
 
-  /* ---- stage 3: strand cards (home) and strand pages ----
-     Official names (strand codes, subject titles, college courses) stay in English because that is how DepEd,
-     CHED and PCSHS call them. Descriptions, skills and headings are in Filipino. A career title is in Filipino
-     only where an everyday Filipino word exists (Inhinyero, Abogado...); titles Filipinos usually say in English stay as they are.
-     Anything not listed here simply stays in English. */
   Object.assign(FIL, {
-    /* strand cards */
     "Academic": "Akademiko",
     "View subjects, courses & careers \u203A": "Tingnan ang mga asignatura, kurso, at karera \u203A",
     "Science, Technology, Engineering & Mathematics": "Agham, Teknolohiya, Inhenyeriya, at Matematika",
     "Business and Management": "Negosyo at Pamamahala",
-    /* one-paragraph overviews (card + strand page) */
     "STEM is built for learners who like asking why something works and proving it. Expect heavy math, laboratory science, and a lot of problem sets.":
       "Ang STEM ay para sa mga mag-aaral na mahilig magtanong kung bakit gumagana ang isang bagay at patunayan ito. Asahan ang mabigat na math, laboratory science, at maraming problem set.",
     "ASSH is for learners drawn to people, culture, language, and ideas: how societies work and how to write and argue well about them.":
@@ -199,7 +198,6 @@
       "Bagay ang ICT sa mga mag-aaral na mahilig gumawa at mag-ayos ng mga digital na bagay, tulad ng app, website, network, at sistema.",
     "IA is a hands-on technical track for learners who like building, wiring, and fixing things with tools and machinery.":
       "Ang IA ay hands-on na technical track para sa mga mag-aaral na mahilig gumawa, mag-wire, at mag-ayos ng mga bagay gamit ang mga kasangkapan at makinarya.",
-    /* strand page: video */
     "Watch the recap": "Panoorin ang recap",
     "A quick recap of what STEM learners actually study and build.": "Mabilis na recap ng kung ano talaga ang pinag-aaralan at binubuo ng mga mag-aaral ng STEM.",
     "A quick recap of what ASSH learners read, discuss, and write about.": "Mabilis na recap ng binabasa, pinag-uusapan, at isinusulat ng mga mag-aaral ng ASSH.",
@@ -211,7 +209,6 @@
     "Video looks blurry? YouTube picks the quality automatically. Use the settings (gear) icon in the player and choose a higher quality.":
       "Malabo ba ang video? Awtomatikong pumipili ng quality ang YouTube. Gamitin ang settings (gear) icon sa player at pumili ng mas mataas na quality.",
     "Watch on YouTube": "Panoorin sa YouTube",
-    /* strand page: sections */
     "Possible subjects you may take": "Mga asignaturang maaari mong kunin",
     "These are typical for the strand. The subjects PCSHS actually offers can vary by school year.":
       "Karaniwang asignatura ito ng strand. Maaaring magbago kada school year ang aktuwal na asignaturang iniaalok ng PCSHS.",
@@ -222,7 +219,6 @@
     "The assessment has six short skill tests, one per strand, plus an interests questionnaire, and shows how your results line up with each one.":
       "May anim na maikling skill test ang assessment, isa bawat strand, kasama ang interests questionnaire, at ipinapakita nito kung paano nagtutugma ang iyong resulta sa bawat isa.",
     "Take the Assessment": "Sagutan ang Assessment", "Back to Home": "Bumalik sa Home", "Keep browsing:": "Tingnan din ang iba:",
-    /* subject descriptions (the subject titles stay in English) */
     "You work with functions, graphs, and trigonometry, then learn how quantities change using limits and derivatives.":
       "Gagamit ka ng mga function, graph, at trigonometry, saka mo matututuhan kung paano nagbabago ang mga dami gamit ang limits at derivatives.",
     "You study motion, forces, energy, electricity, and waves, and use math to explain how the physical world behaves.":
@@ -283,7 +279,6 @@
       "Magbabasa at gagawa ka ng technical drawing para sa mga makina at istruktura, gamit ang karaniwang simbolo at sukat.",
     "You learn how circuits and electronic parts work, and practice building, testing, and repairing simple devices.":
       "Malalaman mo kung paano gumagana ang mga circuit at electronic parts, at magsasanay kang bumuo, sumubok, at mag-ayos ng mga simpleng device.",
-    /* skills you'll build */
     "Analytical & logical reasoning": "Pagsusuri at lohikal na pangangatwiran", "Data interpretation": "Pag-interpret ng data",
     "Scientific methodology": "Metodolohiyang pang-agham", "Precision & patience with detail": "Katumpakan at pasensya sa mga detalye",
     "Writing & public speaking": "Pagsulat at pagsasalita sa harap ng madla", "Critical & reflective thinking": "Kritikal at mapagnilay na pag-iisip",
@@ -295,10 +290,8 @@
     "Programming & logic building": "Programming at pagbuo ng lohika", "Digital design": "Digital na disenyo", "Systematic thinking": "Sistematikong pag-iisip",
     "Manual dexterity & precision": "Liksi ng kamay at katumpakan", "Practical troubleshooting": "Praktikal na troubleshooting",
     "Safety-conscious work habits": "Ligtas at maingat na gawi sa trabaho", "Tool & equipment handling": "Paghawak ng mga tool at kagamitan",
-    /* college courses: official program names stay in English */
     "Engineering (all branches)": "Engineering (lahat ng sangay)"
   });
-  /* career titles (used in the "Career fields" list, the typed line and its screen-reader text) */
   const CAREER_FIL = {
     "Engineer": "Inhinyero", "Researcher / Scientist": "Mananaliksik / Siyentipiko", "Doctor": "Doktor", "Architect": "Arkitekto",
     "Teacher / Professor": "Guro / Propesor", "Lawyer": "Abogado", "Journalist": "Mamamahayag", "Psychologist": "Sikologo", "Public Servant": "Lingkod-Bayan",
@@ -306,7 +299,6 @@
     "Electrician": "Elektrisyan", "Electrical Technician": "Teknisyan sa Kuryente", "Industrial Electrician": "Elektrisyan sa Industriya", "Building Technician": "Teknisyan sa Gusali"
   };
   Object.assign(FIL, CAREER_FIL);
-  /* the highlighted sentence under "Watch the recap": [text before, highlighted words, text after] per strand */
   const FOCUS_FIL = {
     STEM: ["Malalim na pag-aaral ng likas at pisikal na agham na ", "nakasentro muna sa teorya", ", kasama ang advanced na matematika."],
     ASSH: ["Ang pag-aaral sa ", "pag-uugali ng tao at lipunan", ", komunikasyon, at humanidades."],
@@ -315,7 +307,7 @@
     ICT: ["Praktikal na ", "pagsasanay na nakabatay sa kasanayan", " sa mga sistema ng kompyuter, software, at digital media."],
     IA: ["", "Technical-vocational na pagsasanay", " sa mga sistemang elektrikal, installation, at maintenance."]
   };
-  const careerInline = c => CAREER_FIL[c] ? CAREER_FIL[c].toLowerCase() : c;   // Filipino titles go lowercase inside a sentence; English titles keep their capitals
+  const careerInline = c => CAREER_FIL[c] ? CAREER_FIL[c].toLowerCase() : c;
   const typePrefix = name => `Maaaring maging daan ang ${name} para maging `;
   PATTERNS.push(
     [/^Formerly (\w+)$/, m => `Dating ${m[1]}`],
@@ -324,21 +316,21 @@
     [/^Where (\w+) can take you$/, m => `Saan ka madadala ng ${m[1]}`],
     [/^Does (\w+) sound like you\?$/, m => `Tugma ba sa iyo ang ${m[1]}?`],
     [/^(\w+) can take you to becoming$/, m => typePrefix(m[1]).trim()],
-    [/^(\w+) can take you to becoming (.+)\.$/, m => {    // screen-reader version of the typed line
+    [/^(\w+) can take you to becoming (.+)\.$/, m => {
       const items = m[2].split(", ").map(x => { return careerInline(x.replace(/^an? /, "")); });
       const last = items.pop();
       return `${typePrefix(m[1])}${items.length ? items.join(", ") + ", o " : ""}${last}.`;
     }]
   );
 
-  const orig = new WeakMap();           // node/element -> original English (so we can switch back)
-  const origHTML = new WeakMap();       // .sd-focus-text element -> its original English markup
+  const orig = new WeakMap();
+  const origHTML = new WeakMap();
   const ATTRS = ["aria-label", "title", "placeholder"];
   let lang = "en";
   try { lang = sessionStorage.getItem(KEY) === "fil" ? "fil" : "en"; } catch (e) {}
   const NORM_FIL = {}; Object.keys(FIL).forEach(k => { NORM_FIL[norm(k)] = FIL[k]; });
 
-  function swap(text) {                 // keeps surrounding spaces, returns null if no translation
+  function swap(text) {
     const n = norm(text);
     let t = NORM_FIL[n];
     if (t == null) for (const [re, fn] of PATTERNS) { const m = n.match(re); if (m) { t = fn(m); break; } }
@@ -347,7 +339,7 @@
   }
   function apply(root) {
     if (lang !== "fil") return;
-    (root.querySelectorAll ? root.querySelectorAll(".sd-focus-text") : []).forEach(el => {   // sentence with a highlighted phrase: swapped as a whole
+    (root.querySelectorAll ? root.querySelectorAll(".sd-focus-text") : []).forEach(el => {
       const sd = el.closest(".sd"), f = sd && FOCUS_FIL[sd.dataset.strand];
       if (!f || origHTML.has(el)) return;
       origHTML.set(el, el.innerHTML);
@@ -378,8 +370,9 @@
   }
 
   let busy = false, queued = false;
-  const LIVE = ".sd-type, .sd-frame";   // the typed career and the animated picture change on their own all the time; they never need re-translating
+  const LIVE = ".sd-type, .sd-frame, .hero-type";
   const inLiveArea = n => { const el = n.nodeType === 1 ? n : n.parentElement; return !!(el && el.closest(LIVE)); };
+  // watches the page and translates again whenever the main script draws a new screen. the watcher thingy
   const obs = new MutationObserver(records => {
     if (busy || queued || lang !== "fil") return;
     if (records.every(r => inLiveArea(r.target))) return;
@@ -388,6 +381,7 @@
   });
   function watch() { obs.observe(document.body, { childList: true, subtree: true, characterData: true }); }
 
+  // switches the language and remembers it for this tab only
   function setLang(next) {
     lang = next;
     try { sessionStorage.setItem(KEY, lang); } catch (e) {}
@@ -398,15 +392,13 @@
     document.querySelectorAll("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     window.dispatchEvent(new Event("cw-langchange"));
   }
-  /* used by the typewriter on the strand pages (script2.js), so it types Filipino letter by letter */
   window.CW_i18n = {
     lang: () => lang,
     typePrefix,
     careerWords: careers => careers.map(careerInline),
-    career: c => CAREER_FIL[c] || c      /* Filipino title with its capital letter, used by the typed line on the home page */
+    career: c => CAREER_FIL[c] || c
   };
 
-  /* settings panel (gear in the header): opens/closes with a class so it can animate */
   const btn = document.getElementById("settings-btn"), panel = document.getElementById("settings-panel");
   if (btn && panel) {
     const setOpen = open => { panel.classList.toggle("is-open", open); btn.setAttribute("aria-expanded", String(open)); };
