@@ -1,11 +1,9 @@
-/* Dark mode. Loaded in <head> so the saved theme is applied before the page paints (no white flash).
-   The choice is kept in session storage (like the language), so it clears when the tab closes.
-   To follow the device's light/dark setting when nothing is saved, change DEFAULT_THEME to "system". */
 (function () {
   "use strict";
   var KEY = "strandwise_theme";
-  var COOLDOWN_MS = 3000;               /* wait this long between switches (stops spam-tapping lag on phones) */
-  var DEFAULT_THEME = "light";          /* "light" or "system" */
+  // cant spam the switch, it waits a bit. phones were lagging when people tapped it like crazy xd
+  var COOLDOWN_MS = 3000;
+  var DEFAULT_THEME = "light";
   var root = document.documentElement;
 
   function saved() { try { return sessionStorage.getItem(KEY); } catch (e) { return null; } }
@@ -23,6 +21,7 @@
     if (sw) sw.setAttribute("aria-checked", String(theme === "dark"));
   }
 
+  // sets the theme before the page paints so theres no white flash. yasssss
   apply(current());
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -31,7 +30,7 @@
     sw.setAttribute("aria-checked", String(current() === "dark"));
     var cooling = false;
     sw.addEventListener("click", function () {
-      if (cooling) return;                       /* cooldown: ignore taps while the last switch is still settling */
+      if (cooling) return;
       cooling = true;
       sw.classList.add("is-cooling");
       sw.setAttribute("aria-disabled", "true");
@@ -41,8 +40,22 @@
         sw.removeAttribute("aria-disabled");
       }, COOLDOWN_MS);
       var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-      try { sessionStorage.setItem(KEY, next); } catch (e) { /* storage blocked: still switches for this visit */ }
+      try { sessionStorage.setItem(KEY, next); } catch (e) { }
       apply(next);
     });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var header = document.querySelector(".site-header");
+    if (!header) return;
+    // note to self : only flips the class when it actually changes, so nothing runs on every scroll pixel
+    var scrolled = null;
+    function update() {
+      var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+      var now = y > 24;
+      if (now !== scrolled) { scrolled = now; header.classList.toggle("is-scrolled", now); }
+    }
+    window.addEventListener("scroll", update, { passive: true });
+    update();
   });
 })();
