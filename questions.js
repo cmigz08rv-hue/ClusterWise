@@ -1,42 +1,9 @@
-/* =========================================================
-   ClusterWise — QUESTION BANK (data only, no logic)
-   Loaded BEFORE script2.js. Edit questions here without
-   touching the controller.
-
-   SCHEMA
-   MODULES[CODE] = {
-     title:     shown on the hub card and above each question
-     blurb:     one-line description on the hub card
-     questions: [
-       {
-         q:                  the question text (plain text; use \n for line breaks)
-         options:            exactly 4 answer strings
-         correctAnswerIndex: 0-3, the position of the right answer in `options`
-         topic:              short skill label shown as a tag above the question
-                             (keep it broad so it does not hint at the method)
-       }
-     ]
-   }
-
-   RULES
-   - 15 questions per module (90 total). The controller counts
-     questions.length, so a module with a different count still works.
-   - The app shuffles what the student sees and still scores against
-     correctAnswerIndex of the ORIGINAL order below.
-   - Avoid "all of the above" / "none of the above" (shuffling breaks them).
-   - Do not type the less-than sign in question text (it is inserted as HTML);
-     write "smaller than" instead.
-   - No images: flowcharts and schematics are described in text.
-   ========================================================= */
-
-/* Order the modules appear in the hub */
+// note to self : this is the order of the skill tests in the hub
 const MODULE_ORDER = ["STEM", "ASSH", "BM", "ICT", "IA", "HT"];
 
+// 6 skill modules x 15 questions, 4 options each and 1 correct answer. add or edit questions here lol
 const MODULES = {
 
-  /* ---------------------------------------------------------
-     STEM — Math & Natural Sciences
-     --------------------------------------------------------- */
   STEM: {
     title: "Math & Natural Sciences",
     blurb: "Numerical problem solving and basic science reasoning.",
@@ -199,9 +166,6 @@ const MODULES = {
     ]
   },
 
-  /* ---------------------------------------------------------
-     ASSH — Verbal Reading Comprehension & Logical Fallacies
-     --------------------------------------------------------- */
   ASSH: {
     title: "Verbal Reading & Logical Fallacies",
     blurb: "Reading comprehension and spotting flawed arguments.",
@@ -359,9 +323,6 @@ const MODULES = {
     ]
   },
 
-  /* ---------------------------------------------------------
-     BM — Quantitative & Financial Reasoning
-     --------------------------------------------------------- */
   BM: {
     title: "Quantitative & Financial Reasoning",
     blurb: "Percentages, interest, profit, and everyday money problems.",
@@ -479,9 +440,6 @@ const MODULES = {
     ]
   },
 
-  /* ---------------------------------------------------------
-     ICT — Logic, Computers & Problem Solving
-     --------------------------------------------------------- */
   ICT: {
     title: "Logic, Computers & Problem Solving",
     blurb: "Step-by-step logic, how computers work, and the basics of web pages.",
@@ -634,9 +592,6 @@ const MODULES = {
     ]
   },
 
-  /* ---------------------------------------------------------
-     IA — Mechanical Logic, Tool Safety & Schematic Analysis
-     --------------------------------------------------------- */
   IA: {
     title: "Electricity, Machines & Tool Safety",
     blurb: "How machines and circuits behave, and safe work habits.",
@@ -809,9 +764,6 @@ const MODULES = {
     ]
   },
 
-  /* ---------------------------------------------------------
-     HT — Situational Judgment & Service Recovery
-     --------------------------------------------------------- */
   HT: {
     title: "Situational Judgment & Service Recovery",
     blurb: "Choosing the best response in real service situations.",
@@ -985,13 +937,7 @@ const MODULES = {
   }
 };
 
-/* =========================================================
-   INTEREST QUESTIONNAIRE (no right or wrong answers)
-   Part A: 24 statements rated 1-5 (4 per strand, shown in random order).
-   Part B: 6 forced-choice items. Each lists one activity per strand;
-           the student picks one "most" and one "least".
-   Strand tags are never shown to students.
-   ========================================================= */
+// the interests part : rating labels, 24 statements (part a) and 6 most/least scenarios (part b). wowowowow
 const INTEREST = {
   title: "Interests & Preferences",
   blurb: "What you enjoy doing, with no right or wrong answers.",
