@@ -1,37 +1,4 @@
-/* =========================================================
-   ClusterWise — assessment hub controller (script2.js)
-
-   Requires questions.js to be loaded first (MODULES, MODULE_ORDER).
-
-   SCREEN FLOW (state transitions)
-   ---------------------------------------------------------
-   view-home
-      │  "Start Assessment" (home or strand page)   -> grade check
-      ▼
-   view-stakes   (strand notice, once per session; Continue locked for STAKES_WAIT_MS)
-      │  Continue                                   -> openHub()
-      ▼
-   view-hub  ◄──────────────────────────────────────────────┐
-      │  click an unfinished module card -> startModule(code)│
-      ▼                                                      │
-   view-assessment (one module, one question at a time)      │
-      │  last question + "Finish test" -> finishModule()     │
-      │  (score saved, module locked, NO answers shown) ─────┘
-      │
-   view-hub, once all 6 modules are done:
-      │  "See Overall Results" unlocks -> startResultsLoading()
-      ▼
-   view-loading   (about 4.5 s of compass + progress bar, plays once per session)
-      │  finishes -> showResults()
-      ▼
-   view-results
-
-   Finished modules are saved (sessionStorage). The current screen and a
-   test in progress (question number, answers, option order) are also saved,
-   so a refresh puts the student back where they were.
-   ========================================================= */
-
-/* ---------- Strand reference data ---------- */
+// note to self : every strand fact lives in here. change the words here and the strand pages follow lol
 const STRANDS = {
   STEM: {
     name: "STEM",
@@ -41,7 +8,7 @@ const STRANDS = {
     focus: "Deep, theory-first study of the natural and physical sciences, paired with advanced mathematics.",
     highlight: "theory-first",
     subjects: ["Pre-Calculus & Basic Calculus", "General Physics", "General Chemistry", "General Biology", "Research"],
-    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+    subjectNotes: {
       "Pre-Calculus & Basic Calculus": "You work with functions, graphs, and trigonometry, then learn how quantities change using limits and derivatives.",
       "General Physics": "You study motion, forces, energy, electricity, and waves, and use math to explain how the physical world behaves.",
       "General Chemistry": "You explore what everything is made of, how substances react, and why, with hands-on lab work.",
@@ -58,12 +25,12 @@ const STRANDS = {
     name: "ASSH",
     full: "Arts, Social Sciences, and Humanities",
     color: "#C2457F",
-    formerly: "HUMMS",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
+    formerly: "HUMMS",
     overview: "ASSH is for learners drawn to people, culture, language, and ideas: how societies work and how to write and argue well about them.",
     focus: "The study of human behavior, society, communication, and the humanities.",
     highlight: "human behavior, society",
     subjects: ["Creative Writing", "Philosophy", "Communication", "Politics & Governance", "Disciplines & Ideas in Social Sciences"],
-    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+    subjectNotes: {
       "Creative Writing": "You write stories, poems, and essays, and learn what makes writing stand out.",
       "Philosophy": "You ask big questions about truth, right and wrong, and how we know what we know.",
       "Communication": "You study how people share ideas, and practice speaking, presenting, and reading media critically.",
@@ -80,12 +47,12 @@ const STRANDS = {
     name: "BM",
     full: "Business and Management",
     color: "#E4572E",
-    formerly: "ABM",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
+    formerly: "ABM",
     overview: "BM suits learners curious about how businesses run, how money moves, and how to lead or manage an organization.",
     focus: "The fundamentals of business operations, finance, and management practices.",
     highlight: "business operations, finance",
     subjects: ["Fundamentals of ABM", "Business Finance", "Organization & Management", "Applied Economics", "Business Math"],
-    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+    subjectNotes: {
       "Fundamentals of ABM": "You learn the basics of accounting and how a business keeps track of what it earns and spends.",
       "Business Finance": "You learn how businesses raise, manage, and invest money, and how to read financial statements.",
       "Organization & Management": "You study how businesses are organized and led, including planning, teamwork, and decision-making.",
@@ -102,12 +69,12 @@ const STRANDS = {
     name: "HT",
     full: "Hospitality and Tourism",
     color: "#3457D5",
-    formerly: "HE",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
+    formerly: "HE",
     overview: "HT is a practical, service-oriented track covering cooking, hotel and restaurant operations, and tourism skills you can apply right away.",
     focus: "Hands-on training in food, service, hospitality, and tourism-related work.",
     highlight: "food, service, hospitality",
     subjects: ["Cookery", "Food & Beverage Services", "Housekeeping", "Tourism Promotion", "Caregiving"],
-    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+    subjectNotes: {
       "Cookery": "You learn to prepare food, from knife skills and cooking methods to kitchen safety and plating.",
       "Food & Beverage Services": "You practice serving guests in a restaurant: setting tables, taking orders, serving drinks, and handling customers.",
       "Housekeeping": "You learn how hotels and lodgings keep rooms clean, ready, and comfortable for guests.",
@@ -128,7 +95,7 @@ const STRANDS = {
     focus: "Practical, skills-based training in computer systems, software, and digital media.",
     highlight: "skills-based training",
     subjects: ["Computer Programming", "Computer Systems Servicing", "Animation", "Technical Drafting", "Web/App Development"],
-    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+    subjectNotes: {
       "Computer Programming": "You learn to write code that tells a computer what to do, starting with logic and simple programs.",
       "Computer Systems Servicing": "You assemble, install, and troubleshoot computers and networks, and fix common hardware and software problems.",
       "Animation": "You make moving images, from drawing and storyboarding to bringing characters and scenes to life on a computer.",
@@ -145,12 +112,12 @@ const STRANDS = {
     name: "IA",
     full: "Industrial Arts",
     color: "#B71C1C",
-    formerly: "EIM",   // the strand's old name, shown as "Formerly ..." (videos may still use it)
+    formerly: "EIM",
     overview: "IA is a hands-on technical track for learners who like building, wiring, and fixing things with tools and machinery.",
     focus: "Technical-vocational training in electrical systems, installation, and maintenance work.",
     highlight: "Technical-vocational training",
     subjects: ["Electrical Installation", "Industrial Wiring", "Occupational Health & Safety", "Technical Drawing", "Electronics"],
-    subjectNotes: {   // one plain sentence per subject, shown under its name on the strand page (key must match the name above exactly)
+    subjectNotes: {
       "Electrical Installation": "You learn to install and maintain wiring and electrical systems in homes and buildings, safely.",
       "Industrial Wiring": "You work with the wiring, motors, and controls used in factories and larger buildings.",
       "Occupational Health & Safety": "You learn to spot hazards and keep a workplace safe, including proper gear and procedures.",
@@ -165,7 +132,6 @@ const STRANDS = {
   }
 };
 
-/* ---------- Strand icons (single-color line icons) ---------- */
 const STRAND_ICONS = {
   STEM: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="24" cy="24" rx="18" ry="7" stroke="currentColor" stroke-width="2.2"/>
@@ -203,8 +169,6 @@ const STRAND_ICONS = {
 const STRAND_ORDER = ["STEM", "ASSH", "BM", "HT", "ICT", "IA"];
 const OPTION_LETTERS = ["A", "B", "C", "D"];
 
-/* Plain-language descriptors used by the results breakdown.
-   strength = what a high score suggests, practice = what a low score suggests. */
 const APTITUDE = {
   STEM: { strength: "math and natural-science reasoning", practice: "math and science problem solving" },
   ASSH: { strength: "reading comprehension and spotting flawed arguments", practice: "close reading and judging arguments" },
@@ -214,38 +178,47 @@ const APTITUDE = {
   HT:   { strength: "sound judgment in service situations", practice: "handling customer and service situations" }
 };
 
-/* =========================================================
-   STATE
-   ========================================================= */
+let RFIL = false;
+let RERENDER = false;
+let resultsLang = null;
+const R = (en, fil) => RFIL ? fil : en;
+const filNow = () => !!(window.CW_i18n && window.CW_i18n.lang() === "fil");
+const FIL_APTITUDE = {
+  STEM: { strength: "pangangatwiran sa math at likas na agham", practice: "pagsagot ng mga problema sa math at science" },
+  ASSH: { strength: "pag-unawa sa binasa at pagtukoy ng mali sa argumento", practice: "masusing pagbasa at pagsusuri ng mga argumento" },
+  BM:   { strength: "pangangatwirang numerikal at pampinansyal", practice: "pangangatwirang numerikal at pampinansyal" },
+  ICT:  { strength: "lohikang hakbang-hakbang (algorithmic)", practice: "lohika ng algorithm at flowchart" },
+  IA:   { strength: "pangangatwirang mekanikal, kaligtasan sa paggamit ng tool, at pagbasa ng schematic", practice: "pangangatwirang mekanikal at schematic" },
+  HT:   { strength: "mahusay na paghuhusga sa mga sitwasyon ng serbisyo", practice: "pagharap sa mga sitwasyon ng customer at serbisyo" }
+};
+const apt = (code, key) => RFIL ? FIL_APTITUDE[code][key] : APTITUDE[code][key];
+
+// the keys still say "strandwise" on purpose. dont rename them or saved progress breaks. nouuuu
 const STORAGE_KEY = "strandwise.hub.v1";
-const SESSION_KEY = "strandwise.session.v1";   // where the student is (survives a refresh)
-const PLEDGE_KEY = "strandwise.pledge.v1";     // the "I will answer honestly" tick (this browser session)
-const PROGRESS_KEY = "strandwise.progress.v1"; // unfinished tests: answers saved when the student leaves to the hub
+const SESSION_KEY = "strandwise.session.v1";
+const PLEDGE_KEY = "strandwise.pledge.v1";
+const PROGRESS_KEY = "strandwise.progress.v1";
 let currentViewId = "view-home";
 
 const state = {
-  activeModule: null,   // code of the module being taken, or null (hub / other screens)
-  phase: null,          // "intro" (rules screen) or "question" while a module is active
-  current: 0,           // index of the current question inside the active module
-  draft: [],            // answers for the active module: chosen ORIGINAL option index, or null
-  optionOrder: [],      // per question: shuffled list of original option indexes (display order)
-  scores: {},           // finished modules only: { STEM: { correct: 8, total: 10 }, ... }
-  progress: {},         // unfinished modules only: { STEM: { current, draft, optionOrder }, ... }
-  results: null,        // computed by computeResults()
-  interest: null,       // finished interest questionnaire: { a: {strand: sum of ratings}, b: {strand: most minus least} }
-  iprog: null           // unfinished interest questionnaire (saved position and answers)
+  activeModule: null,
+  phase: null,
+  current: 0,
+  draft: [],
+  optionOrder: [],
+  scores: {},
+  progress: {},
+  results: null,
+  interest: null,
+  iprog: null
 };
 
 const INTEREST_KEY = "strandwise.interest.v1";
 const INTEREST_PROG_KEY = "strandwise.interestprog.v1";
-/* Live interest run. pos 0..nA-1 = Part A statements, nA..nA+nB-1 = Part B items.
-   order[p] = statement index shown at Part A position p; a[p] = its 1-5 rating.
-   bOrder[i] = shuffled strand order for Part B item i; b[i] = { most, least } strand codes. */
 const ist = { active: false, phase: null, pos: 0, order: [], a: [], bOrder: [], b: [] };
 
-/* ---------- sessionStorage (cleared when the tab closes) ---------- */
 function saveState() {
-  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state.scores)); } catch (e) { /* storage blocked: keep going in memory */ }
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state.scores)); } catch (e) { }
 }
 
 function loadState() {
@@ -254,7 +227,6 @@ function loadState() {
     MODULE_ORDER.forEach(code => {
       const s = saved[code];
       const bank = MODULES[code] && MODULES[code].questions;
-      // Only trust an entry if it still matches the current question bank size
       if (s && bank && Number.isInteger(s.correct) && s.total === bank.length && s.correct >= 0 && s.correct <= s.total) {
         state.scores[code] = { correct: s.correct, total: s.total };
       }
@@ -262,18 +234,16 @@ function loadState() {
   } catch (e) { state.scores = {}; }
 }
 
-/* ---------- Honesty pledge: the hub tests stay locked until it is ticked ---------- */
 let pledged = false;
 try { pledged = sessionStorage.getItem(PLEDGE_KEY) === "1"; } catch (e) { pledged = false; }
 function savePledge() {
-  try { sessionStorage.setItem(PLEDGE_KEY, pledged ? "1" : "0"); } catch (e) { /* storage blocked: keep going in memory */ }
+  try { sessionStorage.setItem(PLEDGE_KEY, pledged ? "1" : "0"); } catch (e) { }
 }
 
 const isDone = code => code === "INTEREST" ? Boolean(state.interest) : Boolean(state.scores[code]);
-const countDone = () => MODULE_ORDER.filter(isDone).length;          // skill tests only
-const allDone = () => countDone() === MODULE_ORDER.length && Boolean(state.interest);   // all 6 tests AND the interest questionnaire
+const countDone = () => MODULE_ORDER.filter(isDone).length;
+const allDone = () => countDone() === MODULE_ORDER.length && Boolean(state.interest);
 
-/* ---------- Remember where the student is, so a refresh keeps them there ---------- */
 function saveSession() {
   saveProgress();
   try {
@@ -286,13 +256,9 @@ function saveSession() {
       optionOrder: state.optionOrder,
       interest: ist.active
     }));
-  } catch (e) { /* storage blocked: keep going in memory */ }
+  } catch (e) { }
 }
 
-/* ---------- Saved progress per test ----------
-   Lets a student leave a test for the hub and pick it up later. Each unfinished test keeps its own
-   answers, position and option order (so nothing is re-shuffled). An entry is removed when the test
-   is finished. Kept in sessionStorage, so it is cleared when the tab closes. */
 function validProgress(code, p) {
   const bank = MODULES[code] && MODULES[code].questions;
   if (!bank || !p) return false;
@@ -305,10 +271,9 @@ function validProgress(code, p) {
 }
 
 function persistProgress() {
-  try { sessionStorage.setItem(PROGRESS_KEY, JSON.stringify(state.progress)); } catch (e) { /* storage blocked: keep going in memory */ }
+  try { sessionStorage.setItem(PROGRESS_KEY, JSON.stringify(state.progress)); } catch (e) { }
 }
 
-/* Copies the live test into state.progress (only while a question screen is showing) */
 function saveProgress() {
   const code = state.activeModule;
   if (!code || state.phase !== "question" || isDone(code)) return;
@@ -331,7 +296,7 @@ function loadProgress() {
 
 const answeredCount = code => state.progress[code] ? state.progress[code].draft.filter(a => a !== null).length : 0;
 
-/* Returns true if it put the student back where they were */
+// note to self : puts you back where you were after a refresh. says false when theres nothing to restore
 function restoreSession() {
   try {
     const s = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
@@ -339,7 +304,7 @@ function restoreSession() {
 
     if (s.view === "view-assessment") {
       if (s.interest && !state.interest && resumeInterestFromSaved()) { renderInterest(); showView("view-assessment"); return true; }
-      if (s.phase === "intro") { openHub(); return true; }   // refreshing on the rules screen goes back to the hub
+      if (s.phase === "intro") { openHub(); return true; }
       const code = s.activeModule;
       const bank = MODULES[code] && MODULES[code].questions;
       if (!bank || isDone(code)) { openHub(); return true; }
@@ -362,16 +327,16 @@ function restoreSession() {
     if (s.view === "view-stakes") { openStakes(); return true; }
     if (s.view === "view-hub") { openHub(); return true; }
     if (s.view === "view-results" && allDone()) { showResults(); return true; }
-    if (s.view === "view-loading") {   // refreshed mid-animation: skip it, never leave the student stuck
+    if (s.view === "view-loading") {
       if (allDone()) { showResults(); return true; }
       openHub("replace");
       return true;
     }
-  } catch (e) { /* fall through to home */ }
+  } catch (e) { }
   return false;
 }
 
-/* Dev helper: warns in the console if a question is malformed */
+// quick check that the question bank is set up right. mwehehehe
 function validateQuestionBank() {
   MODULE_ORDER.forEach(code => {
     const m = MODULES[code];
@@ -384,9 +349,7 @@ function validateQuestionBank() {
   });
 }
 
-/* ---------- Option shuffling ----------
-   Display order is generated once per attempt of a module; scoring uses the
-   ORIGINAL option index, so shuffling never affects correctness. */
+// shuffles a copy so the original order stays safe. rlly literally just a swap loop
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -396,11 +359,7 @@ function shuffle(arr) {
   return a;
 }
 
-/* ---------- Browser history (makes the Back / Forward buttons work) ----------
-   Each screen the student opens is recorded with history.pushState. The popstate
-   listener near the bottom of this file shows the right screen again on Back/Forward.
-   The URL itself never changes, so refreshing still uses the sessionStorage restore. */
-let currentStrand = null;   // which strand page is open (needed to come back to the right one)
+let currentStrand = null;
 
 function historyState(id) {
   return {
@@ -410,27 +369,25 @@ function historyState(id) {
   };
 }
 
-/* mode: "push" (default) adds an entry, "replace" swaps the current one,
-   "none" leaves history alone (used when Back/Forward itself brought us here) */
 function recordHistory(id, mode) {
   if (mode === "none") return;
   try {
     const next = historyState(id);
     const cur = history.state;
     if (mode === "replace" || !cur) {
-      history.replaceState(next, "");                 // first screen of the visit, or a correction
+      history.replaceState(next, "");
     } else if (cur.view !== next.view || (cur.strand || null) !== (next.strand || null)) {
-      history.pushState(next, "");                    // a new screen
+      history.pushState(next, "");
     }
-  } catch (e) { /* history blocked: the site still works, just without Back/Forward */ }
+  } catch (e) { }
 }
 
-/* ---------- View switching ---------- */
 function showView(id, mode = "push") {
-  if (unlock.active) endUnlock();   // any screen change cuts the unlock cutscene short
-  if (id !== "view-stakes" && stakesTimer) stopStakesTimer();   // leaving the notice cancels its countdown
-  if (id !== "view-loading" && loader.active) stopLoader();   // leaving the loading screen early (Back, logo) cancels its timer
+  if (unlock.active) endUnlock();
+  if (id !== "view-stakes" && stakesTimer) stopStakesTimer();
+  if (id !== "view-loading" && loader.active) stopLoader();
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  if (id === "view-results" && resultsLang && state.results && resultsLang !== (filNow() ? "fil" : "en")) renderResults();
   document.getElementById(id).classList.add("active");
   currentViewId = id;
   recordHistory(id, mode);
@@ -438,30 +395,19 @@ function showView(id, mode = "push") {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* =========================================================
-   HOME / NAVIGATION
-   ========================================================= */
-/* Every "Start Assessment" entry point opens the hub */
 function openHub(mode) {
   if (typeof gradeLocked === "function" && gradeLocked()) { openGate("blocked"); return; }
   renderHub();
-  showView("view-hub", typeof mode === "string" ? mode : "push");   // a click passes an Event, not a string
+  showView("view-hub", typeof mode === "string" ? mode : "push");
 }
 
-/* ---------- Grade check before the assessment ----------
-   Self-declared: the site has no logins, so it cannot verify a grade.
-     "ok"     = chose Grade 10 or below -> the hub opens.
-     "locked" = chose Grade 11-12 -> every Start Assessment button is locked and shows a message instead.
-   WHERE IT IS KEPT: sessionStorage, so it is cleared when the tab closes (same as the rest of the progress).
-   To keep the lock after the tab closes, make gradeStore() return localStorage instead. */
 const GRADE_KEY = "strandwise.grade.v1";
 const gradeStore = () => sessionStorage;
-let gradeMem = null;   // used if the browser blocks storage
+let gradeMem = null;
 function gradeGet() { try { return gradeStore().getItem(GRADE_KEY) || gradeMem; } catch (e) { return gradeMem; } }
-function gradeSet(v) { gradeMem = v; try { gradeStore().setItem(GRADE_KEY, v); } catch (e) { /* storage blocked: kept in memory */ } }
+function gradeSet(v) { gradeMem = v; try { gradeStore().setItem(GRADE_KEY, v); } catch (e) { } }
 const gradeLocked = () => gradeGet() === "locked";
 
-/* Greys out the Start buttons (the look is in CSS, keyed on body.grade-locked) */
 function applyGradeLock() {
   const locked = gradeLocked();
   document.body.classList.toggle("grade-locked", locked);
@@ -478,7 +424,6 @@ function closeGate(restoreFocus) {
   if (restoreFocus && cwGateReturnFocus && document.contains(cwGateReturnFocus)) cwGateReturnFocus.focus();
 }
 
-/* step = "ask" (radio cards) or "blocked" (the Grade 10-and-below message) */
 function showGateStep(step) {
   const ask = cwGate.querySelector("#cw-gate-ask");
   const blocked = cwGate.querySelector("#cw-gate-blocked");
@@ -556,22 +501,17 @@ function buildGate() {
   cwGate.querySelector("#cw-gate-explore").addEventListener("click", () => { closeGate(false); document.getElementById("nav-explore").click(); });
   cwGate.querySelector("#cw-gate-faq").addEventListener("click", () => { closeGate(false); document.getElementById("nav-faq").click(); });
 
-  cwGate.addEventListener("click", e => { if (e.target === cwGate) closeGate(true); });   // click outside = close
+  cwGate.addEventListener("click", e => { if (e.target === cwGate) closeGate(true); });
   cwGate.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); closeGate(true); } });
-  document.addEventListener("focusin", e => {                                              // keep focus inside the dialog
+  document.addEventListener("focusin", e => {
     if (cwGate.hidden || cwGate.contains(e.target)) return;
     const step = cwGate.querySelector("#cw-gate-ask").hidden ? "#cw-gate-explore" : 'input[name="cw-grade"]';
     cwGate.querySelector(step).focus();
   });
 }
 
-/* ---------- Strand notice (view-stakes) ----------
-   Shown once per tab session, after the grade check and before the hub. Continue stays locked for
-   STAKES_WAIT_MS so the student has to sit with it for a moment. Once Continue has been pressed, the
-   notice is "seen" for the rest of the session (sessionStorage, cleared when the tab closes) and later
-   Start Assessment clicks go straight to the hub. Back/Forward onto it shows it with Continue unlocked. */
 const STAKES_KEY = "strandwise.stakes.v1";
-const STAKES_WAIT_MS = 5000;   // how long Continue stays locked (change this to lengthen/shorten the wait)
+const STAKES_WAIT_MS = 5000;
 let stakesSeen = false;
 try { stakesSeen = sessionStorage.getItem(STAKES_KEY) === "1"; } catch (e) { stakesSeen = false; }
 let stakesTimer = null;
@@ -579,14 +519,15 @@ let stakesTimer = null;
 function stopStakesTimer() {
   if (stakesTimer) { clearInterval(stakesTimer); stakesTimer = null; }
   const v = document.getElementById("view-stakes");
-  if (v) v.classList.remove("stakes-locked");   // the "!" badge only pulses while Continue is locked
+  if (v) v.classList.remove("stakes-locked");
 }
 
+// the continue button stays locked for a few seconds so people actually read the notice. the countdown thingy
 function runStakesCountdown() {
   const btn = document.getElementById("stakes-continue");
   stopStakesTimer();
   if (stakesSeen) { btn.disabled = false; btn.textContent = "Continue"; return; }
-  const end = Date.now() + STAKES_WAIT_MS;   // clock-based, so a throttled background tab can't stretch or skip it
+  const end = Date.now() + STAKES_WAIT_MS;
   btn.disabled = true;
   document.getElementById("view-stakes").classList.add("stakes-locked");
   const tick = () => {
@@ -599,7 +540,7 @@ function runStakesCountdown() {
 }
 
 function openStakes(mode) {
-  if (gradeGet() !== "ok") { startAssessment(); return; }   // no valid grade check yet (or Grade 11-12): back to the gate
+  if (gradeGet() !== "ok") { startAssessment(); return; }
   runStakesCountdown();
   showView("view-stakes", typeof mode === "string" ? mode : "push");
 }
@@ -611,11 +552,10 @@ function proceedAfterGrade() {
 document.getElementById("stakes-continue").addEventListener("click", () => {
   if (document.getElementById("stakes-continue").disabled) return;
   stakesSeen = true;
-  try { sessionStorage.setItem(STAKES_KEY, "1"); } catch (e) { /* storage blocked: kept in memory */ }
+  try { sessionStorage.setItem(STAKES_KEY, "1"); } catch (e) { }
   openHub();
 });
 
-/* Every "Start Assessment" button goes through here */
 function startAssessment() {
   const g = gradeGet();
   if (g === "ok") { proceedAfterGrade(); return; }
@@ -640,13 +580,12 @@ document.getElementById("nav-faq").addEventListener("click", () => confirmLeave(
   }, 50);
 }));
 
-/* ---------- Explore Strands cards (home page) ---------- */
-/* The two groups shown on the home page (labels are what PCSHS calls them) */
 const STRAND_GROUPS = [
   { label: "Academic", codes: ["STEM", "ASSH", "BM"] },
   { label: "TechPro",  codes: ["HT", "ICT", "IA"] }
 ];
 
+// draws all the strand cards on the home page. wowowowow so many cards
 function renderStrandGrid() {
   const grid = document.getElementById("strand-grid");
   grid.innerHTML = "";
@@ -682,34 +621,25 @@ function renderStrandGrid() {
   });
 }
 
-/* ---------- Strand page: "a / an" for the typed career, e.g. "an Engineer", "a Doctor" ---------- */
 function withArticle(word) {
-  if (/^(u[ix]|uni|use|eu)/i.test(word)) return "a " + word;   // "UI/UX Designer" sounds like "you"
+  if (/^(u[ix]|uni|use|eu)/i.test(word)) return "a " + word;
   return (/^[aeiou]/i.test(word) ? "an " : "a ") + word;
 }
 
-/* ---------- Strand page: typewriter line under the description ----------
-   Types one career at a time, holds, backspaces, then moves to the next.
-   Stops by itself when the student leaves the page, pauses while the tab is hidden,
-   and shows the first career as plain text when "reduce motion" is on. */
 let sdTypeToken = 0;
 function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
-  const token = ++sdTypeToken;                       // a newer render cancels older loops
+  const token = ++sdTypeToken;
   const out = root.querySelector(".sd-type-word");
   if (!out) return;
   const reduced = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  /* Filipino mode (translations.js) types the Filipino career titles; English keeps "an Engineer", "a Doctor"... */
   const i18n = () => (window.CW_i18n && window.CW_i18n.lang() === "fil") ? window.CW_i18n : null;
   const wordsNow = () => { const t = i18n(); return t ? t.careerWords(info.careers) : info.careers.map(withArticle); };
   const prefixNow = () => { const t = i18n(); return t ? t.typePrefix(info.name) : `${info.name} can take you to becoming `; };
   let words = wordsNow();
 
-  /* Reserve exactly the height the longest sentence needs at the current width (instead of a fixed
-     guess), so the page doesn't jump while typing and there is no big empty gap when it fits on one
-     line. Re-measures when the line's width changes (rotation, resize, the page appearing again). */
   const line = out.closest(".sd-type");
   function reserve(list) {
-    if (!line || !line.clientWidth) return;                    // hidden page measures 0: keep the CSS default
+    if (!line || !line.clientWidth) return;
     const probe = document.createElement("span");
     probe.setAttribute("aria-hidden", "true");
     probe.style.cssText = "position:absolute;left:0;top:0;width:calc(100% - 8px);visibility:hidden;pointer-events:none;";
@@ -730,7 +660,7 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
     };
     if ("ResizeObserver" in window) new ResizeObserver(refit).observe(line);
     refit();
-    const onLang = () => {                                       // language switched while this page is open
+    const onLang = () => {
       if (token !== sdTypeToken || !root.isConnected) { window.removeEventListener("cw-langchange", onLang); return; }
       words = wordsNow();
       lastW = 0; refit();
@@ -749,8 +679,8 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
   let w = 0, n = 0, deleting = false;
   function tick() {
     if (token !== sdTypeToken || !root.isConnected) return;
-    if (!view.classList.contains("active")) return;                 // left the strand page
-    if (document.hidden) { setTimeout(tick, 500); return; }         // tab in background
+    if (!view.classList.contains("active")) return;
+    if (document.hidden) { setTimeout(tick, 500); return; }
     words = wordsNow();
     if (w >= words.length) w = 0;
     const word = words[w];
@@ -770,27 +700,20 @@ function initStrandTypewriter(root, info, viewId = "view-strand-detail") {
   setTimeout(tick, 900);
 }
 
-/* ---------- ICT frame: replays the build on a loop ----------
-   The markup in STRAND_FRAMES.ICT is the finished picture. When motion is allowed this puts it back to
-   "empty" and plays: Java compiles and runs in the terminal, each subject says ok, a cursor
-   draws a logo on the design canvas, then a ring hops across the palette, recoloring the logo and the
-   wireframe while the layers list steps along. Loop is about 13.5 seconds.
-   Like the typewriter: stops when the student leaves the page, and "reduce motion" keeps the finished picture.
-   To change the wording: the lines are in STRAND_FRAMES.ICT. To change the pace: the numbers in run() below (milliseconds). */
-const ICT_THEMES = [                       // one per palette dot, in the order the dots appear
-  { sq: "#7A56D1", ci: "#FFD36E", sp: "#C39BFF" },   // the finished logo: violet square, gold circle, lavender spark
+const ICT_THEMES = [
+  { sq: "#7A56D1", ci: "#FFD36E", sp: "#C39BFF" },
   { sq: "#C39BFF", ci: "#5B3FA8", sp: "#FFD36E" },
   { sq: "#FFD36E", ci: "#7A56D1", sp: "#C39BFF" },
   { sq: "#5B3FA8", ci: "#C39BFF", sp: "#FFD36E" }
 ];
-const ICT_HOPS = [[2, 0], [1, 1], [3, 2], [0, 3]];   // [palette dot, layer], so Header, Image, Text, Button in turn
+const ICT_HOPS = [[2, 0], [1, 1], [3, 2], [0, 3]];
 let ictToken = 0;
 function initIctFrame(root, viewId = "view-strand-detail") {
   const frame = root.querySelector(".fr-ict");
   if (!frame) return;
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const view = document.getElementById(viewId);
-  const token = ++ictToken;                          // a newer render cancels older loops
+  const token = ++ictToken;
   const alive = () => token === ictToken && frame.isConnected && view && view.classList.contains("active");
 
   const q = sel => frame.querySelector(sel);
@@ -816,7 +739,7 @@ function initIctFrame(root, viewId = "view-strand-detail") {
 
   function reset() {
     timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf);
-    frame.classList.add("ict-snap", "ict-live");                    // snap: no transitions while resetting
+    frame.classList.add("ict-snap", "ict-live");
     frame.classList.remove("ict-fade", "ict-done", "ict-sw-on");
     lines.forEach(el => el.classList.remove("on"));
     blocks.forEach(b => b.classList.remove("on", "ol"));
@@ -829,7 +752,6 @@ function initIctFrame(root, viewId = "view-strand-detail") {
     frame.classList.remove("ict-snap");
   }
 
-  /* the cursor drags out a square, drops a circle in it, then a spark (about 2.2 s) */
   function draw() {
     const t0 = performance.now();
     cur.style.opacity = 1;
@@ -859,23 +781,22 @@ function initIctFrame(root, viewId = "view-strand-detail") {
     reset();
     const at = (ms, fn) => timers.push(setTimeout(() => { if (alive()) fn(); }, ms));
     const type = i => lines[i].classList.add("on");
-    at(300,  () => type(0));                                                     // > javac Main.java
-    at(900,  () => { type(1); setP(10); });                                       // compiling...
-    at(1500, () => type(2));                                                     // > java Main
-    at(2100, () => type(3));                                                     // Hello, PCSHS!
-    at(2900, () => { type(4); setP(25); });                                       // java ok
-    at(3800, () => { type(5); blocks.forEach(b => b.classList.add("ol")); setP(45); });   // web/app dev ok: wireframe outlined
-    at(4700, () => { type(6); draw(); setP(70); });                               // animation ok: the cursor draws
-    at(7100, () => { type(7); blocks.forEach(b => b.classList.remove("ol")); frame.classList.add("ict-sw-on"); });   // ui/ux design ok: palette appears
-    ICT_HOPS.forEach((h, n) => at(7700 + n * 550, () => hop(h[0], h[1])));       // the ring hops, layers step along
-    at(9900,  () => { layer(-1); setP(100); frame.classList.add("ict-done"); });  // settles on the finished logo
+    at(300,  () => type(0));
+    at(900,  () => { type(1); setP(10); });
+    at(1500, () => type(2));
+    at(2100, () => type(3));
+    at(2900, () => { type(4); setP(25); });
+    at(3800, () => { type(5); blocks.forEach(b => b.classList.add("ol")); setP(45); });
+    at(4700, () => { type(6); draw(); setP(70); });
+    at(7100, () => { type(7); blocks.forEach(b => b.classList.remove("ol")); frame.classList.add("ict-sw-on"); });
+    ICT_HOPS.forEach((h, n) => at(7700 + n * 550, () => hop(h[0], h[1])));
+    at(9900,  () => { layer(-1); setP(100); frame.classList.add("ict-done"); });
     at(13000, () => frame.classList.add("ict-fade"));
     at(13500, run);
   }
   setTimeout(() => { if (alive()) run(); }, 600);
 }
 
-/* ---------- Strand page: gentle scroll reveal (reuses .reveal / .reveal-in from style2.css) ---------- */
 function initStrandMotion(root) {
   if (!window.matchMedia || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (!("IntersectionObserver" in window)) return;
@@ -895,18 +816,9 @@ function initStrandMotion(root) {
   targets.forEach(el => { el.classList.add("reveal"); io.observe(el); });
 }
 
-/* ---------- Strand scenes: the one decorative layer each strand page can have ----------
-   Purely visual (hidden from screen readers). The look and motion live in style2.css under
-   .sd[data-strand="CODE"]. To add a scene for another strand, add an entry here and style it there.
-   ASSH: ideas the strand actually studies, drifting up behind the hero like speech bubbles. */
 const STRAND_SCENES = {
-  /* ASSH bubbles now live inside the hero frame (STRAND_FRAMES.ASSH). Add an entry here for a background scene. */
 };
 
-/* ---------- Strand frames: the animated illustration beside each strand's intro ----------
-   Inline SVG (ICT is HTML), hidden from screen readers. Colors come from the strand's --sc.
-   The drawing lives here; the motion lives in style2.css (search ".fr-"). All motion is off
-   for "reduce motion", which leaves the finished drawing. */
 const FR_OPEN = '<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" focusable="false">';
 const STRAND_FRAMES = {
   STEM: FR_OPEN + `
@@ -1010,9 +922,6 @@ const STRAND_FRAMES = {
     <path class="k" d="M0 160H320"/>
   </svg>`,
 
-  /* ICT: a mini workspace. Terminal (Java) + design canvas + layers + wireframe + progress bar.
-     The markup below is the FINISHED picture (what "reduce motion" shows). initIctFrame() replays the build in a loop.
-     Look: style2.css under "ICT frame". */
   ICT: `<div class="fr-ict">
     <div class="ict-main">
       <div class="ict-pnl ict-term">
@@ -1098,9 +1007,6 @@ function strandSceneHTML(code) {
   return `<div class="sd-scene sd-scene-bubbles" aria-hidden="true">${bubbles}</div>`;
 }
 
-/* ---------- Strand detail page (from Explore Strands) ---------- */
-/* The strand page markup. Used by the Explore Strands page (withClosing = true) and by the
-   results page (withClosing = false: no "Take the Assessment / Keep browsing" panel). */
 function strandPageHTML(code, withClosing = true) {
   const info = STRANDS[code];
   const li = arr => arr.map(s => `<li>${s}</li>`).join("");
@@ -1109,7 +1015,7 @@ function strandPageHTML(code, withClosing = true) {
     return `<li><span class="sd-subj-text"><span class="sd-subj-name">${s}</span>${note ? `<span class="sd-subj-desc">${note}</span>` : ""}</span></li>`;
   }).join("");
   const others = STRAND_ORDER.filter(s => s !== code);
-  const nameTag = withClosing ? "h1" : "h2";   // the results page already has its own h1
+  const nameTag = withClosing ? "h1" : "h2";
 
   return `
     <div class="sd" data-strand="${code}" style="--sc:${info.color}">
@@ -1207,27 +1113,12 @@ function renderStrandDetail(code) {
   root.querySelectorAll(".sd-other").forEach(btn => {
     btn.addEventListener("click", () => {
       renderStrandDetail(btn.dataset.strand);
-      recordHistory("view-strand-detail");          // so Back returns to the strand you just left
+      recordHistory("view-strand-detail");
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   });
 }
 
-/* =========================================================================
-   STRAND RECAP VIDEO — unchanged from before.
-
-   Each strand in STRANDS has:
-     - videoId:      YouTube video ID (after "v=" or "youtu.be/"). Leave ""
-                      to show the "Video coming soon" placeholder.
-     - videoCaption: one-line description under the frame.
-
-   To use a self-hosted file instead of YouTube, replace the <iframe> in the
-   hasVideo branch below with:
-       <video class="video-frame-media" controls preload="metadata"
-         poster="YOUR_POSTER_IMAGE_URL.jpg">
-         <source src="YOUR_VIDEO_FILE_URL.mp4" type="video/mp4">
-       </video>
-   ========================================================================= */
 function renderStrandVideo(info) {
   const hasVideo = Boolean(info.videoId);
 
@@ -1260,12 +1151,6 @@ function renderStrandVideo(info) {
   `;
 }
 
-/* =========================================================
-   ASSESSMENT HUB  (view-hub)
-   Reuses existing classes only: .assess-header/.stepper/.step for the
-   progress strip, .strand-card for module cards, .btn for the results button.
-   ========================================================= */
-/* Six-step strip. activeCode highlights the module being taken (or none in the hub). */
 const STEP_LABELS = {
   STEM: "Math & Science", ASSH: "Reading", BM: "Finance",
   ICT: "Logic", IA: "Mechanics", HT: "Service", INTEREST: "Interests"
@@ -1287,7 +1172,7 @@ function renderHub() {
   const hub = document.getElementById("view-hub");
   ist.active = false;
   const done = countDone() + (state.interest ? 1 : 0);
-  const totalSteps = MODULE_ORDER.length + 1;   // six skill tests + the interest questionnaire
+  const totalSteps = MODULE_ORDER.length + 1;
   const perTest = MODULES[MODULE_ORDER[0]].questions.length;
   const skillTotal = MODULE_ORDER.reduce((n, c) => n + MODULES[c].questions.length, 0);
   const interestTotal = INTEREST.statements.length + INTEREST.forced.length;
@@ -1344,7 +1229,7 @@ function renderHub() {
     const info = STRANDS[code];
     const mod = MODULES[code];
     const finished = isDone(code);
-    const inProgress = !finished && validProgress(code, state.progress[code]) && answeredCount(code) > 0;   // seen question 1 but answered nothing = not started
+    const inProgress = !finished && validProgress(code, state.progress[code]) && answeredCount(code) > 0;
     const card = document.createElement("button");
     card.className = "strand-card" + (inProgress ? " strand-card-inprogress" : "");
     card.dataset.code = code;
@@ -1361,7 +1246,6 @@ function renderHub() {
     grid.appendChild(card);
   });
 
-  // Seventh card: the interest questionnaire (locked by the pledge like the tests)
   {
     const iDone = Boolean(state.interest);
     const iAnswered = state.iprog ? interestAnswered(state.iprog) : 0;
@@ -1381,28 +1265,24 @@ function renderHub() {
     grid.appendChild(iCard);
   }
 
-  // The pledge locks/unlocks the unfinished test cards (finished ones are always locked: no retakes)
   const pledgeBox = document.getElementById("hub-pledge");
   pledgeBox.addEventListener("change", () => {
-    if (!pledgeBox.checked) { pledgeBox.checked = true; return; }   // once ticked it stays ticked
+    if (!pledgeBox.checked) { pledgeBox.checked = true; return; }
     pledged = true;
     savePledge();
     applyPledge();
   });
   applyPledge();
 
-  // "See Overall Results" stays locked until every module is finished
   const resultsBtn = document.getElementById("hub-results-btn");
   resultsBtn.disabled = !allDone();
   resultsBtn.addEventListener("click", startResultsLoading);
-  // Padlock while locked, open padlock once every part is done (icon only, the label stays the same)
   const svgOpen = '<svg class="results-lock" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
   const lockIcon = allDone()
     ? svgOpen + '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>'
     : svgOpen + '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   resultsBtn.innerHTML = lockIcon + "<span>See Overall Results</span>";
 
-  // Say why it is locked (or that it is ready) so a greyed-out button is never a mystery
   const note = document.getElementById("hub-results-note");
   const left = [...MODULE_ORDER, "INTEREST"].filter(c => !isDone(c));
   if (left.length === 0) note.textContent = "All seven parts are done. Your results are ready.";
@@ -1410,7 +1290,6 @@ function renderHub() {
   else note.textContent = `${left.length} ${left.length === 1 ? "part" : "parts"} left: ${left.map(c => STEP_LABELS[c]).join(", ")}.`;
 }
 
-/* Lock or unlock the hub's test cards to match the honesty pledge */
 function applyPledge() {
   const grid = document.getElementById("hub-grid");
   if (!grid) return;
@@ -1424,7 +1303,6 @@ function applyPledge() {
   const box = document.getElementById("hub-honesty");
   if (box) box.classList.toggle("hub-honesty-signed", pledged);
 
-  // Once pledged, the tick is locked in for the rest of the browser session
   const pledgeBox = document.getElementById("hub-pledge");
   if (pledgeBox) {
     pledgeBox.checked = pledged;
@@ -1436,9 +1314,6 @@ function applyPledge() {
   }
 }
 
-/* =========================================================
-   SUB-TEST  (view-assessment)
-   ========================================================= */
 const stepperEl = document.getElementById("stepper");
 const qProgressFill = document.getElementById("q-progress-fill");
 const qProgressLabel = document.getElementById("q-progress-label");
@@ -1448,12 +1323,11 @@ const btnNext = document.getElementById("btn-next");
 
 const assessView = document.getElementById("view-assessment");
 
-/* Hub -> rules screen for the chosen test (the test itself starts on "Begin test") */
 function startModule(code) {
   ist.active = false;
-  if (isDone(code) || !pledged) return;       // no retakes, and the honesty pledge comes first
+  if (isDone(code) || !pledged) return;
   const saved = state.progress[code];
-  if (validProgress(code, saved) && saved.draft.some(a => a !== null)) {   // left earlier with answers: pick up exactly where they stopped
+  if (validProgress(code, saved) && saved.draft.some(a => a !== null)) {
     state.activeModule = code;
     state.current = saved.current;
     state.draft = saved.draft.slice();
@@ -1471,7 +1345,6 @@ function startModule(code) {
   showView("view-assessment");
 }
 
-/* Rules screen shown before the first question of a test */
 function renderIntro() {
   const code = state.activeModule;
   const mod = MODULES[code];
@@ -1484,7 +1357,7 @@ function renderIntro() {
   qProgressLabel.textContent = `${code}: Before you begin`;
 
   qCard.classList.remove("card-in");
-  void qCard.offsetWidth; // restart animation
+  void qCard.offsetWidth;
   qCard.innerHTML = `
     <p class="q-eyebrow">${mod.title}</p>
     <h2 class="q-text">Read this before you start</h2>
@@ -1511,17 +1384,12 @@ function renderIntro() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
   document.getElementById("intro-back").addEventListener("click", () => {
-    // step back through history when the previous entry is the hub, so Back/Forward stay tidy
     if (history.state && history.state.view === "view-assessment") history.back();
     else openHub();
   });
   saveSession();
 }
 
-/* Splits a question into context (passage, scenario, flowchart) and the actual question.
-   - Text before the last blank line is context.
-   - A long single paragraph is split before its final "?" sentence when there is real context.
-   Context blocks with indentation or arrow flowcharts keep their spacing in a monospace box. */
 function splitQuestion(raw) {
   const paras = raw.split(/\n\s*\n/);
   if (paras.length > 1) return { context: paras.slice(0, -1), question: paras[paras.length - 1] };
@@ -1559,7 +1427,7 @@ function renderQuestion() {
   qProgressLabel.textContent = `${code}: Question ${state.current + 1} of ${total}`;
 
   qCard.classList.remove("card-in");
-  void qCard.offsetWidth; // restart animation
+  void qCard.offsetWidth;
 
   qCard.innerHTML = `
     <button class="q-exit" id="q-exit" type="button">&larr; Save &amp; back to hub</button>
@@ -1585,7 +1453,7 @@ function renderQuestion() {
       qCard.querySelectorAll(".option").forEach(l => l.classList.remove("option-selected"));
       label.classList.add("option-selected", "option-pulse");
       setTimeout(() => label.classList.remove("option-pulse"), 350);
-      state.draft[state.current] = Number(label.dataset.idx);   // ORIGINAL option index
+      state.draft[state.current] = Number(label.dataset.idx);
       saveSession();
       btnNext.disabled = false;
     });
@@ -1597,7 +1465,6 @@ function renderQuestion() {
   saveSession();
 }
 
-/* Question screen -> Hub, keeping the answers so the test can be resumed */
 function exitToHub() {
   if (ist.active) { saveInterest(); ist.active = false; }
   saveProgress();
@@ -1607,8 +1474,8 @@ function exitToHub() {
   state.draft = [];
   state.optionOrder = [];
   if (history.state && history.state.view === "view-assessment") {
-    history.back();   // the entry before a test is the hub, so Back/Forward stay tidy
-    setTimeout(() => { if (currentViewId === "view-assessment") openHub("replace"); }, 250);   // fallback if there was nothing to go back to
+    history.back();
+    setTimeout(() => { if (currentViewId === "view-assessment") openHub("replace"); }, 250);
   } else {
     openHub("replace");
   }
@@ -1634,7 +1501,6 @@ btnNext.addEventListener("click", () => {
   }
 });
 
-/* Sub-test -> Hub. Scores the module objectively, locks it, shows no answers. */
 function finishModule() {
   const code = state.activeModule;
   const bank = MODULES[code].questions;
@@ -1642,22 +1508,17 @@ function finishModule() {
 
   state.scores[code] = { correct, total: bank.length };
   saveState();
-  delete state.progress[code];      // finished: nothing left to resume
+  delete state.progress[code];
   persistProgress();
 
   state.activeModule = null;
   state.phase = null;
   state.draft = [];
   state.optionOrder = [];
-  openHub("replace");   // replaces the locked test's history entry so Back never lands on it
-  playUnlockIfFirst();  // only does anything when this was the seventh and last part
+  openHub("replace");
+  playUnlockIfFirst();
 }
 
-/* =========================================================
-   INTEREST QUESTIONNAIRE  (runs in view-assessment, like a skill test)
-   Part A: rate statements 1-5. Part B: pick "most" and "least" from one activity per strand.
-   Nothing here is "correct" or "wrong", so it has its own save/restore and scoring.
-   ========================================================= */
 const nPartA = () => INTEREST.statements.length;
 const nPartB = () => INTEREST.forced.length;
 
@@ -1686,7 +1547,7 @@ function loadInterest() {
     if (validInterestDone(d)) state.interest = d;
     const p = JSON.parse(sessionStorage.getItem(INTEREST_PROG_KEY) || "null");
     if (!state.interest && validInterestProg(p)) state.iprog = p;
-  } catch (e) { /* storage blocked or corrupt: start fresh */ }
+  } catch (e) { }
 }
 
 function interestAnswered(p) {
@@ -1697,7 +1558,7 @@ function saveInterest() {
   if (!ist.active || !["A", "transition", "B"].includes(ist.phase)) return;
   const p = { phase: ist.phase, pos: ist.pos, order: ist.order, a: ist.a, bOrder: ist.bOrder, b: ist.b };
   state.iprog = JSON.parse(JSON.stringify(p));
-  try { sessionStorage.setItem(INTEREST_PROG_KEY, JSON.stringify(p)); } catch (e) { /* keep going in memory */ }
+  try { sessionStorage.setItem(INTEREST_PROG_KEY, JSON.stringify(p)); } catch (e) { }
 }
 
 function resumeInterestFromSaved() {
@@ -1709,7 +1570,7 @@ function resumeInterestFromSaved() {
 }
 
 function startInterest() {
-  if (state.interest || !pledged) return;   // no retakes, and the honesty pledge comes first
+  if (state.interest || !pledged) return;
   if (state.iprog && interestAnswered(state.iprog) > 0 && resumeInterestFromSaved()) {
     renderInterest();
     showView("view-assessment");
@@ -1735,7 +1596,7 @@ function renderInterest() {
 function interestCardReset() {
   stepperEl.innerHTML = stepperHTML("INTEREST");
   qCard.classList.remove("card-in");
-  void qCard.offsetWidth;   // restart animation
+  void qCard.offsetWidth;
 }
 
 function renderInterestIntro() {
@@ -1862,7 +1723,6 @@ function renderInterestItem() {
             </span>
           </div>`).join("")}
       </div>`;
-    // Working copy of the pair; written to ist.b only when both are chosen
     let most = ist.b[bi] ? ist.b[bi].most : null, least = ist.b[bi] ? ist.b[bi].least : null;
     const paint = () => {
       qCard.querySelectorAll(".pick-item").forEach(el => {
@@ -1901,12 +1761,11 @@ function interestBack() {
 function interestNext() {
   if (!interestItemDone()) return;
   const nA = nPartA(), total = nA + nPartB();
-  if (ist.pos === nA - 1) { ist.pos = nA; renderInterestTransition(); return; }   // Part A -> explain Part B
+  if (ist.pos === nA - 1) { ist.pos = nA; renderInterestTransition(); return; }
   if (ist.pos < total - 1) { ist.pos++; renderInterestItem(); }
   else finishInterest();
 }
 
-/* Locks the questionnaire: stores raw totals only (rating sum and most-minus-least per strand) */
 function finishInterest() {
   const a = {}, b = {};
   STRAND_ORDER.forEach(c => { a[c] = 0; b[c] = 0; });
@@ -1917,15 +1776,15 @@ function finishInterest() {
   try {
     sessionStorage.setItem(INTEREST_KEY, JSON.stringify(state.interest));
     sessionStorage.removeItem(INTEREST_PROG_KEY);
-  } catch (e) { /* keep going in memory */ }
+  } catch (e) { }
   ist.active = false; ist.phase = null;
   openHub("replace");
-  playUnlockIfFirst();  // only does anything when this was the seventh and last part
+  playUnlockIfFirst();
 }
 
-/* Interest per strand, 0-100: Part A and Part B each converted to 0-100, then averaged 50/50 (provisional weights).
-   Rank is 1 = most interested; equal percentages share a rank. */
+// note to self : part a and part b both turn into 0-100 per strand, then get mixed with this weight. 0.5 = 50/50
 const INTEREST_WEIGHT_A = 0.5;
+// da resultz part 1 : score every strand from the interests answers, then rank them yisyisyis
 function interestScores() {
   const cnt = {};
   INTEREST.statements.forEach(s => { cnt[s.strand] = (cnt[s.strand] || 0) + 1; });
@@ -1940,29 +1799,17 @@ function interestScores() {
   return out;
 }
 
-/* =========================================================
-   UNLOCK CUTSCENE  (full-screen overlay on the hub)
-   Plays ONCE per browser session, right after the seventh and last part is finished
-   (called from finishModule() and finishInterest(), nowhere else, so a refresh,
-   Back/Forward or a later hub visit can never replay it).
-   One big padlock fades in, shakes, the shackle swings open, a short message appears,
-   then everything fades out by itself. Tapping anywhere (or Enter / Space / Esc) skips it.
-   People with "reduce motion" switched on never see it: the button is simply active.
-   Tweak the feel here: UNLOCK_TITLE, UNLOCK_TEXT, UNLOCK_HINT, UNLOCK_AT, UNLOCK_FADE_MS.
-   Look: the last block of style2.css (".unlock-overlay").
-   ========================================================= */
-const UNLOCK_KEY = "strandwise.unlock.v1";   // old "strandwise" prefix on purpose, same as the other saved keys
+const UNLOCK_KEY = "strandwise.unlock.v1";
 const UNLOCK_TITLE = "You did it!";
 const UNLOCK_TEXT = "All seven parts are complete. Your skills and interests are ready to compare.";
 const UNLOCK_HINT = "Tap anywhere to continue";
-const UNLOCK_AT = { pop: 300, shake: 700, open: 1150, title: 1250, text: 1550, hint: 2000, end: 3400 };   // ms from start
-const UNLOCK_FADE_MS = 350;                  // fade-out length (keep in step with the CSS transition)
+const UNLOCK_AT = { pop: 300, shake: 700, open: 1150, title: 1250, text: 1550, hint: 2000, end: 3400 };
+const UNLOCK_FADE_MS = 350;
 const unlock = { active: false, timers: [], el: null };
 
 function unlockSeen() { try { return sessionStorage.getItem(UNLOCK_KEY) === "1"; } catch (e) { return false; } }
-function markUnlockSeen() { try { sessionStorage.setItem(UNLOCK_KEY, "1"); } catch (e) { /* fine */ } }
+function markUnlockSeen() { try { sessionStorage.setItem(UNLOCK_KEY, "1"); } catch (e) { } }
 
-/* The padlock icon inside the hub's results button: closed while the cutscene runs, open afterwards */
 function setResultsLockIcon(open) {
   const path = document.querySelector("#hub-results-btn .results-lock path");
   if (path) path.setAttribute("d", open ? "M8 11V7a4 4 0 0 1 7.5-2" : "M8 11V7a4 4 0 0 1 8 0v4");
@@ -1970,12 +1817,12 @@ function setResultsLockIcon(open) {
 
 function playUnlockIfFirst() {
   if (unlock.active || !allDone() || unlockSeen()) return;
-  markUnlockSeen();                                   // marked first, so even a refresh mid-cutscene can't replay it
+  markUnlockSeen();
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const btn = document.getElementById("hub-results-btn");
   if (reduce || !btn) return;
 
-  btn.classList.add("unlock-hold");                   // looks locked until the cutscene ends
+  btn.classList.add("unlock-hold");
   setResultsLockIcon(false);
 
   const el = document.createElement("div");
@@ -2010,7 +1857,7 @@ function playUnlockIfFirst() {
     <p class="uc-hint uc-fade" aria-hidden="true">${UNLOCK_HINT}</p>
     <p class="uc-sr" role="status" aria-live="polite"></p>`;
   document.body.appendChild(el);
-  document.body.classList.add("cw-modal-open");       // no page scrolling underneath
+  document.body.classList.add("cw-modal-open");
   unlock.active = true;
   unlock.el = el;
 
@@ -2018,7 +1865,7 @@ function playUnlockIfFirst() {
   const [title, text, hint] = ["uc-title", "uc-text", "uc-hint"].map(c => el.querySelector("." + c));
   const at = (ms, fn) => unlock.timers.push(setTimeout(fn, ms));
 
-  void el.offsetWidth;                                // lets the fade-in transition run
+  void el.offsetWidth;
   el.classList.add("show");
   el.focus({ preventScroll: true });
 
@@ -2043,7 +1890,7 @@ function endUnlock() {
   const el = unlock.el;
   unlock.active = false;
   unlock.el = null;
-  el.classList.remove("show");                        // fade out
+  el.classList.remove("show");
   setTimeout(() => {
     el.remove();
     document.body.classList.remove("cw-modal-open");
@@ -2051,7 +1898,7 @@ function endUnlock() {
     if (!btn) return;
     btn.classList.remove("unlock-hold");
     setResultsLockIcon(true);
-    if (currentViewId === "view-hub") {               // draw the eye to the now-active button
+    if (currentViewId === "view-hub") {
       btn.classList.add("unlock-pulse");
       setTimeout(() => btn.classList.remove("unlock-pulse"), 2000);
       btn.focus({ preventScroll: true });
@@ -2059,11 +1906,7 @@ function endUnlock() {
   }, UNLOCK_FADE_MS);
 }
 
-/* =========================================================
-   SCORING + RESULTS  (view-results)
-   ========================================================= */
-/* Raw score and percentage per strand, sorted best-first.
-   Equal scores keep STRAND_ORDER order (stable sort). */
+// skill scores into percentages, sorted high to low, then the interest score gets stuck on each one. skill and interest stay separate tho
 function computeResults() {
   state.results = STRAND_ORDER.map(strand => {
     const { correct, total } = state.scores[strand];
@@ -2073,7 +1916,7 @@ function computeResults() {
   state.results.forEach(r => { r.ipct = isc[r.strand].pct; r.irank = isc[r.strand].rank; });
 }
 
-/* Hub -> Results (only reachable when all 6 modules are done) */
+// results stay locked until all seven parts are done
 function showResults() {
   if (!allDone()) return;
   computeResults();
@@ -2081,26 +1924,19 @@ function showResults() {
   showView("view-results");
 }
 
-/* =========================================================
-   RESULTS LOADING SCREEN  (view-loading)
-   Purely visual: a swinging compass, rotating phrases and a progress bar that
-   speeds up, stalls near 80%, then finishes. Plays once per browser session;
-   after that the hub button goes straight to the results.
-   Not saved in browser history, so Back never lands on it.
-   Tweak the feel here: LOADER_BAR_MS, LOADER_HOLD_MS, LOADER_TITLE, LOADER_TILE_AT, LOADER_STOPS.
-   ========================================================= */
+// timings for the results loading screen. play with these if it feels too slow lol
 const LOADER_KEY = "strandwise.loader.v1";
-const LOADER_BAR_MS = 3800;    // how long the bar takes to reach 100%
-const LOADER_HOLD_MS = 700;    // pause on "Got it!" before the results open
+const LOADER_BAR_MS = 3800;
+const LOADER_HOLD_MS = 700;
 const LOADER_TITLE = "Working on your results…";
-const LOADER_TILE_AT = [14, 28, 42, 56, 70, 80];   // bar percent at which each strand tile (in STRAND_ORDER) lights up
-const LOADER_CHECK_AT = [30, 62];                  // checklist lines 1 and 2 tick here; line 3 ticks at the finish
+const LOADER_TILE_AT = [14, 28, 42, 56, 70, 80];
+const LOADER_CHECK_AT = [30, 62];
 const LOADER_DONE_PHRASE = "Got it! Opening your results…";
-const LOADER_STOPS = [[0, 0], [0.25, 30], [0.55, 62], [0.75, 80], [0.88, 82], [1, 100]];   // [time share, percent]
+const LOADER_STOPS = [[0, 0], [0.25, 30], [0.55, 62], [0.75, 80], [0.88, 82], [1, 100]];
 const loader = { active: false, raf: 0, timer: 0, swap: 0 };
 
 function loaderSeen() { try { return sessionStorage.getItem(LOADER_KEY) === "1"; } catch (e) { return false; } }
-function markLoaderSeen() { try { sessionStorage.setItem(LOADER_KEY, "1"); } catch (e) { /* fine */ } }
+function markLoaderSeen() { try { sessionStorage.setItem(LOADER_KEY, "1"); } catch (e) { } }
 
 function loaderPct(p) {
   for (let i = 1; i < LOADER_STOPS.length; i++) {
@@ -2141,8 +1977,8 @@ function loaderBurst(host) {
 }
 
 function startResultsLoading() {
-  if (loader.active || !allDone()) return;            // blocks double-taps
-  if (loaderSeen()) { showResults(); return; }        // already watched it this session
+  if (loader.active || !allDone()) return;
+  if (loaderSeen()) { showResults(); return; }
 
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const barMs = reduce ? 1200 : LOADER_BAR_MS;
@@ -2184,7 +2020,6 @@ function startResultsLoading() {
     }, holdMs);
   }
 
-  // reset to the starting look
   fill.style.width = "0%";
   pct.textContent = "0%";
   phrase.textContent = LOADER_TITLE;
@@ -2213,57 +2048,58 @@ function startResultsLoading() {
   loader.raf = requestAnimationFrame(tick);
 }
 
-/* Which strands to recommend. Everything tied at the top qualifies, but only 2 are ever shown.
-   If more than 2 tie, interest breaks the tie (highest interest first). If interest cannot
-   separate them either, the first two in strand order are kept and the text says so.
-   Interest is used only as a tie-breaker here, never merged into the skill score. */
 const MAX_RECOMMENDED = 2;
-const LOW_SIGNAL_PCT = 35;   // top skill score below this is close to guessing level (25%); provisional until the pilot
+const LOW_SIGNAL_PCT = 35;
 function pickRecommended(results) {
   const tiedAll = results.filter(r => r.percentage === results[0].percentage);
   if (tiedAll.length <= MAX_RECOMMENDED) return { rec: tiedAll, tiedAll, byInterest: false, arbitrary: false };
-  const sorted = tiedAll.slice().sort((a, b) => b.ipct - a.ipct);   // stable: equal interest keeps strand order
+  const sorted = tiedAll.slice().sort((a, b) => b.ipct - a.ipct);
   const arbitrary = sorted[MAX_RECOMMENDED - 1].ipct === sorted[MAX_RECOMMENDED].ipct;
   return { rec: sorted.slice(0, MAX_RECOMMENDED), tiedAll, byInterest: !arbitrary, arbitrary };
 }
 
-/* Text comparing the strongest areas with the weakest */
 function buildBreakdown(results, pick) {
   const fmt = r => `<strong>${STRANDS[r.strand].name}</strong> (${r.correct}/${r.total})`;
+  const AND = R(" and ", " at ");
   const { rec, tiedAll } = pick;
   const first = results[0], low = results[results.length - 1];
-  const shown = rec.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(" and ");
+  const shown = rec.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(AND);
 
   const tieNote = pick.arbitrary
-    ? `${tiedAll.length} strands tied for your highest score (${tiedAll.map(fmt).join(", ")}), and your interest results could not separate them either, so two are shown here. Treat all ${tiedAll.length} as worth a look. `
+    ? R(`${tiedAll.length} strands tied for your highest score (${tiedAll.map(fmt).join(", ")}), and your interest results could not separate them either, so two are shown here. Treat all ${tiedAll.length} as worth a look. `,
+        `${tiedAll.length} strand ang magkapantay sa iyong pinakamataas na score (${tiedAll.map(fmt).join(", ")}), at hindi rin sila napaghiwalay ng iyong resulta sa interes, kaya dalawa ang ipinapakita rito. Sulit tingnan ang lahat ng ${tiedAll.length}. `)
     : pick.byInterest
-      ? `${tiedAll.length} strands tied for your highest score (${tiedAll.map(fmt).join(", ")}). To keep your result clear, your interest results broke the tie, so ${shown} are shown. `
+      ? R(`${tiedAll.length} strands tied for your highest score (${tiedAll.map(fmt).join(", ")}). To keep your result clear, your interest results broke the tie, so ${shown} are shown. `,
+          `${tiedAll.length} strand ang magkapantay sa iyong pinakamataas na score (${tiedAll.map(fmt).join(", ")}). Para manatiling malinaw ang resulta, ang iyong resulta sa interes ang ginamit na pantukoy, kaya ipinapakita ang ${shown}. `)
       : "";
 
   if (first.percentage === low.percentage) {
-    return `You scored the same on all six tests (${first.percentage}%), so no single strand stands out on aptitude alone. ${pick.byInterest ? `The two strands shown are the ones you showed the most interest in. ` : pick.arbitrary ? `The two strands shown are simply the first two in the usual order. ` : ``}Use your interest results and the strand descriptions below to decide.`;
+    return R(`You scored the same on all six tests (${first.percentage}%), so no single strand stands out on aptitude alone. ${pick.byInterest ? `The two strands shown are the ones you showed the most interest in. ` : pick.arbitrary ? `The two strands shown are simply the first two in the usual order. ` : ``}Use your interest results and the strand descriptions below to decide.`,
+             `Pareho ang score mo sa lahat ng anim na test (${first.percentage}%), kaya walang iisang strand na namumukod-tangi batay sa kakayahan lamang. ${pick.byInterest ? `Ang dalawang strand na ipinapakita ay ang pinakagusto mo. ` : pick.arbitrary ? `Ang dalawang strand na ipinapakita ay ang unang dalawa sa karaniwang pagkakasunod-sunod. ` : ``}Gamitin ang iyong resulta sa interes at ang mga paglalarawan ng strand sa ibaba para magdesisyon.`);
   }
 
   let text = "";
   if (tieNote) {
     text += tieNote;
   } else if (tiedAll.length > 1) {
-    text += `${tiedAll.map(fmt).join(" and ")} came out level at the top, so treat them as equally strong fits. `;
+    text += R(`${tiedAll.map(fmt).join(" and ")} came out level at the top, so treat them as equally strong fits. `,
+              `Magkapantay sa tuktok ang ${tiedAll.map(fmt).join(" at ")}, kaya ituring silang parehong malakas na tugma. `);
   }
   const top2 = rec.length > 1 ? rec : [results[0], results[1]];
-  text += `Your highest scores were in ${fmt(top2[0])} and ${fmt(top2[1])}, which point to ${APTITUDE[top2[0].strand].strength} and ${APTITUDE[top2[1].strand].strength}.`;
+  text += R(`Your highest scores were in ${fmt(top2[0])} and ${fmt(top2[1])}, which point to ${apt(top2[0].strand, "strength")} and ${apt(top2[1].strand, "strength")}.`,
+            `Pinakamataas ang mga score mo sa ${fmt(top2[0])} at ${fmt(top2[1])}, na nagpapakita ng ${apt(top2[0].strand, "strength")} at ${apt(top2[1].strand, "strength")}.`);
 
   text += `<br><br>`;
   if (low.percentage >= 70) {
-    text += `Even your lowest score, ${fmt(low)}, is solid, so you have a well-rounded profile.`;
+    text += R(`Even your lowest score, ${fmt(low)}, is solid, so you have a well-rounded profile.`,
+              `Kahit ang pinakamababa mong score, ${fmt(low)}, ay maayos, kaya balanse ang iyong profile.`);
   } else {
-    text += `Your lowest was ${fmt(low)}, so ${APTITUDE[low.strand].practice} may need more practice before it feels comfortable.`;
+    text += R(`Your lowest was ${fmt(low)}, so ${apt(low.strand, "practice")} may need more practice before it feels comfortable.`,
+              `Ang pinakamababa mo ay ${fmt(low)}, kaya maaaring kailanganin pa ng praktis sa ${apt(low.strand, "practice")} bago ka maging komportable.`);
   }
   return text;
 }
 
-
-/* ---------- Skills vs interests (results) ---------- */
 const STRAND_DEMANDS = {
   STEM: "math- and science-heavy, so strengthening that would be the main task",
   ASSH: "reading- and writing-heavy, so building reading and argument skills would be the main task",
@@ -2272,113 +2108,129 @@ const STRAND_DEMANDS = {
   IA:   "built on mechanical and circuit reasoning, so practicing that and reading diagrams would be the main task",
   HT:   "about judgment under pressure, so practicing real service situations would be the main task"
 };
-const ordinal = n => ["", "1st", "2nd", "3rd", "4th", "5th", "6th"][n] || n + "th";
+const FIL_DEMANDS = {
+  STEM: "puno ng math at science, kaya ang pagpapalakas nito ang pangunahing gagawin",
+  ASSH: "maraming pagbasa at pagsulat, kaya ang pagpapalakas ng kasanayan sa pagbasa at pangangatwiran ang pangunahing gagawin",
+  BM:   "maraming numero, kaya ang pagpapalakas ng percentage at math sa pera ang pangunahing gagawin",
+  ICT:  "nakabatay sa hakbang-hakbang na lohika, kaya ang pagsasanay sa lohika at pagsubaybay ng code ang pangunahing gagawin",
+  IA:   "nakabatay sa pangangatwirang mekanikal at circuit, kaya ang pagsasanay nito at pagbasa ng diagram ang pangunahing gagawin",
+  HT:   "tungkol sa paghuhusga habang may pressure, kaya ang pagsasanay sa totoong sitwasyon ng serbisyo ang pangunahing gagawin"
+};
+const demand = code => RFIL ? FIL_DEMANDS[code] : STRAND_DEMANDS[code];
+const ordinal = n => RFIL ? "ika-" + n : ["", "1st", "2nd", "3rd", "4th", "5th", "6th"][n] || n + "th";
 
-/* One main message, chosen by priority. Thresholds are provisional until the pilot. */
 function interestMessage(results, rec) {
-  const nm = list => list.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(" and ");
+  const nm = list => list.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(R(" and ", " at "));
   const maxS = results[0].percentage;
   const topS = rec || results.filter(r => r.percentage === maxS);
   const maxI = Math.max(...results.map(r => r.ipct)), minI = Math.min(...results.map(r => r.ipct));
   const topI = results.filter(r => r.ipct === maxI);
 
   if (maxI - minI <= INTEREST_FLAT_SPREAD) {
-    return `Your interests are spread fairly evenly across the strands, so your skill results may be the clearer guide right now. Explore each strand's page to see what appeals to you.`;
+    return R(`Your interests are spread fairly evenly across the strands, so your skill results may be the clearer guide right now. Explore each strand's page to see what appeals to you.`,
+             `Pantay-pantay ang iyong mga interes sa mga strand, kaya baka mas malinaw na gabay ang iyong skill results sa ngayon. Buksan ang pahina ng bawat strand para makita kung alin ang nakakaakit sa iyo.`);
   }
   const both = topS.filter(r => topI.includes(r));
-  if (both.length) return `<strong>Strong match:</strong> your skills and your interests both point to ${nm(both)}.`;
+  if (both.length) return R(`<strong>Strong match:</strong> your skills and your interests both point to ${nm(both)}.`,
+                            `<strong>Malakas na tugma:</strong> ang iyong kakayahan at interes ay parehong tumuturo sa ${nm(both)}.`);
 
   const gap = topI.find(r => r.percentage < 50 && maxS - r.percentage >= 25);
   if (gap) {
-    return `You showed the highest interest in ${nm(topI)}, but scored lower on ${topI.length > 1 ? "their tests" : "its test"}. A short test with no preparation shows where you are today, not where you can get to. ${STRANDS[gap.strand].name} here is ${STRAND_DEMANDS[gap.strand]}. Read its strand page to see if the daily work appeals to you.`;
+    return R(`You showed the highest interest in ${nm(topI)}, but scored lower on ${topI.length > 1 ? "their tests" : "its test"}. A short test with no preparation shows where you are today, not where you can get to. ${STRANDS[gap.strand].name} here is ${STRAND_DEMANDS[gap.strand]}. Read its strand page to see if the daily work appeals to you.`,
+             `Pinakamataas ang interes mo sa ${nm(topI)}, ngunit mas mababa ang score mo sa ${topI.length > 1 ? "mga test nito" : "test nito"}. Ipinapakita ng maikling test na walang paghahanda kung nasaan ka ngayon, hindi kung hanggang saan ka makakarating. Ang ${STRANDS[gap.strand].name} ay ${FIL_DEMANDS[gap.strand]}. Basahin ang pahina ng strand nito para makita kung gusto mo ang pang-araw-araw na gawain.`);
   }
   if (topS.every(r => r.irank >= 4)) {
-    return `You could do well in ${nm(topS)}, your strongest skill area, but your interest in ${topS.length > 1 ? "them ranked" : "it ranked"} only ${ordinal(Math.min(...topS.map(r => r.irank)))} of six. Check whether you'd enjoy the daily work before choosing ${topS.length > 1 ? "either" : "it"}.`;
+    return R(`You could do well in ${nm(topS)}, your strongest skill area, but your interest in ${topS.length > 1 ? "them ranked" : "it ranked"} only ${ordinal(Math.min(...topS.map(r => r.irank)))} of six. Check whether you'd enjoy the daily work before choosing ${topS.length > 1 ? "either" : "it"}.`,
+             `Maaari kang maging mahusay sa ${nm(topS)}, ang iyong pinakamalakas na skill area, ngunit ${ordinal(Math.min(...topS.map(r => r.irank)))} lamang sa anim ang ranggo ng interes mo rito. Alamin muna kung masisiyahan ka sa pang-araw-araw na gawain bago piliin ${topS.length > 1 ? "ang alinman sa dalawa" : "ito"}.`);
   }
-  return `Your strongest skill is in ${nm(topS)}, while your strongest interest is in ${nm(topI)}. Neither is wrong: skills can be built, and interest is what keeps you going. Read both strand pages before deciding.`;
+  return R(`Your strongest skill is in ${nm(topS)}, while your strongest interest is in ${nm(topI)}. Neither is wrong: skills can be built, and interest is what keeps you going. Read both strand pages before deciding.`,
+           `Ang pinakamalakas mong skill ay nasa ${nm(topS)}, habang ang pinakamalakas mong interes ay nasa ${nm(topI)}. Walang mali sa alinman: puwedeng hubugin ang skill, at ang interes ang nagpapatuloy sa iyo. Basahin ang pahina ng parehong strand bago magdesisyon.`);
 }
 
-const SKILL_HIGH_PCT = 50;     // skill counts as "high" at or above this (guessing level is 25%); provisional until the pilot
-const INTEREST_FLAT_SPREAD = 15; // best minus worst interest at or below this = interests too flat to guide
-const interestLabel = p => p >= 75 ? "High interest" : p >= 50 ? "Some interest" : "Lower interest";
+const SKILL_HIGH_PCT = 50;
+const INTEREST_FLAT_SPREAD = 15;
+const interestLabel = p => p >= 75 ? R("High interest", "Mataas na interes") : p >= 50 ? R("Some interest", "May interes") : R("Lower interest", "Mas mababang interes");
 
-/* Per-strand reasoning for the "Why" cards: skill result, interest, how they fit, next step.
-   Skill and interest are compared but never merged. Thresholds are provisional until the pilot. */
 function strandReasoning(r, results, ctx) {
   const info = STRANDS[r.strand], nm = info.name;
   const ids = results.map(x => x.ipct);
   const flat = Math.max(...ids) - Math.min(...ids) <= INTEREST_FLAT_SPREAD;
 
-  /* skill result */
   const skillRank = 1 + results.filter(o => o.percentage > r.percentage).length;
   const level = results.filter(o => o !== r && o.percentage === r.percentage).map(o => STRANDS[o.strand].name);
+  const AND = R(" and ", " at ");
   let rankText;
-  if (level.length) rankText = skillRank === 1 ? `level with ${level.join(" and ")} at the top` : `${ordinal(skillRank)} of six, level with ${level.join(" and ")}`;
-  else if (skillRank === 1) rankText = `your highest of the six, ${r.percentage - results[1].percentage} percentage points ahead of your next strand`;
-  else rankText = `${ordinal(skillRank)} of six`;
-  let skill = `You scored ${r.correct}/${r.total} (${r.percentage}%) on the ${nm} test: ${rankText}.`;
+  if (level.length) rankText = skillRank === 1
+    ? R(`level with ${level.join(AND)} at the top`, `kapantay ng ${level.join(AND)} sa tuktok`)
+    : R(`${ordinal(skillRank)} of six, level with ${level.join(AND)}`, `${ordinal(skillRank)} sa anim, kapantay ng ${level.join(AND)}`);
+  else if (skillRank === 1) rankText = R(`your highest of the six, ${r.percentage - results[1].percentage} percentage points ahead of your next strand`,
+                                         `pinakamataas mo sa anim, ${r.percentage - results[1].percentage} percentage point na nangunguna sa susunod mong strand`);
+  else rankText = R(`${ordinal(skillRank)} of six`, `${ordinal(skillRank)} sa anim`);
+  let skill = R(`You scored ${r.correct}/${r.total} (${r.percentage}%) on the ${nm} test: ${rankText}.`,
+                `Nakakuha ka ng ${r.correct}/${r.total} (${r.percentage}%) sa ${nm} test: ${rankText}.`);
   skill += r.percentage >= SKILL_HIGH_PCT
-    ? ` That points to ${APTITUDE[r.strand].strength}.`
-    : skillRank === 1 ? ` It is your strongest area compared with the others, but not a high score on its own.` : ``;
-  if (ctx && ctx.extras && ctx.extras.includes(r)) skill += ` That is ${results[0].percentage - r.percentage} percentage points below your top skill ${ctx.rec.length > 1 ? "strands" : "strand"}.`;
-  if (r.percentage < LOW_SIGNAL_PCT) skill += ` This is close to what random guessing would give (about 25%), so treat it as a weak signal.`;
+    ? R(` That points to ${apt(r.strand, "strength")}.`, ` Nagpapakita ito ng ${apt(r.strand, "strength")}.`)
+    : skillRank === 1 ? R(` It is your strongest area compared with the others, but not a high score on its own.`, ` Ito ang pinakamalakas mong larangan kumpara sa iba, ngunit hindi ito mataas na score kung mag-isa.`) : ``;
+  if (ctx && ctx.extras && ctx.extras.includes(r)) skill += R(` That is ${results[0].percentage - r.percentage} percentage points below your top skill ${ctx.rec.length > 1 ? "strands" : "strand"}.`,
+                                                              ` Mas mababa ito nang ${results[0].percentage - r.percentage} percentage point kaysa sa iyong top skill na strand.`);
+  if (r.percentage < LOW_SIGNAL_PCT) skill += R(` This is close to what random guessing would give (about 25%), so treat it as a weak signal.`,
+                                                ` Malapit ito sa makukuha sa basta paghula (mga 25%), kaya ituring itong mahinang batayan.`);
 
-  /* interest */
-  let interest = `Your interest in ${nm} ranked ${ordinal(r.irank)} of six (${interestLabel(r.ipct).toLowerCase()}).`;
-  if (flat) interest += ` Your interests were spread fairly evenly, so this ranking is a weak guide.`;
+  let interest = R(`Your interest in ${nm} ranked ${ordinal(r.irank)} of six (${interestLabel(r.ipct).toLowerCase()}).`,
+                   `Ang interes mo sa ${nm} ay pumuwesto bilang ${ordinal(r.irank)} sa anim (${interestLabel(r.ipct).toLowerCase()}).`);
+  if (flat) interest += R(` Your interests were spread fairly evenly, so this ranking is a weak guide.`,
+                          ` Pantay-pantay ang iyong mga interes, kaya mahinang gabay ang ranggong ito.`);
 
-  /* how they fit + next step */
   const skillHigh = r.percentage >= SKILL_HIGH_PCT;
   const lvl = flat ? "flat" : r.irank <= 2 ? "high" : r.irank >= 5 ? "low" : "mid";
   const isExtra = !!(ctx && ctx.extras && ctx.extras.includes(r));
   const where = ctx && ctx.shown.length > 1
-    ? `Open the <b class="lk">${nm}</b> button below.`
-    : `Read about ${nm} in the section below.`;
+    ? R(`Open the <b class="lk">${nm}</b> button below.`, `Buksan ang <b class="lk">${nm}</b> na button sa ibaba.`)
+    : R(`Read about ${nm} in the section below.`, `Basahin ang tungkol sa ${nm} sa seksyon sa ibaba.`);
+  const hard = R(`Would you be happy working on those subjects even when they're hard?`, `Magiging masaya ka bang pag-aralan ang mga asignaturang iyon kahit mahirap?`);
   let fit, next;
   if (lvl === "flat") {
-    fit = `Because your interests don't separate the strands clearly, your skill result is the clearer guide for ${nm} right now.`;
-    next = `Read each strand's page and notice which daily work appeals to you.`;
+    fit = R(`Because your interests don't separate the strands clearly, your skill result is the clearer guide for ${nm} right now.`,
+            `Dahil hindi malinaw na napaghihiwalay ng iyong mga interes ang mga strand, ang iyong skill result ang mas malinaw na gabay para sa ${nm} sa ngayon.`);
+    next = R(`Read each strand's page and notice which daily work appeals to you.`, `Basahin ang pahina ng bawat strand at pansinin kung aling pang-araw-araw na gawain ang gusto mo.`);
   } else if (isExtra && skillHigh && lvl === "high") {
-    fit = `Interest ahead of your top skill: your ${nm} score is solid, though another strand scored higher. Interest is what keeps you going, so ${nm} is worth a serious look.`;
-    next = `${where} Would you be happy working on those subjects even when they're hard?`;
+    fit = R(`Interest ahead of your top skill: your ${nm} score is solid, though another strand scored higher. Interest is what keeps you going, so ${nm} is worth a serious look.`,
+            `Nangunguna ang interes kaysa sa iyong top skill: maayos ang score mo sa ${nm}, bagaman mas mataas ang sa ibang strand. Ang interes ang nagpapatuloy sa iyo, kaya sulit na seryosong tingnan ang ${nm}.`);
+    next = `${where} ${hard}`;
   } else if (skillHigh && lvl === "high") {
-    fit = `Strong match: your skills and your interest both point to ${nm}.`;
-    next = `${where} If its subjects still sound good, this is a strong match to look into.`;
+    fit = R(`Strong match: your skills and your interest both point to ${nm}.`, `Malakas na tugma: ang iyong kakayahan at interes ay parehong tumuturo sa ${nm}.`);
+    next = R(`${where} If its subjects still sound good, this is a strong match to look into.`, `${where} Kung maganda pa rin ang dating ng mga asignatura nito, malakas na tugma ito na dapat tingnan.`);
   } else if (skillHigh) {
-    fit = `Skills ahead of interest: you could do well in ${nm}, but your interest in it ranked only ${ordinal(r.irank)}. Doing well and enjoying the work are different things.`;
-    next = `${where} Do its subjects sound interesting, or like a chore?`;
+    fit = R(`Skills ahead of interest: you could do well in ${nm}, but your interest in it ranked only ${ordinal(r.irank)}. Doing well and enjoying the work are different things.`,
+            `Nangunguna ang kakayahan kaysa interes: maaari kang maging mahusay sa ${nm}, ngunit ${ordinal(r.irank)} lamang ang ranggo ng interes mo rito. Magkaiba ang paghusay at ang pag-enjoy sa gawain.`);
+    next = R(`${where} Do its subjects sound interesting, or like a chore?`, `${where} Kawili-wili ba ang mga asignatura nito, o parang pabigat lang?`);
   } else if (lvl === "high") {
-    fit = `Interest ahead of skills: you're drawn to ${nm} but scored lower on its test. A short test with no preparation shows where you are today, not where you can get to. ${nm} is ${STRAND_DEMANDS[r.strand]}.`;
-    next = `${where} Would you be happy working on those subjects even when they're hard?`;
+    fit = R(`Interest ahead of skills: you're drawn to ${nm} but scored lower on its test. A short test with no preparation shows where you are today, not where you can get to. ${nm} is ${STRAND_DEMANDS[r.strand]}.`,
+            `Nangunguna ang interes kaysa kakayahan: naaakit ka sa ${nm} ngunit mas mababa ang score mo sa test nito. Ipinapakita ng maikling test na walang paghahanda kung nasaan ka ngayon, hindi kung hanggang saan ka makakarating. Ang ${nm} ay ${FIL_DEMANDS[r.strand]}.`);
+    next = `${where} ${hard}`;
   } else {
-    fit = `Neither your skill score nor your interest points strongly to ${nm}. It is shown because it was among your highest skill scores, not because your interest points to it.`;
-    next = `${where} Compare it with the strand you're most interested in before deciding. ${nm} is ${STRAND_DEMANDS[r.strand]}.`;
+    fit = R(`Neither your skill score nor your interest points strongly to ${nm}. It is shown because it was among your highest skill scores, not because your interest points to it.`,
+            `Hindi malakas na tumuturo sa ${nm} ang iyong skill score o interes. Ipinapakita ito dahil kabilang ito sa pinakamataas mong skill score, hindi dahil tumuturo rito ang iyong interes.`);
+    next = R(`${where} Compare it with the strand you're most interested in before deciding. ${nm} is ${STRAND_DEMANDS[r.strand]}.`,
+             `${where} Ihambing ito sa strand na pinakainteresado ka bago magdesisyon. Ang ${nm} ay ${FIL_DEMANDS[r.strand]}.`);
   }
   return { skill, interest, fit, next };
 }
 
-/* What the "What your results say" box shows.
-   rec    = top skill strand(s), 1 or 2.
-   intSet = top interest strand(s), 1 or 2 (empty when interests are flat). If 3+ tie for top interest,
-            the two with the higher skill score are kept and the rest go in alsoTop (a one-line note).
-   Folder tabs (Interests | Skills) appear unless interests are flat or intSet is exactly the same strands
-   as rec. A strand in both sets simply appears in both tabs.
-   shown  = every strand that gets a card or a chip (union of the two sets, max 4). */
 function pickShown(results, rec) {
   const ids = results.map(x => x.ipct);
   const maxI = Math.max(...ids);
   const flat = maxI - Math.min(...ids) <= INTEREST_FLAT_SPREAD;
-  const topAll = flat ? [] : results.filter(r => r.ipct === maxI);   // results is sorted by skill, highest first
+  const topAll = flat ? [] : results.filter(r => r.ipct === maxI);
   const intSet = topAll.slice(0, MAX_RECOMMENDED);
   const alsoTop = topAll.slice(MAX_RECOMMENDED);
   const sameSet = intSet.length === rec.length && intSet.every(r => rec.includes(r));
   const tabbed = !flat && !sameSet;
-  const extras = intSet.filter(r => !rec.includes(r));   // interest strands that are not top-skill strands
+  const extras = intSet.filter(r => !rec.includes(r));
   const shown = tabbed ? rec.concat(extras) : rec;
   return { rec, intSet, extras, extra: extras[0] || null, alsoTop, tabbed, shown, flat, maxI };
 }
 
-/* Short plain-language picture of each strand's daily work, used in the "Quick check" question */
 const STRAND_DAY = {
   STEM: "math, science",
   ASSH: "reading, writing, arguing a point",
@@ -2387,22 +2239,29 @@ const STRAND_DAY = {
   ICT:  "logic, coding",
   IA:   "electrical work, installing, repairing"
 };
+const FIL_DAY = {
+  STEM: "math, science",
+  ASSH: "pagbasa, pagsulat, pagpapaliwanag ng paninindigan",
+  BM:   "negosyo, numero, pera",
+  HT:   "serbisyo, pagkain, turismo",
+  ICT:  "lohika, coding",
+  IA:   "gawaing elektrikal, pag-install, pagkukumpuni"
+};
 
-/* Tag on each card. `tab` is "skills" or "interests" (the tab the card is in). */
 function cardTag(r, ps, tab) {
   const skillTop = ps.rec.includes(r), intTop = ps.intSet.includes(r);
   const tiedS = ps.rec.length > 1, tiedI = ps.intSet.length > 1;
+  const SEP = " \u00B7 ";
   if (tab === "interests") {
-    if (skillTop && intTop) return tiedI ? "Tied for top interest \u00B7 Top skill" : "Skills and interest match";
-    return tiedI ? "Tied for top interest" : "Your top interest strand";
+    if (skillTop && intTop) return tiedI ? R("Tied for top interest" + SEP + "Top skill", "Magkapantay sa top interes" + SEP + "Top skill") : R("Skills and interest match", "Tugma ang kakayahan at interes");
+    return tiedI ? R("Tied for top interest", "Magkapantay sa top interes") : R("Your top interest strand", "Iyong top interest na strand");
   }
-  if (skillTop && intTop) return tiedS ? "Tied for top skill \u00B7 Top interest" : "Skills and interest match";
-  return tiedS ? "Tied for top skill" : "Your top skill strand";
+  if (skillTop && intTop) return tiedS ? R("Tied for top skill" + SEP + "Top interest", "Magkapantay sa top skill" + SEP + "Top interes") : R("Skills and interest match", "Tugma ang kakayahan at interes");
+  return tiedS ? R("Tied for top skill", "Magkapantay sa top skill") : R("Your top skill strand", "Iyong top skill na strand");
 }
 
-const strandNames = list => list.map(r => STRANDS[r.strand].name).join(" and ");
+const strandNames = list => list.map(r => STRANDS[r.strand].name).join(R(" and ", " at "));
 
-/* The cards for one tab: 1 or 2 strands (skills tab = ps.rec, interests tab = ps.intSet) */
 function whyCardsHTML(results, pick, ps, tab) {
   const list = tab === "interests" ? ps.intSet : ps.rec;
   const ctx = { rec: ps.rec, shown: ps.shown, extra: ps.extra, extras: ps.extras };
@@ -2413,40 +2272,42 @@ function whyCardsHTML(results, pick, ps, tab) {
         <span class="why-tag" style="background:${info.color}">${cardTag(r, ps, tab)}</span>
         <h4 class="why-title"><span class="dot" style="background:${info.color}"></span>${info.name}</h4>
         <div class="parts">
-          <div class="why-part"><span class="why-label">Your skill result</span><p>${t.skill}</p></div>
-          <div class="why-part"><span class="why-label">Your interest</span><p>${t.interest}</p></div>
-          <div class="why-part"><span class="why-label">How they fit together</span><p>${t.fit}</p></div>
-          <div class="why-part"><span class="why-label">Try this next</span><p>${t.next}</p></div>
+          <div class="why-part"><span class="why-label">${R("Your skill result", "Iyong skill result")}</span><p>${t.skill}</p></div>
+          <div class="why-part"><span class="why-label">${R("Your interest", "Iyong interes")}</span><p>${t.interest}</p></div>
+          <div class="why-part"><span class="why-label">${R("How they fit together", "Paano sila nagtutugma")}</span><p>${t.fit}</p></div>
+          <div class="why-part"><span class="why-label">${R("Try this next", "Subukan ito sa susunod")}</span><p>${t.next}</p></div>
         </div>
       </div>`;
   }).join("");
 
-  // 3+ strands tied for top interest: only two get cards, so say so (shown on the page that carries interest)
   const showNote = ps.alsoTop.length && (tab === "interests" || !ps.tabbed);
   const many = ps.alsoTop.length > 1;
   const note = showNote
-    ? `<p class="why-note">Your interest in ${strandNames(ps.alsoTop)} also tied for the top, level with ${strandNames(ps.intSet)}. ${many ? "They have" : "It has"} no card here only to keep this page short, not because ${many ? "they fit" : "it fits"} you less. You can read ${many ? "their pages" : "its page"} under Explore Strands in the menu.</p>`
+    ? `<p class="why-note">${R(
+        `Your interest in ${strandNames(ps.alsoTop)} also tied for the top, level with ${strandNames(ps.intSet)}. ${many ? "They have" : "It has"} no card here only to keep this page short, not because ${many ? "they fit" : "it fits"} you less. You can read ${many ? "their pages" : "its page"} under Explore Strands in the menu.`,
+        `Pumantay rin sa pinakamataas ang interes mo sa ${strandNames(ps.alsoTop)}, kapantay ng ${strandNames(ps.intSet)}. Walang card dito para lang maging maikli ang pahinang ito, hindi dahil mas hindi ${many ? "sila" : "ito"} angkop sa iyo. Mababasa mo ang ${many ? "mga pahina nila" : "pahina nito"} sa Explore Strands sa menu.`)}</p>`
     : "";
   return `<div class="why-grid" data-n="${list.length}">${cards}</div>${note}`;
 }
 
-/* Quick check: its own small block under the folder box, only when the tabs are showing */
 function quickCheckHTML(ps) {
   if (!ps.tabbed) return "";
-  const opts = ps.shown.map(r => `${STRANDS[r.strand].name} work (${STRAND_DAY[r.strand]})`);
-  const list = opts.length > 2 ? opts.slice(0, -1).join(", ") + ", or " + opts[opts.length - 1] : opts.join(" or ");
-  return `<div class="quick-check"><b>Quick check</b><p>Picture a normal school day. Would you rather spend it on ${list}? Your gut answer is useful information.</p></div>`;
+  const opts = ps.shown.map(r => R(`${STRANDS[r.strand].name} work (${STRAND_DAY[r.strand]})`, `gawaing ${STRANDS[r.strand].name} (${FIL_DAY[r.strand]})`));
+  const or = R(", or ", ", o "), orShort = R(" or ", " o ");
+  const list = opts.length > 2 ? opts.slice(0, -1).join(", ") + or + opts[opts.length - 1] : opts.join(orShort);
+  return `<div class="quick-check"><b>${R("Quick check", "Mabilis na tsek")}</b><p>${R(
+    `Picture a normal school day. Would you rather spend it on ${list}? Your gut answer is useful information.`,
+    `Isipin ang isang karaniwang araw sa paaralan. Alin ang mas gusto mong pagkaabalahan: ${list}? Mahalagang impormasyon ang una mong sagot.`)}</p></div>`;
 }
 
-/* "What your results say": heading on the page, then a yellow folder box. When interests and skills point to
-   different strands the box has two tabs (Interests | Skills); otherwise it is a single page. */
 function renderExplain(results, pick, ps) {
   const root = document.getElementById("explain-why");
-  const title = `<h3 class="explain-title">What your results say</h3>`;
+  const title = `<h3 class="explain-title">${R("What your results say", "Ano ang sinasabi ng iyong resulta")}</h3>`;
   const lead = html => `<p class="explain-lead">${html}</p>`;
 
   const pointer = ps.tabbed
-    ? `<br><br>Your top interest ${ps.intSet.length > 1 ? "strands are" : "strand is"} <strong>${strandNames(ps.intSet)}</strong>. See the <button type="button" class="tab-link" data-goto="interests">Interests</button> tab to compare.`
+    ? R(`<br><br>Your top interest ${ps.intSet.length > 1 ? "strands are" : "strand is"} <strong>${strandNames(ps.intSet)}</strong>. See the <button type="button" class="tab-link" data-goto="interests">Interests</button> tab to compare.`,
+        `<br><br>Ang iyong top interes ay <strong>${strandNames(ps.intSet)}</strong>. Tingnan ang <button type="button" class="tab-link" data-goto="interests">Interes</button> tab para maghambing.`)
     : "";
   const skillsHTML = lead(buildBreakdown(results, pick) + pointer) + whyCardsHTML(results, pick, ps, "skills");
 
@@ -2455,18 +2316,18 @@ function renderExplain(results, pick, ps) {
     return;
   }
 
-  const apart = ps.extras.length === ps.intSet.length;   // none of the top interest strands is a top skill strand
+  const apart = ps.extras.length === ps.intSet.length;
   const intLead = (ps.intSet.length > 1
-    ? `Your interests tied: <strong>${strandNames(ps.intSet)}</strong> came out highest.`
-    : `Your highest interest is in <strong>${strandNames(ps.intSet)}</strong>.`)
-    + (apart ? ` Your skills and your interests point to different strands.` : ``);
+    ? R(`Your interests tied: <strong>${strandNames(ps.intSet)}</strong> came out highest.`, `Magkapantay ang iyong mga interes: pinakamataas ang <strong>${strandNames(ps.intSet)}</strong>.`)
+    : R(`Your highest interest is in <strong>${strandNames(ps.intSet)}</strong>.`, `Pinakamataas ang interes mo sa <strong>${strandNames(ps.intSet)}</strong>.`))
+    + (apart ? R(` Your skills and your interests point to different strands.`, ` Magkaiba ang tinutukoy na strand ng iyong kakayahan at interes.`) : ``);
   const interestsHTML = lead(intLead) + whyCardsHTML(results, pick, ps, "interests");
 
   root.innerHTML = `${title}
     <div class="folder-wrap has-tabs">
-      <div class="folder-tabs" role="tablist" aria-label="Interests or skills">
-        <button type="button" class="folder-tab" role="tab" id="ftab-skills" data-tab="skills" aria-selected="true">Skills</button>
-        <button type="button" class="folder-tab" role="tab" id="ftab-interests" data-tab="interests" aria-selected="false">Interests<span class="tab-dot" aria-hidden="true"></span></button>
+      <div class="folder-tabs" role="tablist" aria-label="${R("Interests or skills", "Interes o skill")}">
+        <button type="button" class="folder-tab" role="tab" id="ftab-skills" data-tab="skills" aria-selected="true">${R("Skills", "Skill")}</button>
+        <button type="button" class="folder-tab" role="tab" id="ftab-interests" data-tab="interests" aria-selected="false">${R("Interests", "Interes")}<span class="tab-dot" aria-hidden="true"></span></button>
       </div>
       <div class="folder-box" id="folder-panel" role="tabpanel"></div>
     </div>
@@ -2481,10 +2342,10 @@ function renderExplain(results, pick, ps) {
     current = which;
     tabs.forEach(t => t.setAttribute("aria-selected", String(t.dataset.tab === which)));
     panel.setAttribute("aria-labelledby", "ftab-" + which);
-    panel.dataset.dir = which === "interests" ? "right" : "left";   // content slides in from the side of the tab
+    panel.dataset.dir = which === "interests" ? "right" : "left";
     panel.classList.toggle("is-first", first);
     panel.innerHTML = `<div class="folder-content">${which === "interests" ? interestsHTML : skillsHTML}</div>`;
-    if (which === "interests") { const d = root.querySelector(".tab-dot"); if (d) d.remove(); }   // seen it
+    if (which === "interests") { const d = root.querySelector(".tab-dot"); if (d) d.remove(); }
   };
   tabs.forEach(t => t.addEventListener("click", () => open(t.dataset.tab)));
   panel.addEventListener("click", e => {
@@ -2515,8 +2376,6 @@ function renderInterestSection(results, rec) {
   `;
 }
 
-/* Shows the recommended strand(s) on the results page using the same layout as the strand page
-   (minus its closing panel). One strand: just the page. Two: a tab bar above it. */
 function renderRecommendedInfo(ps) {
   const rec = ps.shown;
   const tabsEl = document.getElementById("strand-tabs");
@@ -2538,8 +2397,8 @@ function renderRecommendedInfo(ps) {
 
   if (rec.length < 2) {
     const info = STRANDS[rec[0].strand];
-    titleEl.innerHTML = `Get to know <span style="color:${info.color}">${info.name}</span>`;
-    subEl.textContent = "Here's what it covers, what you'd learn, and where it can lead.";
+    titleEl.innerHTML = `${R("Get to know", "Kilalanin ang")} <span style="color:${info.color}">${info.name}</span>`;
+    subEl.textContent = R("Here's what it covers, what you'd learn, and where it can lead.", "Narito ang saklaw nito, ang matututunan mo, at kung saan ito maaaring humantong.");
     tabsEl.hidden = true;
     tabsEl.innerHTML = "";
     panel.removeAttribute("role");
@@ -2547,15 +2406,15 @@ function renderRecommendedInfo(ps) {
     return;
   }
 
-  const countWord = ["", "", "two", "three", "four"][rec.length];
-  titleEl.textContent = ps.tabbed ? "Get to know your strands" : "Get to know your recommended strands";
+  const countWord = R(["", "", "two", "three", "four"], ["", "", "dalawang", "tatlong", "apat na"])[rec.length];
+  titleEl.textContent = ps.tabbed ? R("Get to know your strands", "Kilalanin ang iyong mga strand") : R("Get to know your recommended strands", "Kilalanin ang iyong mga inirerekomendang strand");
   subEl.textContent = !ps.tabbed
-    ? "Your skills tied, so here are two to compare. Switch between them below."
+    ? R("Your skills tied, so here are two to compare. Switch between them below.", "Magkapantay ang iyong mga skill, kaya may dalawang pagkukumparahan dito. Lumipat sa pagitan nila sa ibaba.")
     : rec.length === 2
-      ? "Your skills and interests point to different strands. Switch between them below."
-      : `Your skills and interests point to ${countWord} strands. Switch between them below.`;
+      ? R("Your skills and interests point to different strands. Switch between them below.", "Magkaiba ang tinutukoy na strand ng iyong kakayahan at interes. Lumipat sa pagitan nila sa ibaba.")
+      : R(`Your skills and interests point to ${countWord} strands. Switch between them below.`, `Ang iyong kakayahan at interes ay tumuturo sa ${countWord} strand. Lumipat sa pagitan nila sa ibaba.`);
   tabsEl.hidden = false;
-  tabsEl.innerHTML = `<div class="chip-row" role="tablist" aria-label="Your strands"></div>`;
+  tabsEl.innerHTML = `<div class="chip-row" role="tablist" aria-label="${R("Your strands", "Iyong mga strand")}"></div>`;
   panel.setAttribute("role", "tabpanel");
   const row = tabsEl.querySelector(".chip-row");
   rec.forEach(r => {
@@ -2570,7 +2429,7 @@ function renderRecommendedInfo(ps) {
       const tag = document.createElement("span");
       tag.className = "tabtag";
       const sk = ps.rec.includes(r), it = ps.intSet.includes(r);
-      tag.textContent = sk && it ? "Skill & interest" : it ? "Top interest" : "Top skill";
+      tag.textContent = sk && it ? R("Skill & interest", "Skill at interes") : it ? R("Top interest", "Top interes") : "Top skill";
       tab.appendChild(tag);
     }
     tab.addEventListener("click", () => show(r.strand));
@@ -2579,11 +2438,6 @@ function renderRecommendedInfo(ps) {
   show(rec[0].strand);
 }
 
-/* ---------- Results hero: strand stickers ----------
-   Shows the recommended strand(s) as stickers (icon + name in the strand's color) with the skill
-   score on a stamp. rec always holds 1 or 2 strands (see pickRecommended), and when there are 2
-   they are tied, so the score is shown once. Sets data-count (1 or 2) and --rc1 / --rc2 on
-   .results-hero for style2.css. A low skill score gets calmer wording and no confetti. */
 function renderResultsHero(pick, results, lowSignal, m) {
   const hero = document.querySelector(".results-hero");
   const h1 = document.getElementById("result-headline");
@@ -2592,8 +2446,8 @@ function renderResultsHero(pick, results, lowSignal, m) {
   const c = m.c, rec = pick.rec, ints = m.ps.intSet, ui = rvCaseUI(m);
   const lead = c.family === "merged" ? [c.shared[0]] : c.family === "shared" ? c.shared.concat(c.sOnly, c.iOnly) : rec.concat(ints);
   const colors = lead.map(r => STRANDS[r.strand].color);
-  hero.dataset.count = c.family === "columns" ? "2" : "1";   // style2.css: "2" = two compact side-by-side cards
-  hero.dataset.layout = c.family;                             // merged | shared | columns
+  hero.dataset.count = c.family === "columns" ? "2" : "1";
+  hero.dataset.layout = c.family;
   hero.dataset.case = String(c.caseNo);
   hero.classList.toggle("res-low", lowSignal);
   hero.classList.toggle("res-perfect", c.caseNo === 1);
@@ -2607,33 +2461,32 @@ function renderResultsHero(pick, results, lowSignal, m) {
   const withStar = (r, tilt) => `<span class="rv-wrap">${stk(r, tilt)}${star}</span>`;
   let items;
 
-  if (c.family === "merged") {                       /* cases 1 and 2 */
+  if (c.family === "merged") {
     const r = c.shared[0];
-    items = `<span class="res-item"><span class="rv-cap rv-cap-top">Top skill and top interest</span>${stk(r, "-3deg")}<span class="res-stamp"><b>${r.percentage}%</b><small>Skill score</small></span></span>`;
-  } else if (c.family === "shared") {                /* cases 4, 6, 8, 9: the shared strand is lifted and starred */
+    items = `<span class="res-item"><span class="rv-cap rv-cap-top">${R("Top skill and top interest", "Top skill at top interes")}</span>${stk(r, "-3deg")}<span class="res-stamp"><b>${r.percentage}%</b><small>Skill score</small></span></span>`;
+  } else if (c.family === "shared") {
     if (c.caseNo === 8) {
-      items = `<span class="rv-duo">${c.shared.map((r, i) => `<span class="res-item rv-side">${cap("On both lists")}${withStar(r, i ? "2.5deg" : "-3deg")}<span class="rv-sub">Tied on both</span></span>`).join("")}</span>`;
+      items = `<span class="rv-duo">${c.shared.map((r, i) => `<span class="res-item rv-side">${cap(R("On both lists", "Nasa parehong listahan"))}${withStar(r, i ? "2.5deg" : "-3deg")}<span class="rv-sub">${R("Tied on both", "Magkapantay sa dalawa")}</span></span>`).join("")}</span>`;
     } else {
       const r = c.shared[0];
-      const sub = `${r.percentage}% skill, ${c.iTied ? "tied " : ""}${ordinal(r.irank)} interest`;
+      const sub = R(`${r.percentage}% skill, ${c.iTied ? "tied " : ""}${ordinal(r.irank)} interest`, `${r.percentage}% skill, ${c.iTied ? "magkapantay sa " : ""}${ordinal(r.irank)} sa interes`);
       const faded = (list, label, tilt) => list.map(o => `<span class="res-item rv-faded">${cap(label)}${stk(o, tilt)}</span>`).join("");
-      items = `<span class="rv-main">${cap("On both lists")}${withStar(r, "-3deg")}<span class="rv-sub">${sub}</span></span>`
-        + (c.sOnly.length || c.iOnly.length ? `<span class="rv-others">${faded(c.sOnly, "Skill only", "-3deg")}${faded(c.iOnly, "Interest only", "2.5deg")}</span>` : "");
+      items = `<span class="rv-main">${cap(R("On both lists", "Nasa parehong listahan"))}${withStar(r, "-3deg")}<span class="rv-sub">${sub}</span></span>`
+        + (c.sOnly.length || c.iOnly.length ? `<span class="rv-others">${faded(c.sOnly, R("Skill only", "Skill lang"), "-3deg")}${faded(c.iOnly, R("Interest only", "Interes lang"), "2.5deg")}</span>` : "");
     }
-  } else {                                           /* columns: skills left, interests right (cases 3, 5, 7, 10, flat) */
-    const none = `<span class="res-sticker res-none" style="--sc:var(--ink-soft);--tilt:2.5deg"><span class="res-name">None yet</span></span>`;
+  } else {
+    const none = `<span class="res-sticker res-none" style="--sc:var(--ink-soft);--tilt:2.5deg"><span class="res-name">${R("None yet", "Wala pa")}</span></span>`;
     const stack = (list, tilt) => `<span class="rv-stk${list.length > 1 ? " rv-stack" : ""}">${list.map((r, i) => (i ? `<span class="rv-eq" aria-hidden="true">=</span>` : "") + stk(r, tilt)).join("")}</span>`;
     const side = (capTxt, inner, sub) => `<span class="res-item rv-side">${cap(capTxt)}${inner}<span class="rv-sub">${sub}</span></span>`;
     const iNone = !ints.length, p0 = results[0].percentage;
-    items = side(c.sTied ? "Top skills, tied" : "Top skill", c.flatSkill ? none : stack(rec, "-3deg"), c.flatSkill ? "Same score on all six" : c.sTied ? `${p0}% on both` : `${p0}% on its test`)
+    items = side(c.sTied ? R("Top skills, tied", "Top skill, magkapantay") : "Top skill", c.flatSkill ? none : stack(rec, "-3deg"), c.flatSkill ? R("Same score on all six", "Pareho ang score sa anim") : c.sTied ? R(`${p0}% on both`, `${p0}% sa dalawa`) : R(`${p0}% on its test`, `${p0}% sa test nito`))
       + `<span class="res-and" aria-hidden="true">${ui.mid}</span>`
-      + side(c.iTied ? "Top interests, tied" : "Top interest", iNone ? none : stack(ints, "2.5deg"), iNone ? "Spread evenly" : c.iTied ? `Tied ${ordinal(ints[0].irank)}` : `${ordinal(ints[0].irank)} of six`);
+      + side(c.iTied ? R("Top interests, tied", "Top interes, magkapantay") : R("Top interest", "Top interes"), iNone ? none : stack(ints, "2.5deg"), iNone ? R("Spread evenly", "Pantay-pantay") : c.iTied ? R(`Tied ${ordinal(ints[0].irank)}`, `Magkapantay sa ${ordinal(ints[0].irank)}`) : R(`${ordinal(ints[0].irank)} of six`, `${ordinal(ints[0].irank)} sa anim`));
   }
 
   const label = ui.label ? `<span class="res-label">${ui.label}</span>` : "";
   h1.innerHTML = `<span class="res-match">${label}<span class="res-row">${items}</span><span class="res-pill"><b aria-hidden="true">${ui.sym}</b><span>${ui.pill}</span></span></span><span class="res-line">${ui.line}</span>`;
 
-  /* Background layer: two color blobs, sparkles, and a confetti burst sized to the result */
   const old = hero.querySelector(".res-decor");
   if (old) old.remove();
   const decor = document.createElement("div");
@@ -2646,7 +2499,7 @@ function renderResultsHero(pick, results, lowSignal, m) {
 
   const calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const n = CONFETTI_COUNT[c.confetti] || 0;
-  if (n && !lowSignal && !calm) {
+  if (n && !lowSignal && !calm && !RERENDER) {
     const palette = colors.concat(["#FFD25E", "#22262B"]);
     for (let i = 0; i < n; i++) {
       const p = document.createElement("span");
@@ -2664,25 +2517,10 @@ function renderResultsHero(pick, results, lowSignal, m) {
   }
 }
 
-/* =========================================================
-   RESULTS PAGE v2: dual hero, one comparison chart, reasoning, reactive FAQ.
-   Skill and interest are shown side by side and never merged.
-   kind: perfect  = same #1 strand in both AND skill >= SKILL_HIGH_PCT (exclusive gold hero)
-         building = same #1 strand in both, skill still below SKILL_HIGH_PCT
-         near     = the two top strands are one step apart (skill #1 is interest #2, or the reverse)
-         apart    = different paths     flat = interests too even to name a favorite
-   ========================================================= */
-const CONFETTI_COUNT = { full: 48, medium: 28, small: 14 };   // none = no entry
-const rvNames = list => list.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(" and ");
+const CONFETTI_COUNT = { full: 48, medium: 28, small: 14 };
+const rvNames = list => list.map(r => `<strong>${STRANDS[r.strand].name}</strong>`).join(R(" and ", " at "));
 const rvChip = r => { const i = STRANDS[r.strand]; return `<span class="rv-chip" style="--sc:${i.color}"><span class="rv-ico" aria-hidden="true">${STRAND_ICONS[r.strand]}</span><span class="rv-name">${i.name}</span></span>`; };
 
-/* Sorts the result into one of the 12 cases (13 = every skill score equal).
-   Skills: one strand or tied. Interests: one, tied, or flat. Overlap: strands on both lists.
-   "Tied" means equal skill percentage, or equal rounded interest percentage (ipct is already rounded).
-   family: merged  = 1 and 2 (same single strand on both sides)
-           shared  = 4, 6, 8, 9 (a tie exists and at least one strand is on both lists)
-           columns = 3, 5, 7, 10, 11, 12, 13 (skills left, interests right)
-   calm = a strand is shared but its skill is under SKILL_HIGH_PCT: no gold, no star, no confetti. */
 function resultsCase(results, pick, ps) {
   const rec = pick.rec, ints = ps.intSet;
   const flatSkill = results[0].percentage === results[results.length - 1].percentage;
@@ -2719,126 +2557,185 @@ function resultsModel(results, pick) {
   return { ps, kind, both: c.shared, c, low: results[0].percentage < LOW_SIGNAL_PCT };
 }
 
-/* Symbol, pill, headline and optional label for each case. The symbol is decorative (aria-hidden), the pill text says it in words. */
-const tiedWord = n => ({ 2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six" }[n] || String(n));
+const tiedWord = n => RFIL ? ({ 2: "Dalawang", 3: "Tatlong", 4: "Apat na", 5: "Limang", 6: "Anim na" }[n] || String(n)) : ({ 2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six" }[n] || String(n));
 function rvCaseUI(m) {
   const c = m.c, ints = m.ps.intSet, nm = r => STRANDS[r.strand].name;
   const sh = c.shared[0], topS = m.ps.rec[0];
-  const lab = m.low ? "Your highest skill and interest" : "Your top skill and your top interest";
-  const allN = tiedWord(new Set(m.ps.rec.concat(ints).map(r => r.strand)).size).toLowerCase();
+  const lab = m.low ? R("Your highest skill and interest", "Iyong pinakamataas na skill at interes") : R("Your top skill and your top interest", "Iyong top skill at top interes");
+  const allCount = new Set(m.ps.rec.concat(ints).map(r => r.strand)).size;
+  const allN = RFIL ? String(allCount) : tiedWord(allCount).toLowerCase();
   const t = {
-    1:  { sym: "\u2713", pill: "Perfect match", line: "Your skills and your interest agree.", label: "A perfect match" },
-    2:  { sym: "~", pill: "Same pick, skills still building", line: "Same pick. Your skills are still building.", label: lab },
+    1:  { sym: "\u2713", pill: R("Perfect match", "Perpektong tugma"), line: R("Your skills and your interest agree.", "Magkasundo ang iyong kakayahan at interes."), label: R("A perfect match", "Isang perpektong tugma") },
+    2:  { sym: "~", pill: R("Same pick, skills still building", "Parehong pinili, hinuhubog pa ang skill"), line: R("Same pick. Your skills are still building.", "Parehong pinili. Hinuhubog pa ang iyong skill."), label: lab },
     3:  m.kind === "near"
-        ? { sym: "\u2248", pill: "Close: one step apart", line: "Your top picks sit one step apart.", label: lab }
-        : { sym: "\u2260", pill: "Different paths", line: "Your skills and interests point different ways.", label: lab },
-    4:  sh && { sym: "=", pill: "Your skill broke the tie", line: `${tiedWord(c.iCount)} strands tied on interest. Your skill points to ${nm(sh)}.` },
-    5:  { sym: "\u2260", pill: "Different paths", line: `Your skill points to ${nm(topS)}. Your interests are tied.` },
-    6:  sh && { sym: "=", pill: "Your interest broke the tie", line: `${tiedWord(c.sCount)} strands tied on skill. Your interest points to ${nm(sh)}.` },
-    7:  { sym: "\u2260", pill: "Different paths", line: `Your interest points to ${ints[0] ? nm(ints[0]) : "one strand"}. Your skills are tied.` },
-    8:  { sym: "\u2713", pill: "Double match", line: "Both strands tie on skill and on interest." },
-    9:  sh && { sym: "=", pill: "One strand on both lists", line: `${nm(sh)} shows up in both.` },
-    10: { sym: "\u2260", pill: "Wide open", line: `No strand overlaps. All ${allN} are worth a look.` },
-    11: { sym: "\u2026", pill: "Skills lead the way", line: "Your skills are the clearer guide right now.", label: lab },
-    12: { sym: "\u2026", pill: "Skills lead the way", line: "Your skills are the clearer guide right now.", label: lab },
+        ? { sym: "\u2248", pill: R("Close: one step apart", "Malapit: isang hakbang ang pagitan"), line: R("Your top picks sit one step apart.", "Isang hakbang lang ang pagitan ng iyong mga top pick."), label: lab }
+        : { sym: "\u2260", pill: R("Different paths", "Magkaibang landas"), line: R("Your skills and interests point different ways.", "Magkaiba ang tinutukoy ng iyong kakayahan at interes."), label: lab },
+    4:  sh && { sym: "=", pill: R("Your skill broke the tie", "Ang skill mo ang nagpasya"), line: R(`${tiedWord(c.iCount)} strands tied on interest. Your skill points to ${nm(sh)}.`, `${tiedWord(c.iCount)} strand ang magkapantay sa interes. Ang iyong skill ay tumuturo sa ${nm(sh)}.`) },
+    5:  { sym: "\u2260", pill: R("Different paths", "Magkaibang landas"), line: R(`Your skill points to ${nm(topS)}. Your interests are tied.`, `Ang iyong skill ay tumuturo sa ${nm(topS)}. Magkapantay ang iyong mga interes.`) },
+    6:  sh && { sym: "=", pill: R("Your interest broke the tie", "Ang interes mo ang nagpasya"), line: R(`${tiedWord(c.sCount)} strands tied on skill. Your interest points to ${nm(sh)}.`, `${tiedWord(c.sCount)} strand ang magkapantay sa skill. Ang iyong interes ay tumuturo sa ${nm(sh)}.`) },
+    7:  { sym: "\u2260", pill: R("Different paths", "Magkaibang landas"), line: R(`Your interest points to ${ints[0] ? nm(ints[0]) : "one strand"}. Your skills are tied.`, `Ang iyong interes ay tumuturo sa ${ints[0] ? nm(ints[0]) : "iisang strand"}. Magkapantay ang iyong mga skill.`) },
+    8:  { sym: "\u2713", pill: R("Double match", "Dobleng tugma"), line: R("Both strands tie on skill and on interest.", "Magkapantay ang dalawang strand sa skill at sa interes.") },
+    9:  sh && { sym: "=", pill: R("One strand on both lists", "Isang strand sa parehong listahan"), line: R(`${nm(sh)} shows up in both.`, `Lumabas ang ${nm(sh)} sa dalawa.`) },
+    10: { sym: "\u2260", pill: R("Wide open", "Bukas ang daan"), line: R(`No strand overlaps. All ${allN} are worth a look.`, `Walang magkapatong na strand. Sulit tingnan ang lahat ng ${allN}.`) },
+    11: { sym: "\u2026", pill: R("Skills lead the way", "Skill ang nangunguna"), line: R("Your skills are the clearer guide right now.", "Ang iyong skill ang mas malinaw na gabay sa ngayon."), label: lab },
+    12: { sym: "\u2026", pill: R("Skills lead the way", "Skill ang nangunguna"), line: R("Your skills are the clearer guide right now.", "Ang iyong skill ang mas malinaw na gabay sa ngayon."), label: lab },
     13: c.flatInt
-        ? { sym: "\u2026", pill: "Explore to decide", line: "Nothing stands out yet. Explore each strand.", label: lab }
-        : { sym: "\u2026", pill: "Interests lead the way", line: "Your interests are the clearer guide right now.", label: lab }
+        ? { sym: "\u2026", pill: R("Explore to decide", "Tuklasin para makapagpasya"), line: R("Nothing stands out yet. Explore each strand.", "Wala pang namumukod-tangi. Tuklasin ang bawat strand."), label: lab }
+        : { sym: "\u2026", pill: R("Interests lead the way", "Interes ang nangunguna"), line: R("Your interests are the clearer guide right now.", "Ang iyong interes ang mas malinaw na gabay sa ngayon."), label: lab }
   }[c.caseNo];
   return Object.assign({ mid: c.flatInt || c.flatSkill ? "\u2026" : "\u2260", label: "" }, t);
 }
 
-/* Results v2 helpers. Message under the hero: custom for perfect/building, else the existing interestMessage(). */
 function rvMessage(m, results, pick) {
   const r = m.both[0], nm = r ? rvNames([r]) : "";
-  if (m.kind === "perfect") return `Your skills and your interests both put ${nm} first. That is the strongest signal this assessment can give, though it is still a snapshot, not a verdict.`;
-  if (m.kind === "building") return `Your skills and your interests both put ${nm} first, but your skill score is still modest. Interest is a great start. ${STRANDS[r.strand].name} is ${STRAND_DEMANDS[r.strand]}.`;
+  if (m.kind === "perfect") return R(`Your skills and your interests both put ${nm} first. That is the strongest signal this assessment can give, though it is still a snapshot, not a verdict.`,
+                                     `Parehong inuuna ng iyong kakayahan at interes ang ${nm}. Iyan ang pinakamalakas na senyales na maibibigay ng assessment na ito, bagaman snapshot pa rin ito, hindi hatol.`);
+  if (m.kind === "building") return R(`Your skills and your interests both put ${nm} first, but your skill score is still modest. Interest is a great start. ${STRANDS[r.strand].name} is ${STRAND_DEMANDS[r.strand]}.`,
+                                      `Parehong inuuna ng iyong kakayahan at interes ang ${nm}, ngunit katamtaman pa ang iyong skill score. Magandang simula ang interes. Ang ${STRANDS[r.strand].name} ay ${FIL_DEMANDS[r.strand]}.`);
   const c = m.c;
   if (c.flatSkill) {
-    const same = `You scored the same on all six tests (${results[0].percentage}%), so your skills don't point to one strand.`;
+    const same = R(`You scored the same on all six tests (${results[0].percentage}%), so your skills don't point to one strand.`,
+                   `Pareho ang score mo sa lahat ng anim na test (${results[0].percentage}%), kaya hindi tumuturo sa iisang strand ang iyong mga skill.`);
     return c.flatInt
-      ? `${same} Your interests are spread evenly too, so nothing stands out yet. Explore each strand's page to see what appeals to you.`
-      : `${same} Your strongest interest is in ${rvNames(m.ps.intSet)}. Use that and the strand pages to see which daily work appeals to you.`;
+      ? R(`${same} Your interests are spread evenly too, so nothing stands out yet. Explore each strand's page to see what appeals to you.`,
+          `${same} Pantay-pantay rin ang iyong mga interes, kaya wala pang namumukod-tangi. Buksan ang pahina ng bawat strand para makita kung alin ang nakakaakit sa iyo.`)
+      : R(`${same} Your strongest interest is in ${rvNames(m.ps.intSet)}. Use that and the strand pages to see which daily work appeals to you.`,
+          `${same} Pinakamalakas ang interes mo sa ${rvNames(m.ps.intSet)}. Gamitin iyon at ang mga pahina ng strand para makita kung aling pang-araw-araw na gawain ang gusto mo.`);
   }
   if (m.kind === "shared") {
     const sNames = rvNames(pick.rec), iNames = rvNames(m.ps.intSet);
-    const lead = {
+    const lead = R({
       4: `Your interests tied across ${iNames}, and your skill result points to ${nm}.`,
       6: `Your skills tied across ${sNames}, and your interest points to ${nm}.`,
       8: `${rvNames(c.shared)} tie on skill and on interest, so neither beats the other.`,
       9: `Your skills tied across ${sNames} and your interests tied across ${iNames}. ${nm} is the one on both lists.`
-    }[c.caseNo];
+    }, {
+      4: `Magkapantay ang iyong mga interes sa ${iNames}, at ang iyong skill result ay tumuturo sa ${nm}.`,
+      6: `Magkapantay ang iyong mga skill sa ${sNames}, at ang iyong interes ay tumuturo sa ${nm}.`,
+      8: `Magkapantay ang ${rvNames(c.shared)} sa skill at sa interes, kaya walang nangunguna sa dalawa.`,
+      9: `Magkapantay ang iyong mga skill sa ${sNames} at magkapantay ang iyong mga interes sa ${iNames}. Ang ${nm} ang nasa parehong listahan.`
+    })[c.caseNo];
     return c.calm
-      ? `${lead} Your skill score is still modest, so read the strand page to see whether the practice it asks for would be worth it.`
-      : `${lead} That overlap is a good sign, though it is still a snapshot, not a verdict.`;
+      ? R(`${lead} Your skill score is still modest, so read the strand page to see whether the practice it asks for would be worth it.`,
+          `${lead} Katamtaman pa ang iyong skill score, kaya basahin ang pahina ng strand para makita kung sulit ang praktis na hinihingi nito.`)
+      : R(`${lead} That overlap is a good sign, though it is still a snapshot, not a verdict.`,
+          `${lead} Magandang senyales ang pagtutugma na iyon, bagaman snapshot pa rin ito, hindi hatol.`);
   }
   return interestMessage(results, pick.rec);
 }
 
-/* Two bar graphs: skill and interest. Each is sorted best-first, the first bar gets the star. #bar-chart stays the id (savecard.js watches it). */
 function renderRvCharts(m, results) {
   const root = document.getElementById("bar-chart");
   const byInt = results.slice().sort((a, b) => b.ipct - a.ipct);
   const col = (r, pct, sub) => `<div class="bar-col"><div class="bar-pct">${pct}%</div><div class="bar-track"><div class="bar-fill" style="background:${STRANDS[r.strand].color};" data-target="${pct}"></div></div><div class="bar-label">${STRANDS[r.strand].name}<br>${sub}</div></div>`;
-  root.innerHTML = `<div class="rv-chart"><span class="rv-tab">Skill<small>how you did on the tests</small></span><div class="bar-chart">${results.map(r => col(r, r.percentage, `${r.correct}/${r.total}`)).join("")}</div></div>
-    <div class="rv-chart rv-int"><span class="rv-tab">Interest<small>ranked against your own strands</small></span><div class="bar-chart">${byInt.map(r => col(r, r.ipct, ordinal(r.irank))).join("")}</div></div>`;
+  root.innerHTML = `<div class="rv-chart"><span class="rv-tab">Skill<small>${R("how you did on the tests", "kung paano ka sa mga test")}</small></span><div class="bar-chart">${results.map(r => col(r, r.percentage, `${r.correct}/${r.total}`)).join("")}</div></div>
+    <div class="rv-chart rv-int"><span class="rv-tab">${R("Interest", "Interes")}<small>${R("ranked against your own strands", "iniranggo laban sa sarili mong mga strand")}</small></span><div class="bar-chart">${byInt.map(r => col(r, r.ipct, ordinal(r.irank))).join("")}</div></div>`;
   requestAnimationFrame(() => setTimeout(() => root.querySelectorAll(".bar-fill").forEach(el => { el.style.height = el.dataset.target + "%"; }), 50));
 }
 
-/* Skills and interests, strand by strand */
 function renderRvRows(m, results) {
   const root = document.getElementById("interest-section"), { ps } = m;
-  root.innerHTML = `<h3>Skills and interests, strand by strand</h3>
+  root.innerHTML = `<h3>${R("Skills and interests, strand by strand", "Mga skill at interes, bawat strand")}</h3>
     <div class="si-grid">${results.map(r => {
       const info = STRANDS[r.strand], ts = ps.rec.includes(r), ti = ps.intSet.includes(r);
-      const badges = (ts ? `<span class="rv-badge">Top skill</span>` : "") + (ti ? `<span class="rv-badge rv-badge-i">Top interest</span>` : "");
+      const badges = (ts ? `<span class="rv-badge">Top skill</span>` : "") + (ti ? `<span class="rv-badge rv-badge-i">${R("Top interest", "Top interes")}</span>` : "");
       return `<div class="si-row${ts || ti ? " rv-row-top" : ""}" style="--sc:${info.color}">
         <span class="si-name"><span class="dot" style="background:${info.color}"></span>${info.name}${badges}</span>
         <div class="si-line"><span class="si-tag">Skill</span><div class="si-track"><div class="si-fill" data-w="${r.percentage}" style="width:0"></div></div><span class="si-val">${r.percentage}%</span></div>
-        <div class="si-line"><span class="si-tag">Interest</span><div class="si-track"><div class="si-fill si-fill-int" data-w="${r.ipct}" style="width:0"></div></div><span class="si-val">${ordinal(r.irank)}, ${interestLabel(r.ipct).toLowerCase()}</span></div></div>`;
+        <div class="si-line"><span class="si-tag">${R("Interest", "Interes")}</span><div class="si-track"><div class="si-fill si-fill-int" data-w="${r.ipct}" style="width:0"></div></div><span class="si-val">${ordinal(r.irank)}, ${interestLabel(r.ipct).toLowerCase()}</span></div></div>`;
     }).join("")}</div>
-    <p class="si-note">Solid bars are skill, striped bars are interest. Interest is ranked against your own other strands, so "1st" means your strongest interest, not a fixed score. The two are never combined, so any gap stays visible.</p>`;
+    <p class="si-note">${R(`Solid bars are skill, striped bars are interest. Interest is ranked against your own other strands, so "1st" means your strongest interest, not a fixed score. The two are never combined, so any gap stays visible.`,
+                           `Ang solidong bar ay skill, ang may guhit ay interes. Iniranggo ang interes laban sa iba mong strand, kaya ang "ika-1" ay nangangahulugang pinakamalakas mong interes, hindi nakapirming score. Hindi pinagsasama ang dalawa, kaya nananatiling nakikita ang anumang agwat.`)}</p>`;
   requestAnimationFrame(() => setTimeout(() => root.querySelectorAll(".si-fill").forEach(el => { el.style.width = el.dataset.w + "%"; }), 60));
 }
 
-/* FAQ: grouped, and the questions change with the result (kind) and use the student's own strands and numbers */
 function renderRvFaq(m, results, pick) {
   const { ps, kind } = m, rec = pick.rec, top = rec[0];
-  const names = list => list.map(r => STRANDS[r.strand].name).join(" and ");
+  const names = list => list.map(r => STRANDS[r.strand].name).join(R(" and ", " at "));
   const sName = names(rec), iName = ps.intSet.length ? names(ps.intSet) : "";
   const focus = m.both[0];
   const fa = focus ? names([focus]) : "";
   const c = m.c, iAll = ps.intSet.concat(ps.alsoTop);
   const sNames = names(pick.tiedAll), iNames = names(iAll), pct = focus ? focus.percentage : 0;
   const kindMap = {
-    perfect: () => ({ q: "Does a perfect match guarantee I'll do well?", a: `No. It means ${fa} came first in both your skills (${focus.percentage}%) and your interests, which is a strong sign. But it is based on ${focus.total} questions and a questionnaire, not a promise. Read the strand page to check that the daily work still appeals to you.` }),
-    building: () => ({ q: `My interest in ${fa} is high but my skills are modest. Should I still choose it?`, a: `You can. Interest is what keeps people going when work gets hard, and your ${focus.percentage}% shows where you are today, not your limit. ${fa} is ${STRAND_DEMANDS[focus.strand]}. Ask yourself whether you would put in that practice.` }),
-    near: () => ({ q: "My skills and interests are one step apart. What does that mean?", a: `Your strongest skill is ${sName} and your strongest interest is ${iName}, but each ranks near the top on the other measure. That makes both realistic options, so compare the two strand pages and picture the daily work.` }),
-    apart: () => ({ q: "Why did my skills and interests point to different strands?", a: `Being good at something and wanting to spend your days on it are different things. Your strongest skill is ${sName} and your strongest interest is ${iName}. Neither is wrong: skills can be built, and interest is what keeps you going.` }),
-    flat: () => ({ q: "Why didn't my interests point to one strand?", a: `Your interest scores were close together across all six strands, so no single one stood out. That is common and not a problem. Use your skill results as the guide for now, and read each strand page to notice what appeals to you.` }),
-    flatSkill: () => ({ q: "Why didn't my skills point to one strand?", a: `You scored the same on all six tests, so no strand stood out on skills. That can happen with short tests. Use your interest results and the strand pages as your guide for now.` }),
-    split: () => ({ q: "Why don't my skills and interests share a strand?", a: `Your top skill result is ${sName} and your top interest is ${iName}, so no strand is on both lists. That is common: skills can be built, and interest is what keeps you going. Compare the strand pages and picture the daily work.` }),
-    s4: () => ({ q: `Why did ${iNames} tie on interest, and why does ${fa} lead?`, a: `${iNames} landed on the same interest score. Your skill test put ${fa} ahead (${pct}%), so it is the strand on both lists. The others are not ruled out.` }),
-    s6: () => ({ q: `Why did ${sNames} tie on skill, and why does ${fa} lead?`, a: `${sNames} scored the same on their tests (${pct}%). Your interest ranked ${fa} first, so it is on both lists. The other tied strand is still a strong skill result.` }),
-    s8: () => ({ q: "What does a double match mean?", a: `${names(c.shared)} tied on both your skills and your interests, so neither beats the other. Treat both as equally good fits and read both strand pages.` }),
-    s9: () => ({ q: `Why is ${fa} highlighted?`, a: `Your skills tied across ${sNames} and your interests tied across ${iNames}. ${fa} is the only strand on both lists, so it gets the star. The others are still worth a look.` })
+    perfect: () => ({
+      q: R("Does a perfect match guarantee I'll do well?", "Ginagarantiya ba ng perpektong tugma na magiging mahusay ako?"),
+      a: R(`No. It means ${fa} came first in both your skills (${focus.percentage}%) and your interests, which is a strong sign. But it is based on ${focus.total} questions and a questionnaire, not a promise. Read the strand page to check that the daily work still appeals to you.`,
+           `Hindi. Ibig sabihin lang nito na ang ${fa} ang nauna sa parehong skill (${focus.percentage}%) at interes mo, na malakas na senyales. Ngunit nakabatay ito sa ${focus.total} tanong at isang talatanungan, hindi pangako. Basahin ang pahina ng strand para tiyaking gusto mo pa rin ang pang-araw-araw na gawain.`) }),
+    building: () => ({
+      q: R(`My interest in ${fa} is high but my skills are modest. Should I still choose it?`, `Mataas ang interes ko sa ${fa} pero katamtaman ang skill ko. Dapat ko pa rin ba itong piliin?`),
+      a: R(`You can. Interest is what keeps people going when work gets hard, and your ${focus.percentage}% shows where you are today, not your limit. ${fa} is ${STRAND_DEMANDS[focus.strand]}. Ask yourself whether you would put in that practice.`,
+           `Puwede. Ang interes ang nagpapatuloy sa tao kapag mahirap na ang gawain, at ang ${focus.percentage}% mo ay nagpapakita kung nasaan ka ngayon, hindi ang iyong hangganan. Ang ${fa} ay ${FIL_DEMANDS[focus.strand]}. Tanungin ang sarili kung handa kang magsanay nang ganoon.`) }),
+    near: () => ({
+      q: R("My skills and interests are one step apart. What does that mean?", "Isang hakbang ang pagitan ng skill at interes ko. Ano ang ibig sabihin nito?"),
+      a: R(`Your strongest skill is ${sName} and your strongest interest is ${iName}, but each ranks near the top on the other measure. That makes both realistic options, so compare the two strand pages and picture the daily work.`,
+           `Pinakamalakas ang skill mo sa ${sName} at pinakamalakas ang interes mo sa ${iName}, ngunit parehong malapit sa tuktok ang bawat isa sa kabilang sukatan. Kaya parehong makatotohanang opsyon ang dalawa; ihambing ang dalawang pahina ng strand at isipin ang pang-araw-araw na gawain.`) }),
+    apart: () => ({
+      q: R("Why did my skills and interests point to different strands?", "Bakit magkaibang strand ang tinutukoy ng skill at interes ko?"),
+      a: R(`Being good at something and wanting to spend your days on it are different things. Your strongest skill is ${sName} and your strongest interest is ${iName}. Neither is wrong: skills can be built, and interest is what keeps you going.`,
+           `Magkaiba ang pagiging mahusay sa isang bagay at ang pagnanais na gugulin ang mga araw mo rito. Pinakamalakas ang skill mo sa ${sName} at pinakamalakas ang interes mo sa ${iName}. Walang mali sa alinman: puwedeng hubugin ang skill, at ang interes ang nagpapatuloy sa iyo.`) }),
+    flat: () => ({
+      q: R("Why didn't my interests point to one strand?", "Bakit hindi tumuro sa iisang strand ang mga interes ko?"),
+      a: R(`Your interest scores were close together across all six strands, so no single one stood out. That is common and not a problem. Use your skill results as the guide for now, and read each strand page to notice what appeals to you.`,
+           `Magkakalapit ang mga interes mo sa lahat ng anim na strand, kaya walang iisang namukod-tangi. Karaniwan iyon at hindi problema. Gamitin muna ang iyong skill results bilang gabay, at basahin ang pahina ng bawat strand para mapansin kung alin ang nakakaakit sa iyo.`) }),
+    flatSkill: () => ({
+      q: R("Why didn't my skills point to one strand?", "Bakit hindi tumuro sa iisang strand ang mga skill ko?"),
+      a: R(`You scored the same on all six tests, so no strand stood out on skills. That can happen with short tests. Use your interest results and the strand pages as your guide for now.`,
+           `Pareho ang score mo sa lahat ng anim na test, kaya walang strand na namukod-tangi sa skill. Puwede itong mangyari sa maiikling test. Gamitin muna ang iyong resulta sa interes at ang mga pahina ng strand bilang gabay.`) }),
+    split: () => ({
+      q: R("Why don't my skills and interests share a strand?", "Bakit walang strand na pareho sa skill at interes ko?"),
+      a: R(`Your top skill result is ${sName} and your top interest is ${iName}, so no strand is on both lists. That is common: skills can be built, and interest is what keeps you going. Compare the strand pages and picture the daily work.`,
+           `Ang top skill result mo ay ${sName} at ang top interes mo ay ${iName}, kaya walang strand sa parehong listahan. Karaniwan iyon: puwedeng hubugin ang skill, at ang interes ang nagpapatuloy sa iyo. Ihambing ang mga pahina ng strand at isipin ang pang-araw-araw na gawain.`) }),
+    s4: () => ({
+      q: R(`Why did ${iNames} tie on interest, and why does ${fa} lead?`, `Bakit magkapantay ang ${iNames} sa interes, at bakit nangunguna ang ${fa}?`),
+      a: R(`${iNames} landed on the same interest score. Your skill test put ${fa} ahead (${pct}%), so it is the strand on both lists. The others are not ruled out.`,
+           `Pareho ang interes score ng ${iNames}. Inuna ng skill test mo ang ${fa} (${pct}%), kaya ito ang strand na nasa parehong listahan. Hindi tinatanggal ang iba.`) }),
+    s6: () => ({
+      q: R(`Why did ${sNames} tie on skill, and why does ${fa} lead?`, `Bakit magkapantay ang ${sNames} sa skill, at bakit nangunguna ang ${fa}?`),
+      a: R(`${sNames} scored the same on their tests (${pct}%). Your interest ranked ${fa} first, so it is on both lists. The other tied strand is still a strong skill result.`,
+           `Pareho ang score ng ${sNames} sa kanilang mga test (${pct}%). Inuna ng interes mo ang ${fa}, kaya nasa parehong listahan ito. Malakas pa ring skill result ang kabilang strand na magkapantay.`) }),
+    s8: () => ({
+      q: R("What does a double match mean?", "Ano ang ibig sabihin ng dobleng tugma?"),
+      a: R(`${names(c.shared)} tied on both your skills and your interests, so neither beats the other. Treat both as equally good fits and read both strand pages.`,
+           `Magkapantay ang ${names(c.shared)} sa parehong skill at interes mo, kaya walang nangunguna. Ituring na parehong angkop ang dalawa at basahin ang pahina ng dalawa.`) }),
+    s9: () => ({
+      q: R(`Why is ${fa} highlighted?`, `Bakit naka-highlight ang ${fa}?`),
+      a: R(`Your skills tied across ${sNames} and your interests tied across ${iNames}. ${fa} is the only strand on both lists, so it gets the star. The others are still worth a look.`,
+           `Magkapantay ang mga skill mo sa ${sNames} at ang mga interes mo sa ${iNames}. Ang ${fa} lang ang nasa parehong listahan, kaya ito ang may star. Sulit pa ring tingnan ang iba.`) })
   };
   const kindQ = kindMap[c.flatSkill ? "flatSkill" : kind === "shared" ? "s" + c.caseNo : kind]();
-  const tieQ = pick.tiedAll.length > 1 && !c.flatSkill ? { q: `Why were ${names(rec)} shown for my skills?`, a: pick.arbitrary
-    ? `${names(pick.tiedAll)} tied for your highest score (${top.percentage}%), and your interests could not separate them. Only two are shown, so treat all ${pick.tiedAll.length} as worth exploring.`
-    : `${names(pick.tiedAll)} tied for your highest score (${top.percentage}%).${pick.byInterest ? " Only two can be shown, so your interest results chose them. The others are not ruled out." : " Treat them as equally strong fits."}` } : null;
-  const iTieQ = c.iTied && (kind !== "shared" || ps.alsoTop.length) ? { q: `Why are ${iNames} tied for interest?`, a: `After the two parts of the questionnaire were combined and rounded, ${iNames} landed on the same score (${iAll[0].ipct}%). ${ps.alsoTop.length ? `Only two can be shown, so your skill scores chose which appear (${names(ps.alsoTop)} also tied). ` : ""}Treat them as equally appealing.` } : null;
+  const tieQ = pick.tiedAll.length > 1 && !c.flatSkill ? {
+    q: R(`Why were ${names(rec)} shown for my skills?`, `Bakit ipinakita ang ${names(rec)} para sa skill ko?`),
+    a: pick.arbitrary
+      ? R(`${names(pick.tiedAll)} tied for your highest score (${top.percentage}%), and your interests could not separate them. Only two are shown, so treat all ${pick.tiedAll.length} as worth exploring.`,
+          `Magkapantay ang ${names(pick.tiedAll)} sa pinakamataas mong score (${top.percentage}%), at hindi sila napaghiwalay ng iyong mga interes. Dalawa lang ang ipinapakita, kaya sulit tuklasin ang lahat ng ${pick.tiedAll.length}.`)
+      : R(`${names(pick.tiedAll)} tied for your highest score (${top.percentage}%).${pick.byInterest ? " Only two can be shown, so your interest results chose them. The others are not ruled out." : " Treat them as equally strong fits."}`,
+          `Magkapantay ang ${names(pick.tiedAll)} sa pinakamataas mong score (${top.percentage}%).${pick.byInterest ? " Dalawa lang ang maipapakita, kaya ang resulta mo sa interes ang pumili. Hindi tinatanggal ang iba." : " Ituring silang parehong malakas na tugma."}`) } : null;
+  const iTieQ = c.iTied && (kind !== "shared" || ps.alsoTop.length) ? {
+    q: R(`Why are ${iNames} tied for interest?`, `Bakit magkapantay ang ${iNames} sa interes?`),
+    a: R(`After the two parts of the questionnaire were combined and rounded, ${iNames} landed on the same score (${iAll[0].ipct}%). ${ps.alsoTop.length ? `Only two can be shown, so your skill scores chose which appear (${names(ps.alsoTop)} also tied). ` : ""}Treat them as equally appealing.`,
+         `Matapos pagsamahin at i-round ang dalawang bahagi ng talatanungan, pareho ang score ng ${iNames} (${iAll[0].ipct}%). ${ps.alsoTop.length ? `Dalawa lang ang maipapakita, kaya ang skill scores mo ang pumili kung alin ang lalabas (magkapantay rin ang ${names(ps.alsoTop)}). ` : ""}Ituring silang parehong kaakit-akit.`) } : null;
   const groups = [
-    { title: "About your result", items: [
-      { q: "How was my skill score calculated?", a: `Each skill test has multiple-choice questions with one correct answer. Your score for a strand is the number you got right, shown as a raw score and a percentage.` },
-      { q: "How was my interest result calculated?", a: `The questionnaire has no right or wrong answers. Part A (ratings) and Part B (most and least) are each turned into a 0 to 100 score per strand, then averaged. Strands are ranked against each other, so the result shows what you prefer compared with your own other strands.` },
+    { title: R("About your result", "Tungkol sa iyong resulta"), items: [
+      { q: R("How was my skill score calculated?", "Paano kinuwenta ang skill score ko?"),
+        a: R(`Each skill test has multiple-choice questions with one correct answer. Your score for a strand is the number you got right, shown as a raw score and a percentage.`,
+             `May multiple-choice na mga tanong ang bawat skill test na may isang tamang sagot. Ang score mo sa isang strand ay ang bilang ng nasagot mong tama, ipinapakita bilang raw score at percentage.`) },
+      { q: R("How was my interest result calculated?", "Paano kinuwenta ang resulta ko sa interes?"),
+        a: R(`The questionnaire has no right or wrong answers. Part A (ratings) and Part B (most and least) are each turned into a 0 to 100 score per strand, then averaged. Strands are ranked against each other, so the result shows what you prefer compared with your own other strands.`,
+             `Walang tama o maling sagot ang talatanungan. Ang Bahagi A (mga rating) at Bahagi B (pinakagusto at pinakaayaw) ay ginagawang 0 hanggang 100 na score bawat strand, saka ina-average. Iniranggo ang mga strand laban sa isa't isa, kaya ipinapakita ng resulta kung ano ang mas gusto mo kumpara sa iba mong strand.`) },
       kindQ, tieQ, iTieQ ].filter(i => i && i.a) },
-    { title: "About your strands", items: [
-      { q: `What subjects are in ${names(ps.shown)}?`, a: ps.shown.map(r => `${STRANDS[r.strand].name} typically includes ${STRANDS[r.strand].subjects.join(", ")}.`).join(" ") },
-      { q: "What college courses are related?", a: ps.shown.map(r => `${STRANDS[r.strand].name}: ${STRANDS[r.strand].courses.join(", ")}.`).join(" ") + " Many courses accept graduates from other strands too." } ] },
-    { title: "What to do next", items: [
-      { q: "Does a low score mean I can't take that strand?", a: `No. Each test is a short snapshot of your current skills, not a limit. Skills can be built with practice, and a strand you enjoy may be worth choosing even if you scored lower there.` },
-      { q: "Can I still choose another strand?", a: `Yes. This result is a suggestion based on today, not a requirement. Talk it over with your parents, teachers, or guidance counselor.` } ] }
+    { title: R("About your strands", "Tungkol sa iyong mga strand"), items: [
+      { q: R(`What subjects are in ${names(ps.shown)}?`, `Anu-anong asignatura ang nasa ${names(ps.shown)}?`),
+        a: ps.shown.map(r => R(`${STRANDS[r.strand].name} typically includes ${STRANDS[r.strand].subjects.join(", ")}.`, `Karaniwang kasama sa ${STRANDS[r.strand].name} ang ${STRANDS[r.strand].subjects.join(", ")}.`)).join(" ") },
+      { q: R("What college courses are related?", "Anong mga kurso sa kolehiyo ang kaugnay?"),
+        a: ps.shown.map(r => `${STRANDS[r.strand].name}: ${STRANDS[r.strand].courses.join(", ")}.`).join(" ") + R(" Many courses accept graduates from other strands too.", " Maraming kurso ang tumatanggap din ng nagtapos mula sa ibang strand.") } ] },
+    { title: R("What to do next", "Ano ang susunod na gagawin"), items: [
+      { q: R("Does a low score mean I can't take that strand?", "Ibig bang sabihin ng mababang score ay hindi ko na puwedeng kunin ang strand na iyon?"),
+        a: R(`No. Each test is a short snapshot of your current skills, not a limit. Skills can be built with practice, and a strand you enjoy may be worth choosing even if you scored lower there.`,
+             `Hindi. Maikling snapshot lamang ng kasalukuyan mong kakayahan ang bawat test, hindi limitasyon. Puwedeng hubugin ang skill sa praktis, at maaaring sulit piliin ang strand na gusto mo kahit mas mababa ang score mo roon.`) },
+      { q: R("Can I still choose another strand?", "Puwede ko pa bang piliin ang ibang strand?"),
+        a: R(`Yes. This result is a suggestion based on today, not a requirement. Talk it over with your parents, teachers, or guidance counselor.`,
+             `Oo. Mungkahi lang ang resultang ito batay sa ngayon, hindi kailangang sundin. Pag-usapan ito kasama ang iyong mga magulang, guro, o guidance counselor.`) } ] }
   ];
   const el = document.getElementById("faq-list");
   el.innerHTML = groups.map(g => `<div class="rv-faq-group"><h4 class="rv-faq-title">${g.title}</h4>${g.items.map(it => `
@@ -2851,20 +2748,48 @@ function renderRvFaq(m, results, pick) {
 }
 
 function renderResults() {
-  const results = state.results, pick = pickRecommended(results), m = resultsModel(results, pick);
-  renderResultsHero(pick, results, m.low, m);
-  document.getElementById("result-sub").innerHTML = rvMessage(m, results, pick) + `<br><small>${m.low ? "Your skill scores were low and close together, so lean on your interests and explore each strand. " : ""}This is a starting point, not a final decision. You know yourself best.</small>`;
-  renderRvCharts(m, results);
-  renderRvRows(m, results);
-  renderExplain(results, pick, m.ps);      // the folder tabs (Skills | Interests)
-  renderRecommendedInfo(m.ps);             // "Get to know your strands"
-  renderRvFaq(m, results, pick);
+  RFIL = filNow();
+  try {
+    const results = state.results, pick = pickRecommended(results), m = resultsModel(results, pick);
+    renderResultsHero(pick, results, m.low, m);
+    document.getElementById("result-sub").innerHTML = rvMessage(m, results, pick) + `<br><small>${m.low ? R("Your skill scores were low and close together, so lean on your interests and explore each strand. ", "Mababa at magkakalapit ang iyong mga skill score, kaya umasa sa iyong mga interes at tuklasin ang bawat strand. ") : ""}${R("This is a starting point, not a final decision. You know yourself best.", "Panimulang gabay lamang ito, hindi pinal na desisyon. Ikaw ang pinakakilala sa sarili mo.")}</small>`;
+    renderRvCharts(m, results);
+    renderRvRows(m, results);
+    renderExplain(results, pick, m.ps);
+    renderRecommendedInfo(m.ps);
+    renderRvFaq(m, results, pick);
+    resultsLang = RFIL ? "fil" : "en";
+  } finally {
+    RFIL = false;
+  }
 }
 
-/* ---------- Hero decoration: 8 sparkles (they twinkle via style2.css) ----------
-   The sparkles are real elements (not background paint) so they can animate smoothly.
-   Positions and timing live in style2.css. Always created, even with reduced motion.
-   (The colored dots were removed on purpose; the typewriter line carries the strand colors.) */
+window.addEventListener("cw-langchange", () => {
+  const view = document.getElementById("view-results");
+  if (!view || !view.classList.contains("active") || !state.results) return;
+  const y = window.pageYOffset;
+  const tab = document.querySelector("#explain-why .folder-tab[aria-selected='true']");
+  const chip = document.querySelector("#strand-tabs .chip-active");
+  const wasOpen = Array.from(document.querySelectorAll("#faq-list .faq-item")).map(el => el.classList.contains("faq-open"));
+  RERENDER = true;
+  try { renderResults(); } finally { RERENDER = false; }
+  const still = document.querySelector("#explain-why .folder-tab[data-tab='" + (tab ? tab.dataset.tab : "") + "']");
+  if (still && still.getAttribute("aria-selected") !== "true") still.click();
+  const chipNow = chip && document.querySelector("#strand-tabs .chip[data-code='" + chip.dataset.code + "']");
+  if (chipNow) chipNow.click();
+  document.querySelectorAll("#faq-list .faq-item").forEach((el, i) => {
+    if (!wasOpen[i]) return;
+    el.classList.add("faq-open");
+    const b = el.querySelector(".faq-question"); if (b) b.setAttribute("aria-expanded", "true");
+  });
+  const quiet = els => { els.forEach(el => { el.style.transition = "none"; }); requestAnimationFrame(() => requestAnimationFrame(() => els.forEach(el => { el.style.transition = ""; }))); };
+  const bars = Array.from(document.querySelectorAll("#bar-chart .bar-fill")), rows = Array.from(document.querySelectorAll("#interest-section .si-fill"));
+  quiet(bars.concat(rows));
+  bars.forEach(el => { el.style.height = el.dataset.target + "%"; });
+  rows.forEach(el => { el.style.width = el.dataset.w + "%"; });
+  window.scrollTo({ top: y, behavior: "instant" });
+});
+
 function initHeroDecor() {
   const hero = document.querySelector(".home-hero");
   if (!hero || hero.querySelector(".hero-twinkle")) return;
@@ -2880,15 +2805,6 @@ function initHeroDecor() {
   hero.insertBefore(layer, hero.firstChild);
 }
 
-/* ---------- Home hero: typewriter line ("Are you a future Engineer?") ----------
-   Sits between the headline and the paragraph. One career per strand, typed in that strand's color.
-   The line is built here (like the sparkles), so index2.html stays untouched.
-   Centering: the box around the sentence is sized to the CURRENT career's full sentence, so the
-   whole line is centered for short words ("Chef") and long ones ("Software Developer") alike.
-   While a word is typed the box stays put (nothing wobbles); in the pause between words,
-   when the word is empty, the box glides to the next sentence's width.
-   Screen readers get one plain sentence. Pauses while the tab is hidden or the home page isn't
-   showing; "reduce motion" shows one static career. */
 const HERO_CAREERS = [
   { text: "Engineer",           strand: "STEM" },
   { text: "Lawyer",             strand: "ASSH" },
@@ -2903,8 +2819,6 @@ function initHeroType() {
   const h1 = hero && hero.querySelector("h1");
   if (!h1 || hero.querySelector(".hero-type")) return;
 
-  /* Language: English by default. In Filipino mode (translations.js) the whole line is typed in Filipino,
-     letter by letter, so nothing is typed in English and swapped afterwards. */
   const fil = () => !!(window.CW_i18n && window.CW_i18n.lang() === "fil");
   const prefixNow = () => fil() ? "Ikaw ba ang susunod na " : "Are you a future ";
   const wordNow = i => fil() ? window.CW_i18n.career(HERO_CAREERS[i].text) : HERO_CAREERS[i].text;
@@ -2915,7 +2829,7 @@ function initHeroType() {
 
   const p = document.createElement("p");
   p.className = "hero-type";
-  p.setAttribute("data-no-i18n", "");      // the translation watcher leaves this line alone; this script owns both languages
+  p.setAttribute("data-no-i18n", "");
   p.innerHTML = `
     <span class="sd-sr"></span>
     <span class="hero-type-box" aria-hidden="true">
@@ -2929,45 +2843,38 @@ function initHeroType() {
   const prefixEl = p.querySelector(".hero-type-prefix");
   const word = p.querySelector(".hero-type-word");
   const caret = p.querySelector(".hero-type-caret");
-  const measure = p.querySelector(".hero-type-measure");   // invisible copy used only to measure widths
+  const measure = p.querySelector(".hero-type-measure");
   const paint = c => { p.style.setProperty("--wc", STRANDS[c.strand].color); };
   const setTexts = () => { prefixEl.textContent = prefixNow(); sr.textContent = spokenNow(); };
   setTexts();
 
-  /* Width of the whole sentence for one career (+4px of slack so it never wraps by a sub-pixel) */
   function sentenceWidth(text) {
     measure.innerHTML = `${prefixNow()}<span class="hero-type-word">${text}</span>?`;
     return measure.getBoundingClientRect().width + 4;
   }
 
-  let w = 0;   // index of the career currently shown
-  let wasHidden = true;   // true while the home page is not showing (a hidden element measures 0px wide)
+  let w = 0;
+  let wasHidden = true;
   function fit(snap) {
     const avail = p.clientWidth;
-    // Home page hidden (display:none): everything measures 0. Writing that would squeeze the box
-    // to 0px and wrap the sentence word by word, so leave the last good width alone.
     if (!avail) { wasHidden = true; return; }
     const target = Math.min(Math.ceil(sentenceWidth(wordNow(w))), avail) + "px";
     if (wasHidden || snap === true) {
-      // Just came back (or first paint, or language switch): snap to the right width instead of gliding from the old one
       box.style.transition = "none";
       box.style.width = target;
-      void box.offsetWidth;          // flush so the snap isn't animated
+      void box.offsetWidth;
       box.style.transition = "";
       wasHidden = false;
     } else {
       box.style.width = target;
     }
-    // on a very narrow screen the longest sentence wraps to two lines: keep room for that
     const widest = Math.max(...HERO_CAREERS.map((c, i) => sentenceWidth(wordNow(i))));
     p.classList.toggle("hero-type-wrap", widest > avail);
   }
-  // Re-measure whenever the line's own size changes: window resize AND the home page
-  // appearing again after another screen (display:none -> block), which "resize" never reports.
   const refit = () => fit();
   if ("ResizeObserver" in window) new ResizeObserver(refit).observe(p);
   else window.addEventListener("resize", refit);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);   // re-measure once web fonts load
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
 
   paint(HERO_CAREERS[0]);
   fit();
@@ -2975,8 +2882,6 @@ function initHeroType() {
   const reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   let n = 0, deleting = false;
 
-  /* Language switched while the home page is open: swap the line at once, restart the current word
-     from empty in the new language (no English left on screen), and re-measure with the new text. */
   window.addEventListener("cw-langchange", () => {
     setTexts();
     n = 0; deleting = false;
@@ -3007,22 +2912,18 @@ function initHeroType() {
         deleting = false;
         w = (w + 1) % HERO_CAREERS.length;
         paint(HERO_CAREERS[w]);
-        fit();                 // the box glides to the next sentence's width during this pause
+        fit();
         delay = 400;
       } else { delay = 40; }
     }
     setTimeout(tick, delay);
   }
-  setTimeout(tick, 1300);   // after the hero entrance animations have played
+  setTimeout(tick, 1300);
 }
 
-/* ---------- Home page motion (works with the ANIM blocks at the end of style2.css) ----------
-   Adds .reveal / .reveal-in classes as the student scrolls.
-   Skipped entirely if the device asks for reduced motion. */
 function initHomeMotion() {
   if (!window.matchMedia || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  // Scroll reveal: "How it works" box + steps, the Explore heading, and the strand cards
   if ("IntersectionObserver" in window) {
     const targets = document.querySelectorAll(
       ".manual, .manual-list li, .explore-strands-section .section-title, " +
@@ -3032,7 +2933,7 @@ function initHomeMotion() {
       let n = 0;
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
-        entry.target.style.setProperty("--rd", (n++ * 0.09) + "s");   // small stagger inside a batch
+        entry.target.style.setProperty("--rd", (n++ * 0.09) + "s");
         entry.target.classList.add("reveal-in");
         io.unobserve(entry.target);
       });
@@ -3041,13 +2942,6 @@ function initHomeMotion() {
   }
 }
 
-/* =========================================================
-   HUB + TEST QUALITY-OF-LIFE
-   1. "Leave this test?" dialog      2. Closing-the-tab warning      3. Keyboard shortcuts on the test screens
-   ========================================================= */
-
-/* ---------- 1. "Leave this test?" dialog ----------
-   A small in-page dialog (not the browser pop-up). It defaults to "Keep going" so a stray Enter never leaves. */
 let cwModal = null, cwModalResolve = null, cwModalReturnFocus = null;
 
 function buildModal() {
@@ -3077,10 +2971,10 @@ function buildModal() {
   };
   stayBtn.addEventListener("click", () => close(false));
   leaveBtn.addEventListener("click", () => close(true));
-  cwModal.addEventListener("click", e => { if (e.target === cwModal) close(false); });   // click outside = keep going
+  cwModal.addEventListener("click", e => { if (e.target === cwModal) close(false); });
   cwModal.addEventListener("keydown", e => {
     if (e.key === "Escape") { e.preventDefault(); close(false); return; }
-    if (e.key !== "Tab") return;                                                          // keep Tab inside the dialog
+    if (e.key !== "Tab") return;
     const first = leaveBtn, last = stayBtn;
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
@@ -3100,15 +2994,12 @@ function askConfirm({ title, body, leave, stay }) {
   return new Promise(resolve => { cwModalResolve = resolve; });
 }
 
-/* True when the student has answered something in the test or questionnaire that is on screen */
 function hasAnswersInRun() {
   if (ist.active) return ist.a.some(v => v !== null) || ist.b.some(x => x !== null);
   if (state.activeModule && state.phase === "question") return state.draft.some(a => a !== null);
   return false;
 }
 
-/* Runs `go` straight away unless the student is mid-test with answers, in which case it asks first.
-   (Answers are already saved either way, so this only protects against an accidental tap.) */
 function confirmLeave(go) {
   if (currentViewId !== "view-assessment" || !hasAnswersInRun()) { go(); return; }
   askConfirm({
@@ -3119,10 +3010,6 @@ function confirmLeave(go) {
   }).then(ok => { if (ok) go(); });
 }
 
-/* ---------- 2. Closing-the-tab warning ----------
-   Progress lives in sessionStorage, so closing the tab wipes it. The browser shows its own generic
-   message (sites can't change the wording). A refresh also triggers it even though a refresh is safe.
-   Phones often skip this prompt, which is why the hub also carries a written note. */
 function hasProgressToLose() {
   return countDone() > 0 || Boolean(state.interest) ||
     MODULE_ORDER.some(c => answeredCount(c) > 0) ||
@@ -3130,15 +3017,11 @@ function hasProgressToLose() {
     hasAnswersInRun();
 }
 window.addEventListener("beforeunload", e => {
-  if (currentViewId === "view-results" || !hasProgressToLose()) return;   // results have their own Save button
+  if (currentViewId === "view-results" || !hasProgressToLose()) return;
   e.preventDefault();
   e.returnValue = "";
 });
 
-/* ---------- 3. Keyboard shortcuts on the test screens ----------
-   Skill tests: A-D or 1-4 pick an answer.  Interests Part A: 1-5 rate.
-   Everywhere: Enter or the right arrow = Next, left arrow = Back, Enter on a rules screen = Begin.
-   On the last question Enter only moves focus to "Finish", so a test can never be locked by one keystroke. */
 const assessBodyEl = document.querySelector("#view-assessment .assess-body");
 const kbdHint = document.createElement("p");
 kbdHint.className = "kbd-hint";
@@ -3158,14 +3041,13 @@ new MutationObserver(updateKbdHint).observe(qCard, { childList: true });
 
 document.addEventListener("keydown", e => {
   if (currentViewId !== "view-assessment") return;
-  if (cwModal && !cwModal.hidden) return;                       // the dialog handles its own keys
+  if (cwModal && !cwModal.hidden) return;
   if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
   const t = e.target, tag = t && t.tagName;
   if (tag === "TEXTAREA" || tag === "SELECT" || (t && t.isContentEditable) ||
       (tag === "INPUT" && t.type !== "radio" && t.type !== "checkbox")) return;
   const key = e.key;
 
-  // Pick an answer
   const opts = qCard.querySelectorAll(".option");
   const rates = qCard.querySelectorAll(".rate-btn");
   if (opts.length) {
@@ -3177,17 +3059,14 @@ document.addEventListener("keydown", e => {
     e.preventDefault(); rates[Number(key) - 1].click(); return;
   }
 
-  if (e.repeat) return;                                          // holding a key must not skip screens
+  if (e.repeat) return;
 
-  // Rules / transition screens: Enter = the big button
   const begin = qCard.querySelector("#intro-begin, #trans-go");
   if (begin) {
     if (key === "Enter" && tag !== "BUTTON" && tag !== "A") { e.preventDefault(); begin.click(); }
     return;
   }
 
-  // Next / Back. Enter on a button normally presses that button, except an answer button that is already
-  // chosen (rating, Most/Least): there Enter means "go on".
   const isLink = tag === "BUTTON" || tag === "A";
   const chosenBtn = Boolean(t && t.matches && t.matches(".rate-selected, .pick-on"));
   const goNext = (key === "Enter" && (!isLink || (chosenBtn && !btnNext.disabled))) || key === "ArrowRight";
@@ -3195,7 +3074,7 @@ document.addEventListener("keydown", e => {
   if (goNext) {
     if (btnNext.disabled) return;
     e.preventDefault();
-    if (/^Finish/.test(btnNext.textContent)) btnNext.focus();    // never lock a test with one keystroke
+    if (/^Finish/.test(btnNext.textContent)) btnNext.focus();
     else btnNext.click();
   } else if (goBack && !btnBack.disabled) {
     e.preventDefault();
@@ -3203,9 +3082,7 @@ document.addEventListener("keydown", e => {
   }
 });
 
-/* ---------- Back / Forward buttons ----------
-   Rebuilds the screen stored in the history entry. Screens that are no longer valid
-   (a finished test, or Results before all six tests are done) fall back to the hub. */
+// back / forward buttons. if the saved page is missing it just goes home. nouuuu no blank screens
 window.addEventListener("popstate", e => {
   const s = e.state;
   if (!s || !s.view || !document.getElementById(s.view)) { showView("view-home", "none"); return; }
@@ -3245,14 +3122,12 @@ window.addEventListener("popstate", e => {
   }
 });
 
-/* ---------- init ---------- */
-if ("scrollRestoration" in history) history.scrollRestoration = "manual";   // we scroll to top ourselves
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 validateQuestionBank();
 loadState();
 loadProgress();
 loadInterest();
-/* Homepage badge: friendly text on purpose (no question count here; the hub and FAQ still state the numbers) */
-/* Homepage FAQ: only one answer open at a time (opening one closes the others) */
+// open one faq question and the others close. rlly literally just that
 (function initFaqAccordion() {
   const items = document.querySelectorAll(".hfaq-list .hfaq-item");
   items.forEach(item => {
@@ -3267,10 +3142,10 @@ initHeroDecor();
 initHeroType();
 initHomeMotion();
 if (!restoreSession()) showView("view-home");
-/* Links from the privacy/terms pages: /#strands and /#faq open those sections of the home page */
+// links like /#strands and /#faq open the home page at that section. yasssss
 (function openFromHash() {
   const target = { "#strands": "nav-explore", "#faq": "nav-faq" }[location.hash];
   if (!target) return;
-  history.replaceState(null, "", location.pathname + location.search);   // so a refresh doesn't repeat it
+  history.replaceState(null, "", location.pathname + location.search);
   document.getElementById(target).click();
 })();
