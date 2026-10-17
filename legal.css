@@ -15,7 +15,7 @@ footer{border-top:1.5px solid var(--line);padding:20px;text-align:center;color:v
 footer a{margin:0 8px}
 @media(max-width:480px){h1{font-size:1.8rem}main{padding-top:28px}}
 
-/* ---- header: same look as the homepage ---- */
+/* header, same as the homepage one */
 .site-header{position:sticky;top:0;z-index:20;height:var(--header-h);display:flex;align-items:center;background:var(--cream);border-bottom:1px solid var(--line)}
 .wrap{max-width:900px;margin:0 auto;padding:0 24px;width:100%}
 .header-inner{display:flex;align-items:center;justify-content:space-between;width:100%}
@@ -46,7 +46,160 @@ footer a{margin:0 8px}
   .nav-links{gap:14px}
   .nav-link{font-size:.8rem}
 }
-/* ---- dark mode (set from the main page's settings; read here from session storage by theme.js) ---- */
+/* dark mode colors. theme.js is the one that adds the data-theme thing */
 :root[data-theme="dark"]{--ink:#ECE7DB;--cream:#12151B;--soft:#2A2619;--muted:#A9AFBA;--line:#333A46;--navy:#F0EBDD;color-scheme:dark}
 :root[data-theme="dark"] main a,:root[data-theme="dark"] footer a{color:#E8A23F}
 :root[data-theme="dark"] .todo{background:#1C2129}
+
+:root{--header-stick:var(--header-h)}
+.nav-link[aria-current="page"]{color:var(--navy)}
+.nav-link[aria-current="page"]::after{transform:scaleX(1)}
+/* note to self : phones and tablets get 2 rows. row 1 stays stuck, row 2 slides away when you scroll xd */
+@media (max-width: 768px) {
+  :root { --header-h: 96px; --header-stick: 56px; }
+  .site-header { height: 56px; margin-bottom: 40px; align-items: flex-start; transition: box-shadow .25s ease; }
+  .site-header::before { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 40px; z-index: -1; background: var(--paper, var(--cream)); border-bottom: 1px solid var(--line); transform-origin: top; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.3,1), visibility .25s; }
+  .site-header .wrap { padding: 0 16px; }
+  .site-header .header-inner { position: relative; flex-direction: column; justify-content: flex-start; align-items: center; gap: 0; }
+  .site-header .brand { height: 56px; gap: 14px; margin: 0 auto; justify-content: center; }
+  .site-header .mark-word { letter-spacing: .02em; }
+  .site-header .nav-links { width: calc(100% + 32px); margin: 0 -16px; height: 40px; justify-content: space-evenly; gap: 0; }
+  .site-header .nav-links .nav-link { flex: 0 0 auto; display: block; text-align: center; font-size: .92rem; line-height: 32px; margin: 4px 0; padding: 0 12px; border-radius: 10px; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.3,1), visibility .25s, background-color .2s ease; }
+  .site-header .nav-links .nav-link::after { left: 12px; right: 12px; bottom: 2px; }
+  .site-header .nav-links .nav-link:active { background: rgba(217,142,43,.12); }
+  .nav-opt { display: inline; }
+  .site-header .settings-wrap { position: absolute; right: 16px; top: 9px; }
+  .site-header.is-scrolled { box-shadow: 0 6px 12px -6px rgba(34,38,43,.28); }
+  :root[data-theme="dark"] .site-header.is-scrolled { box-shadow: 0 6px 12px -6px rgba(0,0,0,.6); }
+  .site-header.is-scrolled::before { opacity: 0; visibility: hidden; transform: scaleY(0); }
+  .site-header.is-scrolled .nav-links .nav-link { opacity: 0; visibility: hidden; transform: translateY(-10px); pointer-events: none; }
+}
+@media (max-width: 520px) {
+  .site-header .settings-wrap { top: 11px; }
+  .site-header .brand { gap: 10px; }
+}
+@media (max-width: 340px) { .site-header .brand { gap: 8px; } }
+@media (prefers-reduced-motion: reduce) { .site-header, .site-header::before, .site-header .nav-links .nav-link { transition: none; } }
+.site-header .nav-links .nav-link[aria-current="page"]{background:var(--soft)}
+@media(min-width:769px){.site-header .nav-links .nav-link[aria-current="page"]{background:none}}
+
+:root{--surface:#fff;--surface-warm:#FFF8DC;--edge:#22262B;--ink-bg:#22262B;--navy-bg:#1D2B45;--paper-alt:#F1E9D8}
+:root[data-theme="dark"]{--surface:#1C2129;--surface-warm:#2A2619;--edge:#5A6272;--ink-bg:#0B0D11;--navy-bg:#3A4E78;--paper-alt:#242A34}
+
+/* settings gear + the little panel (language and dark mode) */
+.settings-wrap{position:relative}
+.settings-btn{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;transition:color .2s ease,border-color .2s ease,background-color .3s ease}
+.settings-btn:hover,.settings-btn[aria-expanded="true"]{color:var(--navy);border-color:var(--amber)}
+.settings-btn svg{transition:transform .3s ease}
+.settings-btn[aria-expanded="true"] svg{transform:rotate(60deg)}
+.settings-panel{position:absolute;right:0;top:calc(100% + 10px);z-index:30;min-width:250px;padding:8px;display:grid;gap:6px;background:var(--surface);border:2px solid var(--edge);border-radius:12px;box-shadow:4px 4px 0 var(--sun);transform-origin:top right;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-10px) scale(.92);transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s}
+.settings-panel.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .2s ease,transform .32s cubic-bezier(.34,1.56,.64,1),visibility 0s}
+.settings-panel::before{content:"";position:absolute;top:-8px;right:13px;width:12px;height:12px;background:var(--surface);border-left:2px solid var(--edge);border-top:2px solid var(--edge);transform:rotate(45deg);border-radius:2px 0 0 0}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:8px;background:var(--surface-warm)}
+.settings-label{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.92rem;color:var(--navy)}
+.lang-seg{display:inline-flex;border:1.5px solid var(--edge);border-radius:999px;overflow:hidden}
+.lang-seg button{font:700 .78rem "Work Sans",sans-serif;padding:5px 11px;border:0;background:transparent;color:var(--ink);cursor:pointer;transition:background-color .2s ease,color .2s ease}
+.lang-seg button[aria-pressed="true"]{background:var(--ink-bg);color:var(--sun)}
+.theme-switch{position:relative;flex-shrink:0;width:52px;height:28px;padding:0;border-radius:999px;border:1.5px solid var(--edge);background:var(--paper-alt);cursor:pointer;transition:background-color .3s ease}
+.theme-switch:focus-visible,.settings-btn:focus-visible,.lang-seg button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.theme-thumb{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:var(--sun);border:1.5px solid var(--edge);display:grid;place-items:center;color:#22262B;transition:transform .34s cubic-bezier(.34,1.56,.64,1),background-color .3s ease}
+.theme-thumb svg{grid-area:1/1;width:13px;height:13px;transition:opacity .25s ease,transform .4s ease}
+.theme-thumb .i-moon{opacity:0;transform:rotate(-90deg) scale(.5)}
+.theme-switch[aria-checked="true"]{background:var(--navy-bg)}
+.theme-switch[aria-checked="true"] .theme-thumb{transform:translateX(24px);background:#E8E3D6}
+.theme-switch[aria-checked="true"] .theme-thumb .i-sun{opacity:0;transform:rotate(90deg) scale(.5)}
+.theme-switch[aria-checked="true"] .theme-thumb .i-moon{opacity:1;transform:none}
+.theme-switch.is-cooling{cursor:not-allowed;opacity:.6}
+.theme-switch::after{content:"";position:absolute;left:6px;right:6px;bottom:-6px;height:3px;border-radius:3px;background:var(--amber);transform:scaleX(0);transform-origin:left;opacity:0}
+.theme-switch.is-cooling::after{opacity:1;animation:themeCool 3s linear forwards}
+@keyframes themeCool{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+html[lang="fil"] .nav-opt{display:none}
+.nav-links a.nav-link{display:inline-block;line-height:normal}
+.header-inner{position:relative}
+@media(max-width:768px){
+  html[lang="fil"] .nav-opt{display:none}
+}
+@media(max-width:520px){.settings-btn{width:34px;height:34px}.settings-panel{min-width:230px}}
+@media(prefers-reduced-motion:reduce){.settings-panel,.settings-panel.is-open,.theme-thumb,.theme-thumb svg{transition-duration:.01s!important;transition-delay:0s!important;transform:none}.theme-switch[aria-checked="true"] .theme-thumb{transform:translateX(24px)}}
+
+/* credits page stuff starts here */
+main.credits{max-width:900px;padding:36px 24px 72px}
+.credits h2{margin:44px 0 12px}
+.c-hero{background:var(--sun);color:#22262B;border:2px solid var(--edge);border-radius:20px;box-shadow:7px 7px 0 var(--amber);padding:32px 32px 30px}
+.c-hero h1{color:#22262B;font-size:clamp(2rem,6vw,3rem);line-height:1.08;letter-spacing:-.01em;margin:10px 0 12px}
+.c-hero p{margin:0;max-width:58ch}
+.c-hero .c-version{display:inline-block;margin:0;padding:3px 12px;font-size:.85rem;font-weight:700;background:#22262B;color:var(--sun);border-radius:999px}
+.lead{display:flex;align-items:center;gap:28px;background:var(--surface);border:2px solid var(--edge);border-radius:18px;padding:24px;margin:0}
+.lead-photo{width:150px;height:150px;border-radius:16px;object-fit:cover;flex-shrink:0;border:2px solid var(--edge);box-shadow:6px 6px 0 var(--sun)}
+.lead-name{font:800 1.7rem/1.15 "Fraunces",Georgia,serif;margin:0}
+.lead-role{margin:4px 0 10px;font-weight:700;font-size:.98rem;color:var(--amber-deep)}
+.lead-bio{margin:0;max-width:52ch}
+.c-teams{display:grid;grid-template-columns:1fr 1fr;margin-top:44px;padding:24px 28px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px}
+.c-teams section+section{border-left:1.5px solid var(--line);padding-left:28px}
+.c-teams h2{margin:0 0 8px;font-size:1.1rem}
+.roster{list-style:none;padding:0;margin:0}
+.roster li{margin:0;padding:11px 0;border-top:1px solid var(--line);font-weight:600}
+.teacher{display:flex;align-items:center;gap:16px;background:var(--navy-bg);color:#fff;border-radius:16px;padding:18px 22px;box-shadow:5px 5px 0 var(--sun)}
+.teacher-icon{flex-shrink:0;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--sun);color:#22262B}
+.teacher-name{font:700 1.3rem/1.2 "Fraunces",Georgia,serif;margin:0}
+.teacher-role{margin:2px 0 0;color:#D8DEEA}
+.refs{display:grid;gap:8px}
+.refs details{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;transition:border-color .3s ease}
+.refs details[open]{border-color:var(--amber)}
+.refs summary{list-style:none;cursor:pointer;display:grid;gap:2px;padding:12px 44px 12px 16px;position:relative}
+.refs summary::-webkit-details-marker{display:none}
+.refs summary::after{content:"";position:absolute;right:18px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--amber-deep);border-bottom:2px solid var(--amber-deep);transform:rotate(45deg);transition:transform .3s cubic-bezier(.2,.8,.3,1),margin-top .3s cubic-bezier(.2,.8,.3,1)}
+.refs details[open] summary::after{transform:rotate(-135deg);margin-top:-2px}
+.refs details.is-closing{border-color:var(--line)}
+.refs details.is-closing summary::after{transform:rotate(45deg);margin-top:-6px}
+.ref-title{transition:color .2s ease}
+.refs summary:hover .ref-title{color:var(--amber-deep)}
+.refs summary:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:12px}
+.ref-title{font-weight:600;font-size:.97rem;line-height:1.4}
+.ref-by{font-size:.85rem;color:var(--muted)}
+.refs details p{margin:0;padding:0 16px 14px;font-size:.92rem;overflow-wrap:anywhere}
+.third{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.third li{display:grid;align-content:start;gap:4px;margin:0;padding:16px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;font-size:.92rem;line-height:1.5}
+.third strong{font:700 1.05rem "Fraunces",Georgia,serif}
+.third li>span:last-child{color:var(--muted)}
+.third-icon{display:grid;place-items:center;width:40px;height:40px;margin-bottom:6px;border-radius:10px;background:var(--soft);color:var(--amber-deep)}
+.third-icon img{width:26px;height:26px;object-fit:contain}
+.c-note{margin:36px 0 0;color:var(--muted);font-size:.92rem}
+@media(max-width:760px){
+  .c-teams{grid-template-columns:1fr;padding:20px 20px}
+  .c-teams section+section{border-left:0;padding-left:0;border-top:1.5px solid var(--line);margin-top:20px;padding-top:20px}
+  .third{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  main.credits{padding:24px 16px 56px}
+  .c-hero{padding:24px 20px;box-shadow:5px 5px 0 var(--amber)}
+  .lead{flex-direction:column;text-align:center;padding:22px 18px}
+}
+@media(prefers-reduced-motion:reduce){.refs details,.refs summary::after,.ref-title{transition:none}}
+:root[data-theme="dark"] .credits a{color:#E8A23F}
+:root[data-theme="dark"] .lead-role,:root[data-theme="dark"] .third-icon{color:#E8A23F}
+:root[data-theme="dark"] .third-icon{background:#2A2619}
+:root[data-theme="dark"] .refs summary::after{border-color:#E8A23F}
+:root[data-theme="dark"] .refs summary:hover .ref-title{color:#E8A23F}
+/* page entrance animation, the content slides up a little when the page opens. yasssss */
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+main:not(.credits){animation:pageIn .5s cubic-bezier(.2,.8,.3,1) both}
+main.credits>*{animation:pageIn .55s cubic-bezier(.2,.8,.3,1) both}
+main.credits>:nth-child(2){animation-delay:.05s}
+main.credits>:nth-child(3){animation-delay:.1s}
+main.credits>:nth-child(4){animation-delay:.15s}
+main.credits>:nth-child(5){animation-delay:.2s}
+main.credits>:nth-child(6){animation-delay:.25s}
+main.credits>:nth-child(7){animation-delay:.3s}
+main.credits>:nth-child(8){animation-delay:.35s}
+main.credits>:nth-child(n+9){animation-delay:.4s}
+footer{animation:pageIn .5s ease .2s both}
+
+/* smooth crossfade between pages. only newer browsers do it, the rest just load normally. nouuuu firefox */
+@view-transition{navigation:auto}
+.site-header{view-transition-name:site-header}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
+@media(prefers-reduced-motion:reduce){
+  main:not(.credits),main.credits>*,footer{animation:none}
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation-duration:.01s!important}
+}
