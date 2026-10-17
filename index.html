@@ -6,7 +6,6 @@
 <title>PCSHS ClusterWise: Find Your SHS Strand | Pasay City South High School</title>
 <link rel="canonical" href="https://pcshs-clusterwise.vercel.app/">
 
-<!-- Search description + link preview (Messenger, Facebook, etc.) -->
 <meta name="description" content="PCSHS ClusterWise is a free tool for Pasay City South High School (PCSHS) learners to see which Senior High School strand fits them, using six skill tests and an interests questionnaire.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PCSHS ClusterWise">
@@ -24,9 +23,12 @@
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 <meta name="theme-color" content="#FBF7EF">
 <script src="theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,100..900,0..100,0..1&family=Work+Sans:wght@400;500;600;700&display=swap">
+<link rel="preload" as="image" href="images/home-background.jpg" fetchpriority="low">
 <link rel="stylesheet" href="style2.css">
 
-<!-- Structured data: helps Google understand what this page is -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -45,7 +47,7 @@
 </script>
 </head>
 <body>
-<!-- ============ HEADER ============ -->
+<!-- header : logos on the left, links + settings gear on the right. on phones it turns into 2 rows -->
 <header class="site-header">
   <div class="wrap header-inner">
     <button class="mark mark-compact brand" id="nav-home" aria-label="ClusterWise home">
@@ -57,6 +59,7 @@
     <nav class="nav-links">
       <button class="nav-link" id="nav-explore"><span class="nav-opt">Explore </span>Strands</button>
       <button class="nav-link" id="nav-faq">FAQ</button>
+      <a class="nav-link" id="nav-credits" href="credits.html">Credits</a>
       <div class="settings-wrap" data-no-i18n-attrs>
         <button class="settings-btn" id="settings-btn" type="button" aria-label="Settings" aria-haspopup="true" aria-expanded="false" aria-controls="settings-panel">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -81,7 +84,6 @@
   </div>
 </header>
 
-<!-- ============ HOME ============ -->
 <section id="view-home" class="view">
   <div class="home-hero">
     <div class="wrap">
@@ -151,7 +153,6 @@
     </section>
   </div>
 
-  <!-- Home-page FAQ: native <details> so the text is in the HTML for Google, no JavaScript needed -->
   <div class="wrap home-faq" id="faq">
     <div class="hfaq-intro">
       <h2 class="section-title">Frequently asked questions</h2>
@@ -200,11 +201,21 @@
     </details>
     </div>
   </div>
+
+  <div class="wrap made-by">
+    <a class="made-by-card" href="credits.html">
+      <span class="made-by-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </span>
+      <span class="made-by-text">
+        <span class="made-by-title">Made by Team DevSphere</span>
+        <span class="made-by-sub">A student project of the Senior High School TechPro Track at PCSHS.</span>
+      </span>
+      <span class="made-by-cta">Meet the team <span aria-hidden="true">&rarr;</span></span>
+    </a>
+  </div>
 </section>
 
-<!-- ============ STRAND NOTICE ============
-     Shown once per tab session, between the grade check and the hub.
-     Continue stays locked for STAKES_WAIT_MS (script2.js) so the student reads it. -->
 <section id="view-stakes" class="view" aria-labelledby="stakes-title">
   <div class="wrap stakes-screen">
     <div class="stakes">
@@ -219,11 +230,8 @@
   </div>
 </section>
 
-<!-- ============ ASSESSMENT HUB ============
-     Empty on purpose: renderHub() in script2.js fills it. -->
 <section id="view-hub" class="view"></section>
 
-<!-- ============ ASSESSMENT (one sub-test at a time) ============ -->
 <section id="view-assessment" class="view">
   <div class="assess-header">
     <div class="wrap">
@@ -242,8 +250,6 @@
   </div>
 </section>
 
-<!-- ============ LOADING (plays once, between the hub and the results) ============
-     Filled and driven by startResultsLoading() in script2.js. -->
 <section id="view-loading" class="view" aria-label="Preparing your results">
   <div class="load-card">
     <div class="load-compass" aria-hidden="true">
@@ -272,7 +278,6 @@
   </div>
 </section>
 
-<!-- ============ RESULTS ============ -->
 <section id="view-results" class="view">
   <div class="results-hero">
     <div class="wrap">
@@ -309,22 +314,18 @@
   </div>
 </section>
 
-<!-- ============ STRAND DETAIL (from Explore Strands) ============
-     Everything inside is built by renderStrandDetail() in script2.js,
-     including the closing panel with its buttons. -->
 <section id="view-strand-detail" class="view">
   <div id="strand-detail-content"></div>
 </section>
 
-<footer class="site-footer">ClusterWise is a strand exploration tool for prospective Junior High School learners of Pasay City South High School (PCSHS).<br><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a></footer>
+<footer class="site-footer">ClusterWise is a strand exploration tool for prospective Junior High School learners of Pasay City South High School (PCSHS).<br><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a> · <a href="credits.html">Credits</a></footer>
 
-<!-- Floating "Save my results" button: only visible while the results page is open (savecard.js toggles it) -->
 <button class="save-fab" id="save-fab" type="button" data-save-results aria-label="Save my results as a picture">
   <svg class="save-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
   <span class="save-label">Save my results</span>
 </button>
 
-<!-- Question bank first (data), then the controller (logic) -->
+<!-- order matters : questions first, then the main script, then savecard, then translations lol -->
 <script src="questions.js"></script>
 <script src="script2.js"></script>
 <script src="savecard.js"></script>
